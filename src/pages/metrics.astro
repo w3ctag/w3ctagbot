@@ -1,0 +1,92 @@
+---
+import Layout from "../layouts/Layout.astro";
+import prisma from "../lib/prisma";
+
+const openCloseHistory = (
+  await prisma.designReview.findMany({
+    select: { created: true, closed: true },
+  })
+).map(({ created, closed }) => ({
+  created: created.getTime(),
+  closed: closed?.getTime(),
+}));
+---
+
+<Layout title="Design review metrics">
+  <nav><a href="/">Home</a></nav>
+  <main></main>
+</Layout>
+
+<script
+  is:inline
+  id="openCloseHistory"
+  data-openCloseHistory={JSON.stringify(openCloseHistory)}></script>
+
+<script>
+  import {
+  binX,
+  line,
+  plot,
+  windowY,
+  type LineOptions,
+} from "@observablehq/plot";
+
+  addEventListener("DOMContentLoaded", function () {
+    const openCloseHistory: { created: number; closed?: number }[] = JSON.parse(
+      document.getElementById("openCloseHistory")?.dataset.openclosehistory!
+    );
+    const events: { Date: Date; type: "Opened" | "Closed" }[] = [];
+    for (const { created, closed } of openCloseHistory) {
+      events.push({ Date: new Date(created), type: "Opened" });
+      if (closed) {
+        events.push({ Date: new Date(closed), type: "Closed" });
+      }
+    }
+    events.sort((a, b) => a.Date.getTime() - b.Date.getTime());
+    const totalOpen = events.reduce(
+      ({ result, total }, { Date, type }) => {
+        total += type === "Opened" ? 1 : -1;
+        result.push({ Date, Open: total });
+        return { result, total };
+      },
+      { result: new Array<{ Date: Date; Open: number }>(), total: 0 }
+    ).result;
+    const main = document.querySelector("main")!;
+    main.append(
+      plot({
+        title: "Open reviews",
+        marks: [
+          line(
+            totalOpen,
+            windowY(
+              { k: 7 },
+              {
+                x: "Date",
+                y: "Open",
+                tip: { pointer: "x", format: { x: "%Y %b %d" } },
+              }
+            )
+          ),
+        ],
+      }),
+      plot({
+        title: "Review throughput",
+        color: { legend: true },
+        marks: [
+          line(
+            events,
+            binX<LineOptions>(
+              { y: "count" },
+              {
+                x: "Date",
+                interval: "month",
+                stroke: "type",
+                tip: { pointer: "x", format: { x: "%B %Y" } },
+              }
+            )
+          ),
+        ],
+      })
+    );
+  });
+</script>

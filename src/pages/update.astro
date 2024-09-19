@@ -1,0 +1,9 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { updateDesignReviews } from "../lib/github";
+
+await updateDesignReviews();
+---
+<Layout title="Updating from Github">
+    <p>Design reviews updated. <a href="/">Go back home.</a></p>
+</Layout>

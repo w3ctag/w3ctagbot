@@ -1,0 +1,44 @@
+---
+import Layout from "../layouts/Layout.astro";
+import prisma from "../lib/prisma";
+
+const openReviews = await prisma.designReview.findMany({
+  where: { closed: null },
+  orderBy: { created: "desc" },
+});
+
+let serverEmpty = false;
+
+if (openReviews.length === 0) {
+  serverEmpty = (await prisma.designReview.count()) === 0;
+}
+---
+
+<Layout title="Open design reviews">
+  <nav>
+    <a href="/metrics">Metrics</a>
+  </nav>
+  <main>
+    <h2>Open reviews</h2>
+    {
+      serverEmpty ? (
+        <p>
+          No design reviews have been loaded into this server.
+          <a href="/update">Try to load some from Github?</a>
+        </p>
+      ) : (
+        <ol>
+          {openReviews.map((review) => (
+            <li>
+              <a
+                href={`https://github.com/w3ctag/design-reviews/issues/${review.number}`}
+              >
+                {review.title}
+              </a>
+            </li>
+          ))}
+        </ol>
+      )
+    }
+  </main>
+</Layout>

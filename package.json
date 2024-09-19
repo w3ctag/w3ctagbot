@@ -1,0 +1,35 @@
+{
+  "name": "w3ctagbot",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "codegen": "graphql-codegen --config gql-codegen.config.ts && prisma generate"
+  },
+  "dependencies": {
+    "@astrojs/node": "^8.3.3",
+    "@graphql-typed-document-node/core": "^3.2.0",
+    "@observablehq/plot": "^0.6.16",
+    "@prisma/client": "^5.19.1",
+    "astro": "^4.15.8",
+    "octokit": "^4.0.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.3",
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/client-preset": "^4.3.3",
+    "@graphql-codegen/typescript": "^4.0.9",
+    "@graphql-codegen/typescript-document-nodes": "^4.0.9",
+    "@octokit/graphql-schema": "^15.25.0",
+    "@types/node": "^22.5.5",
+    "prettier": "^3.3.3",
+    "prettier-plugin-astro": "^0.14.1",
+    "prisma": "^5.19.1",
+    "typescript": "^5.6.2"
+  },
+  "packageManager": "pnpm@9.10.0+sha512.73a29afa36a0d092ece5271de5177ecbf8318d454ecd701343131b8ebc0c1a91c487da46ab77c8e596d6acf1461e3594ced4becedf8921b074fbd8653ed7051c"
+}

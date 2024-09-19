@@ -1,0 +1,28 @@
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model DesignReview {
+  id      String        @id
+  number  Int           @unique
+  title   String
+  labels  ReviewLabel[]
+  created DateTime
+  updated DateTime
+  closed  DateTime?
+}
+
+model ReviewLabel {
+  reviewNumber Int
+  review       DesignReview @relation(fields: [reviewNumber], references: [number])
+  label        String
+
+  @@unique([reviewNumber, label])
+}
