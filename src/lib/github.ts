@@ -1,31 +1,54 @@
-import process from "node:process";
-import { Octokit } from "octokit";
+import { REVIEWS_REPO } from "astro:env/client";
+import {
+  APP_ID,
+  CLIENT_ID,
+  CLIENT_SECRET,
+  INSTALLATION_ID,
+  PRIVATE_KEY,
+  WEBHOOK_SECRET,
+} from "astro:env/server";
+import { App } from "octokit";
 import {
   RecentDesignReviewsDocument,
   TypedDocumentString,
 } from "../gql/graphql";
 import prisma from "./prisma";
 
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+export const app = new App({
+  appId: APP_ID,
+  privateKey: PRIVATE_KEY,
+  oauth: {
+    clientId: CLIENT_ID,
+    clientSecret: CLIENT_SECRET,
+  },
+  webhooks: {
+    secret: WEBHOOK_SECRET,
+  },
+});
 
-function query<TData, TVariables>(
+async function query<TData, TVariables>(
   operation: TypedDocumentString<TData, TVariables>,
-  variables?: TVariables
+  variables?: TVariables,
 ): Promise<TData> {
-  return octokit.graphql<TData>(operation.toString(), { ...variables });
+  return (await app.getInstallationOctokit(INSTALLATION_ID)).graphql<TData>(
+    operation.toString(),
+    { ...variables },
+  );
 }
 
-function pagedQuery<TData extends object, TVariables>(
+async function pagedQuery<TData extends object, TVariables>(
   operation: TypedDocumentString<TData, TVariables>,
-  variables?: TVariables
+  variables?: TVariables,
 ): Promise<TData> {
-  return octokit.graphql.paginate<TData>(operation.toString(), {
+  return (
+    await app.getInstallationOctokit(INSTALLATION_ID)
+  ).graphql.paginate<TData>(operation.toString(), {
     ...variables,
   });
 }
 
 function notNull<T>(value: T | null | undefined): value is T {
-  return !!value;
+  return value != null;
 }
 
 let updateRunning = Promise.resolve();
@@ -40,11 +63,14 @@ export async function updateDesignReviews() {
     orderBy: { updated: "desc" },
     select: { updated: true },
   });
+  const [repoOwner, repoName] = REVIEWS_REPO.split("/");
   const result = await pagedQuery(RecentDesignReviewsDocument, {
     since: latestKnownReview?.updated,
+    owner: repoOwner,
+    repo: repoName,
   });
   if (!result.repository) {
-    throw new Error("w3ctag/design-reviews repository is missing!");
+    throw new Error(`${REVIEWS_REPO} repository is missing!`);
   }
   const issues = result.repository.issues.nodes?.filter(notNull);
   if (!issues || issues.length === 0) {
@@ -58,18 +84,42 @@ export async function updateDesignReviews() {
           id: issue.id,
           number: issue.number,
           title: issue.title,
+          body: issue.body,
           created: issue.createdAt,
           updated: issue.updatedAt,
           closed: issue.closedAt,
+          labels: {
+            create: issue.labels?.nodes
+              ?.filter(notNull)
+              .map((label) => ({ label: label.name, labelId: label.id })),
+          },
         },
         update: {
           title: issue.title,
           updated: issue.updatedAt,
           closed: issue.closedAt,
+          body: issue.body,
+          labels: {
+            deleteMany: {
+              labelId: {
+                notIn:
+                  issue.labels?.nodes
+                    ?.filter(notNull)
+                    .map((label) => label.id) ?? [],
+              },
+            },
+            upsert: issue.labels?.nodes?.filter(notNull).map((label) => ({
+              where: {
+                reviewId_labelId: { reviewId: issue.id, labelId: label.id },
+              },
+              create: { labelId: label.id, label: label.name },
+              update: {},
+            })),
+          },
         },
         select: null,
-      })
-    )
+      }),
+    ),
   );
   finished!();
   return issues.length;

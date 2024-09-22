@@ -10,9 +10,12 @@ datasource db {
 }
 
 model DesignReview {
+  /// The GraphQL Node ID.
   id      String        @id
   number  Int           @unique
   title   String
+  /// The initial comment on the issue, in Markdown format.
+  body    String
   labels  ReviewLabel[]
   created DateTime
   updated DateTime
@@ -20,9 +23,12 @@ model DesignReview {
 }
 
 model ReviewLabel {
-  reviewNumber Int
-  review       DesignReview @relation(fields: [reviewNumber], references: [number])
-  label        String
+  reviewId String
+  review   DesignReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  /// This label's global node ID, which lets us track name changes.
+  labelId  String
+  /// The label's name, which can in theory change over time and is determined by the labelId.
+  label    String
 
-  @@unique([reviewNumber, label])
+  @@unique([reviewId, labelId])
 }

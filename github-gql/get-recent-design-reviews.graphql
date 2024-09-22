@@ -1,6 +1,16 @@
-query RecentDesignReviews($since: DateTime, $cursor: String) {
-  repository(owner: "w3ctag", name: "design-reviews") {
-    issues(states: [OPEN, CLOSED], first: 100, filterBy: { since: $since }, after: $cursor) {
+query RecentDesignReviews(
+  $owner: String!
+  $repo: String!
+  $since: DateTime
+  $cursor: String
+) {
+  repository(owner: $owner, name: $repo) {
+    issues(
+      states: [OPEN, CLOSED]
+      first: 100
+      filterBy: { since: $since }
+      after: $cursor
+    ) {
       pageInfo {
         hasNextPage
         endCursor
@@ -9,12 +19,14 @@ query RecentDesignReviews($since: DateTime, $cursor: String) {
         id
         number
         title
+        body
         createdAt
         updatedAt
         closedAt
         labels(first: 100) {
           totalCount
           nodes {
+            id
             name
           }
         }

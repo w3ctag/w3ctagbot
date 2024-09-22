@@ -31526,12 +31526,14 @@ export type WorkflowsParametersInput = {
 };
 
 export type RecentDesignReviewsQueryVariables = Exact<{
+  owner: Scalars['String']['input'];
+  repo: Scalars['String']['input'];
   since?: InputMaybe<Scalars['DateTime']['input']>;
   cursor?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type RecentDesignReviewsQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, createdAt: any, updatedAt: any, closedAt?: any | null, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null } | null> | null } } | null };
+export type RecentDesignReviewsQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, body: string, createdAt: any, updatedAt: any, closedAt?: any | null, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | null> | null } } | null };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -31549,8 +31551,8 @@ export class TypedDocumentString<TResult, TVariables>
 }
 
 export const RecentDesignReviewsDocument = new TypedDocumentString(`
-    query RecentDesignReviews($since: DateTime, $cursor: String) {
-  repository(owner: "w3ctag", name: "design-reviews") {
+    query RecentDesignReviews($owner: String!, $repo: String!, $since: DateTime, $cursor: String) {
+  repository(owner: $owner, name: $repo) {
     issues(
       states: [OPEN, CLOSED]
       first: 100
@@ -31565,12 +31567,14 @@ export const RecentDesignReviewsDocument = new TypedDocumentString(`
         id
         number
         title
+        body
         createdAt
         updatedAt
         closedAt
         labels(first: 100) {
           totalCount
           nodes {
+            id
             name
           }
         }

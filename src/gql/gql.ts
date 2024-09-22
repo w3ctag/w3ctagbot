@@ -14,13 +14,13 @@ import * as types from './graphql';
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "query RecentDesignReviews($since: DateTime, $cursor: String) {\n  repository(owner: \"w3ctag\", name: \"design-reviews\") {\n    issues(\n      states: [OPEN, CLOSED]\n      first: 100\n      filterBy: {since: $since}\n      after: $cursor\n    ) {\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n      nodes {\n        id\n        number\n        title\n        createdAt\n        updatedAt\n        closedAt\n        labels(first: 100) {\n          totalCount\n          nodes {\n            name\n          }\n        }\n      }\n    }\n  }\n}": types.RecentDesignReviewsDocument,
+    "query RecentDesignReviews($owner: String!, $repo: String!, $since: DateTime, $cursor: String) {\n  repository(owner: $owner, name: $repo) {\n    issues(\n      states: [OPEN, CLOSED]\n      first: 100\n      filterBy: {since: $since}\n      after: $cursor\n    ) {\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n      nodes {\n        id\n        number\n        title\n        body\n        createdAt\n        updatedAt\n        closedAt\n        labels(first: 100) {\n          totalCount\n          nodes {\n            id\n            name\n          }\n        }\n      }\n    }\n  }\n}": types.RecentDesignReviewsDocument,
 };
 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query RecentDesignReviews($since: DateTime, $cursor: String) {\n  repository(owner: \"w3ctag\", name: \"design-reviews\") {\n    issues(\n      states: [OPEN, CLOSED]\n      first: 100\n      filterBy: {since: $since}\n      after: $cursor\n    ) {\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n      nodes {\n        id\n        number\n        title\n        createdAt\n        updatedAt\n        closedAt\n        labels(first: 100) {\n          totalCount\n          nodes {\n            name\n          }\n        }\n      }\n    }\n  }\n}"): typeof import('./graphql').RecentDesignReviewsDocument;
+export function graphql(source: "query RecentDesignReviews($owner: String!, $repo: String!, $since: DateTime, $cursor: String) {\n  repository(owner: $owner, name: $repo) {\n    issues(\n      states: [OPEN, CLOSED]\n      first: 100\n      filterBy: {since: $since}\n      after: $cursor\n    ) {\n      pageInfo {\n        hasNextPage\n        endCursor\n      }\n      nodes {\n        id\n        number\n        title\n        body\n        createdAt\n        updatedAt\n        closedAt\n        labels(first: 100) {\n          totalCount\n          nodes {\n            id\n            name\n          }\n        }\n      }\n    }\n  }\n}"): typeof import('./graphql').RecentDesignReviewsDocument;
 
 
 export function graphql(source: string) {

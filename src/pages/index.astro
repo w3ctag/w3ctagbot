@@ -1,4 +1,5 @@
 ---
+import { REVIEWS_REPO } from "astro:env/client";
 import Layout from "../layouts/Layout.astro";
 import prisma from "../lib/prisma";
 
@@ -31,7 +32,7 @@ if (openReviews.length === 0) {
           {openReviews.map((review) => (
             <li>
               <a
-                href={`https://github.com/w3ctag/design-reviews/issues/${review.number}`}
+                href={`https://github.com/${REVIEWS_REPO}/issues/${review.number}`}
               >
                 {review.title}
               </a>
