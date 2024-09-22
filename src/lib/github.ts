@@ -3,9 +3,8 @@ import {
   APP_ID,
   CLIENT_ID,
   CLIENT_SECRET,
-  INSTALLATION_ID,
   PRIVATE_KEY,
-  WEBHOOK_SECRET,
+  WEBHOOK_SECRET
 } from "astro:env/server";
 import { App } from "octokit";
 import {
@@ -26,25 +25,40 @@ export const app = new App({
   },
 });
 
+// This won't work if an instance of the app is ever installed in more than 1 org. If that happens,
+// we'll need to pass the relevant org into this function.
+let installationId: number | undefined = undefined;
+async function installationOctokit() {
+  if (installationId) {
+    return app.getInstallationOctokit(installationId);
+  }
+  for await (const {
+    octokit,
+    installation,
+  } of app.eachInstallation.iterator()) {
+    installationId = installation.id;
+    return octokit;
+  }
+  throw new Error(`App isn't installed.`);
+}
+
 async function query<TData, TVariables>(
   operation: TypedDocumentString<TData, TVariables>,
   variables?: TVariables,
 ): Promise<TData> {
-  return (await app.getInstallationOctokit(INSTALLATION_ID)).graphql<TData>(
-    operation.toString(),
-    { ...variables },
-  );
+  return (await installationOctokit()).graphql<TData>(operation.toString(), {
+    ...variables,
+  });
 }
 
 async function pagedQuery<TData extends object, TVariables>(
   operation: TypedDocumentString<TData, TVariables>,
   variables?: TVariables,
 ): Promise<TData> {
-  return (
-    await app.getInstallationOctokit(INSTALLATION_ID)
-  ).graphql.paginate<TData>(operation.toString(), {
-    ...variables,
-  });
+  return (await installationOctokit()).graphql.paginate<TData>(
+    operation.toString(),
+    { ...variables },
+  );
 }
 
 function notNull<T>(value: T | null | undefined): value is T {

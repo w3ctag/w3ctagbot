@@ -20,12 +20,8 @@ export default defineConfig({
           access: "public",
           default: "w3ctag/design-reviews",
         }),
-        // Varies by org. Find this at the end of the 'Configure' link
-        // https://github.com/<org>/<repo>/settings/installations.
-        INSTALLATION_ID: envField.number({
-          context: "server",
-          access: "public",
-        }),
+        // These are all defined in the Github App registration. TODO: Make them optional so that a
+        // subset of the app's functionality can be tested locally with just a GITHUB_TOKEN.
         APP_ID: envField.string({ context: "server", access: "public" }),
         PRIVATE_KEY: envField.string({ context: "server", access: "secret" }),
         CLIENT_ID: envField.string({ context: "server", access: "public" }),
