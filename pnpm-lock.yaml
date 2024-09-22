@@ -29,9 +29,6 @@ importers:
       octokit:
         specifier: ^4.0.2
         version: 4.0.2
-      types:
-        specifier: link:@octokit/webhooks/types
-        version: link:@octokit/webhooks/types
       vite:
         specifier: ^5.4.7
         version: 5.4.7(@types/node@22.5.5)
