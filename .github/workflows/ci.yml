@@ -73,9 +73,8 @@ jobs:
           name: built-server
       - name: Extract the built server
         run: |
-          cd built-server
-          tar -xf built-server.tar
-          rm built-server.tar
+          mkdir built-server
+          tar -xf built-server.tar -C built-server
       - name: Store ssh private key
         run: |
           mkdir ~/.ssh
