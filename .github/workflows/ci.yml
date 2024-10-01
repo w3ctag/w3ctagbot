@@ -1,0 +1,84 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: "package.json"
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm build
+      - run: rm -rf node_modules
+      - run: pnpm install --prod
+      - run: pnpm prisma generate
+      - run: tar -cf built-server.tar package.json dist node_modules prisma
+      - uses: actions/upload-artifact@v4
+        with:
+          name: built-server
+          path: built-server.tar
+          if-no-files-found: error
+
+  deploy:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    needs: [test, build]
+    environment:
+      name: production
+      url: "https://github-bot.w3ctag.org/"
+    concurrency:
+      group: production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: built-server
+      - name: Extract the built server
+        run: |
+          cd built-server
+          tar -xf built-server.tar
+          rm built-server.tar
+      - name: Store ssh private key
+        run: |
+          mkdir ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 700 ~/.ssh
+          chmod 600 ~/.ssh/deploy_key
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+      - name: Upload
+        run: rsync -e "ssh -p $SSH_PORT" -azv --safe-links --hard-links --progress --delete  built-server/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
+        env:
+          SSH_PORT: ${{ vars.SSH_PORT }}
+          SSH_HOST: ${{ vars.SSH_HOST }}
+          SSH_USER: ${{ vars.SSH_USER }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+      - name: Update and Restart
+        run: 'ssh -p $SSH_PORT "$SSH_USER@$SSH_HOST" sh -c "DATABASE_URL=file:/var/local/github-bot/prod.db node_modules/.bin/prisma migrate deploy && sudo /usr/bin/systemctl restart github-bot"'
+        env:
+          SSH_PORT: ${{ vars.SSH_PORT }}
+          SSH_HOST: ${{ vars.SSH_HOST }}
+          SSH_USER: ${{ vars.SSH_USER }}
