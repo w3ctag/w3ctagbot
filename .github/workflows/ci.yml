@@ -5,6 +5,11 @@ on:
   push:
     branches: ["main"]
 
+# These are the IDs for https://github.com/organizations/w3ctag/settings/apps/w3c-tag-bot.
+env:
+  APP_ID: "1013567"
+  CLIENT_ID: "Iv23liXTAsX4IYm9H6lc"
+
 jobs:
   test:
     runs-on: ubuntu-latest
