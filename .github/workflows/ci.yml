@@ -75,14 +75,18 @@ jobs:
         run: |
           mkdir built-server
           tar -xf built-server.tar -C built-server
-      - name: Store ssh private key
+      - name: Store ssh private key and host key
         run: |
           mkdir ~/.ssh
           echo "$SSH_KEY" > ~/.ssh/deploy_key
+          echo "[$SSH_HOST]:$SSH_PORT $SSH_HOST_KEY" > ~/.ssh/known_hosts
           chmod 700 ~/.ssh
-          chmod 600 ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/*
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
+          SSH_HOST: ${{ vars.SSH_HOST }}
+          SSH_PORT: ${{ vars.SSH_PORT }}
+          SSH_HOST_KEY: ${{ vars.SSH_HOST_KEY }}
       - name: Upload
         run: rsync -e "ssh -p $SSH_PORT" -azv --safe-links --hard-links --progress --delete  built-server/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
         env:
