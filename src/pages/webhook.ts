@@ -1,8 +1,10 @@
 import type { APIRoute } from "astro";
+import { REVIEWS_REPO } from "astro:env/client";
 import { app } from "../lib/github";
 import prisma from "../lib/prisma";
 
 app.webhooks.on("issues.opened", async ({ payload }) => {
+  if (payload.repository.full_name !== REVIEWS_REPO) return;
   await prisma.designReview.create({
     data: {
       id: payload.issue.node_id,

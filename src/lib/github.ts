@@ -4,7 +4,7 @@ import {
   CLIENT_ID,
   CLIENT_SECRET,
   PRIVATE_KEY,
-  WEBHOOK_SECRET
+  WEBHOOK_SECRET,
 } from "astro:env/server";
 import { App } from "octokit";
 import {
