@@ -1,4 +1,5 @@
 import type { EmitterWebhookEvent } from "@octokit/webhooks";
+import { REVIEWS_REPO } from "astro:env/client";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { app } from "../src/lib/github";
 import prisma from "../src/lib/prisma";
@@ -19,16 +20,12 @@ describe("issues", () => {
       const payload = JSON.stringify({
         action: "opened",
         issue: {
-          url: "https://api.github.com/repos/jyasskin/test-design-reviews/issues/9",
-          repository_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews",
-          labels_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/issues/9/labels{/name}",
-          comments_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/issues/9/comments",
-          events_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/issues/9/events",
-          html_url: "https://github.com/jyasskin/test-design-reviews/issues/9",
+          url: `https://api.github.com/repos/${REVIEWS_REPO}/issues/9`,
+          repository_url: `https://api.github.com/repos/${REVIEWS_REPO}`,
+          labels_url: `https://api.github.com/repos/${REVIEWS_REPO}/issues/9/labels{/name}`,
+          comments_url: `https://api.github.com/repos/${REVIEWS_REPO}/issues/9/comments`,
+          events_url: `https://api.github.com/repos/${REVIEWS_REPO}/issues/9/events`,
+          html_url: `https://github.com/${REVIEWS_REPO}/issues/9`,
           id: 2539552022,
           node_id: "Issue9Id",
           number: 9,
@@ -77,7 +74,7 @@ describe("issues", () => {
           active_lock_reason: null,
           body,
           reactions: {
-            url: "https://api.github.com/repos/jyasskin/test-design-reviews/issues/9/reactions",
+            url: `https://api.github.com/repos/${REVIEWS_REPO}/issues/9/reactions`,
             total_count: 0,
             "+1": 0,
             "-1": 0,
@@ -88,8 +85,7 @@ describe("issues", () => {
             rocket: 0,
             eyes: 0,
           },
-          timeline_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/issues/9/timeline",
+          timeline_url: `https://api.github.com/repos/${REVIEWS_REPO}/issues/9/timeline`,
           performed_via_github_app: null,
           state_reason: null,
         },
@@ -97,7 +93,7 @@ describe("issues", () => {
           id: 849574210,
           node_id: "R_kgDOMqN5Qg",
           name: "test-design-reviews",
-          full_name: "jyasskin/test-design-reviews",
+          full_name: REVIEWS_REPO,
           private: false,
           owner: {
             login: "jyasskin",
@@ -124,89 +120,53 @@ describe("issues", () => {
             type: "User",
             site_admin: false,
           },
-          html_url: "https://github.com/jyasskin/test-design-reviews",
+          html_url: `https://github.com/${REVIEWS_REPO}`,
           description: "Repository to test cloning design-reviews issues",
           fork: false,
-          url: "https://api.github.com/repos/jyasskin/test-design-reviews",
-          forks_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/forks",
-          keys_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/keys{/key_id}",
-          collaborators_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/collaborators{/collaborator}",
-          teams_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/teams",
-          hooks_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/hooks",
-          issue_events_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/issues/events{/number}",
-          events_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/events",
-          assignees_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/assignees{/user}",
-          branches_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/branches{/branch}",
-          tags_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/tags",
-          blobs_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/git/blobs{/sha}",
-          git_tags_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/git/tags{/sha}",
-          git_refs_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/git/refs{/sha}",
-          trees_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/git/trees{/sha}",
-          statuses_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/statuses/{sha}",
-          languages_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/languages",
-          stargazers_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/stargazers",
-          contributors_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/contributors",
-          subscribers_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/subscribers",
-          subscription_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/subscription",
-          commits_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/commits{/sha}",
-          git_commits_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/git/commits{/sha}",
-          comments_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/comments{/number}",
-          issue_comment_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/issues/comments{/number}",
-          contents_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/contents/{+path}",
-          compare_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/compare/{base}...{head}",
-          merges_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/merges",
-          archive_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/{archive_format}{/ref}",
-          downloads_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/downloads",
-          issues_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/issues{/number}",
-          pulls_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/pulls{/number}",
-          milestones_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/milestones{/number}",
-          notifications_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/notifications{?since,all,participating}",
-          labels_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/labels{/name}",
-          releases_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/releases{/id}",
-          deployments_url:
-            "https://api.github.com/repos/jyasskin/test-design-reviews/deployments",
+          url: `https://api.github.com/repos/${REVIEWS_REPO}`,
+          forks_url: `https://api.github.com/repos/${REVIEWS_REPO}/forks`,
+          keys_url: `https://api.github.com/repos/${REVIEWS_REPO}/keys{/key_id}`,
+          collaborators_url: `https://api.github.com/repos/${REVIEWS_REPO}/collaborators{/collaborator}`,
+          teams_url: `https://api.github.com/repos/${REVIEWS_REPO}/teams`,
+          hooks_url: `https://api.github.com/repos/${REVIEWS_REPO}/hooks`,
+          issue_events_url: `https://api.github.com/repos/${REVIEWS_REPO}/issues/events{/number}`,
+          events_url: `https://api.github.com/repos/${REVIEWS_REPO}/events`,
+          assignees_url: `https://api.github.com/repos/${REVIEWS_REPO}/assignees{/user}`,
+          branches_url: `https://api.github.com/repos/${REVIEWS_REPO}/branches{/branch}`,
+          tags_url: `https://api.github.com/repos/${REVIEWS_REPO}/tags`,
+          blobs_url: `https://api.github.com/repos/${REVIEWS_REPO}/git/blobs{/sha}`,
+          git_tags_url: `https://api.github.com/repos/${REVIEWS_REPO}/git/tags{/sha}`,
+          git_refs_url: `https://api.github.com/repos/${REVIEWS_REPO}/git/refs{/sha}`,
+          trees_url: `https://api.github.com/repos/${REVIEWS_REPO}/git/trees{/sha}`,
+          statuses_url: `https://api.github.com/repos/${REVIEWS_REPO}/statuses/{sha}`,
+          languages_url: `https://api.github.com/repos/${REVIEWS_REPO}/languages`,
+          stargazers_url: `https://api.github.com/repos/${REVIEWS_REPO}/stargazers`,
+          contributors_url: `https://api.github.com/repos/${REVIEWS_REPO}/contributors`,
+          subscribers_url: `https://api.github.com/repos/${REVIEWS_REPO}/subscribers`,
+          subscription_url: `https://api.github.com/repos/${REVIEWS_REPO}/subscription`,
+          commits_url: `https://api.github.com/repos/${REVIEWS_REPO}/commits{/sha}`,
+          git_commits_url: `https://api.github.com/repos/${REVIEWS_REPO}/git/commits{/sha}`,
+          comments_url: `https://api.github.com/repos/${REVIEWS_REPO}/comments{/number}`,
+          issue_comment_url: `https://api.github.com/repos/${REVIEWS_REPO}/issues/comments{/number}`,
+          contents_url: `https://api.github.com/repos/${REVIEWS_REPO}/contents/{+path}`,
+          compare_url: `https://api.github.com/repos/${REVIEWS_REPO}/compare/{base}...{head}`,
+          merges_url: `https://api.github.com/repos/${REVIEWS_REPO}/merges`,
+          archive_url: `https://api.github.com/repos/${REVIEWS_REPO}/{archive_format}{/ref}`,
+          downloads_url: `https://api.github.com/repos/${REVIEWS_REPO}/downloads`,
+          issues_url: `https://api.github.com/repos/${REVIEWS_REPO}/issues{/number}`,
+          pulls_url: `https://api.github.com/repos/${REVIEWS_REPO}/pulls{/number}`,
+          milestones_url: `https://api.github.com/repos/${REVIEWS_REPO}/milestones{/number}`,
+          notifications_url: `https://api.github.com/repos/${REVIEWS_REPO}/notifications{?since,all,participating}`,
+          labels_url: `https://api.github.com/repos/${REVIEWS_REPO}/labels{/name}`,
+          releases_url: `https://api.github.com/repos/${REVIEWS_REPO}/releases{/id}`,
+          deployments_url: `https://api.github.com/repos/${REVIEWS_REPO}/deployments`,
           created_at: "2024-08-29T20:54:51Z",
           updated_at: "2024-08-30T17:23:30Z",
           pushed_at: "2024-08-30T17:23:27Z",
-          git_url: "git://github.com/jyasskin/test-design-reviews.git",
-          ssh_url: "git@github.com:jyasskin/test-design-reviews.git",
-          clone_url: "https://github.com/jyasskin/test-design-reviews.git",
-          svn_url: "https://github.com/jyasskin/test-design-reviews",
+          git_url: `git://github.com/${REVIEWS_REPO}.git`,
+          ssh_url: `git@github.com:${REVIEWS_REPO}.git`,
+          clone_url: `https://github.com/${REVIEWS_REPO}.git`,
+          svn_url: `https://github.com/${REVIEWS_REPO}`,
           homepage: null,
           size: 11,
           stargazers_count: 0,
@@ -272,7 +232,7 @@ describe("issues", () => {
       );
       expect(await response.text()).toEqual("");
       expect(response).toHaveProperty("status", 200);
-      const result = await prisma.designReview.findUnique({
+      const result = await prisma.designReview.findUniqueOrThrow({
         where: { id: "Issue9Id" },
         include: { labels: { select: { label: true } } },
       });

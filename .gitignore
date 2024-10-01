@@ -25,4 +25,4 @@ pnpm-debug.log*
 .idea/
 
 # Default database location
-prisma/dev.db
+prisma/*.db

@@ -13,6 +13,8 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: file:./test.db
     steps:
       - uses: actions/checkout@v4
       - name: Setup pnpm
@@ -23,7 +25,15 @@ jobs:
           node-version-file: "package.json"
           cache: pnpm
       - run: pnpm install
-      - run: pnpm test
+      - run: pnpm prisma db push
+      - name: Make a private key for testing.
+        run: openssl genrsa -traditional -out testkey.pem
+      - name: Run tests
+        run: PRIVATE_KEY=$(cat testkey.pem) pnpm test
+        env:
+          # Generated just for this file and never used elsewhere.
+          CLIENT_SECRET: 6d5e528bb01faa2de86ef59dacbdca0b4a406e09
+          WEBHOOK_SECRET: 37651a9cf25c2d370308aee98ce0b7c9a6bfc30c
 
   build:
     runs-on: ubuntu-latest
