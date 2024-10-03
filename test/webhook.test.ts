@@ -1,7 +1,7 @@
 import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import { REVIEWS_REPO } from "astro:env/client";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
-import { app } from "../src/lib/github";
+import { webhooks } from "../src/lib/github/auth";
 import { prisma } from "../src/lib/prisma";
 import { handleWebHook } from "../src/pages/webhook";
 
@@ -225,7 +225,7 @@ describe("issues", () => {
           headers: {
             "x-github-delivery": "unique id",
             "x-github-event": "issues",
-            "X-Hub-Signature-256": await app.webhooks.sign(payload),
+            "X-Hub-Signature-256": await webhooks.sign(payload),
           },
           body: payload,
         }),

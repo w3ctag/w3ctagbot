@@ -1,46 +1,12 @@
 import { REVIEWS_REPO } from "astro:env/client";
 import {
-  APP_ID,
-  CLIENT_ID,
-  CLIENT_SECRET,
-  PRIVATE_KEY,
-  WEBHOOK_SECRET,
-} from "astro:env/server";
-import { App } from "octokit";
-import {
   RecentDesignReviewsDocument,
   TypedDocumentString,
 } from "../gql/graphql";
 import { prisma } from "./prisma";
 
-export const app: App = new App({
-  appId: APP_ID,
-  privateKey: PRIVATE_KEY,
-  oauth: {
-    clientId: CLIENT_ID,
-    clientSecret: CLIENT_SECRET,
-  },
-  webhooks: {
-    secret: WEBHOOK_SECRET,
-  },
-});
-
-// This won't work if an instance of the app is ever installed in more than 1 org. If that happens,
-// we'll need to pass the relevant org into this function.
-let installationId: number | undefined = undefined;
-async function installationOctokit() {
-  if (installationId) {
-    return app.getInstallationOctokit(installationId);
-  }
-  for await (const {
-    octokit,
-    installation,
-  } of app.eachInstallation.iterator()) {
-    installationId = installation.id;
-    return octokit;
-  }
-  throw new Error(`App isn't installed.`);
-}
+import { installationOctokit } from "./github/auth.js";
+//export { app } from './github/auth.js';
 
 export async function query<TData, TVariables>(
   operation: TypedDocumentString<TData, TVariables>,

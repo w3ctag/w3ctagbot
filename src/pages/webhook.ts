@@ -1,9 +1,9 @@
 import type { APIRoute } from "astro";
 import { REVIEWS_REPO } from "astro:env/client";
-import { app } from "../lib/github";
+import { webhooks } from "../lib/github/auth";
 import { prisma } from "../lib/prisma";
 
-app.webhooks.on("issues.opened", async ({ payload }) => {
+webhooks.on("issues.opened", async ({ payload }) => {
   if (payload.repository.full_name !== REVIEWS_REPO) return;
   await prisma.designReview.create({
     data: {
@@ -24,7 +24,7 @@ app.webhooks.on("issues.opened", async ({ payload }) => {
   });
 });
 
-app.webhooks.on(["issues.closed", "issues.reopened"], async ({ payload }) => {
+webhooks.on(["issues.closed", "issues.reopened"], async ({ payload }) => {
   await prisma.designReview.update({
     where: {
       id: payload.issue.node_id,
@@ -36,7 +36,7 @@ app.webhooks.on(["issues.closed", "issues.reopened"], async ({ payload }) => {
   });
 });
 
-app.webhooks.on("issues.edited", async ({ payload }) => {
+webhooks.on("issues.edited", async ({ payload }) => {
   await prisma.designReview.update({
     where: {
       id: payload.issue.node_id,
@@ -49,7 +49,7 @@ app.webhooks.on("issues.edited", async ({ payload }) => {
   });
 });
 
-app.webhooks.on("issues.labeled", async ({ payload }) => {
+webhooks.on("issues.labeled", async ({ payload }) => {
   if (!payload.label) return;
   await prisma.reviewLabel.upsert({
     where: {
@@ -67,7 +67,7 @@ app.webhooks.on("issues.labeled", async ({ payload }) => {
   });
 });
 
-app.webhooks.on("issues.unlabeled", async ({ payload }) => {
+webhooks.on("issues.unlabeled", async ({ payload }) => {
   if (!payload.label) return;
   await prisma.reviewLabel.delete({
     where: {
@@ -81,7 +81,7 @@ app.webhooks.on("issues.unlabeled", async ({ payload }) => {
 
 export async function handleWebHook(request: Request): Promise<Response> {
   try {
-    await app.webhooks.verifyAndReceive({
+    await webhooks.verifyAndReceive({
       id: request.headers.get("x-github-delivery") ?? "",
       // "as any" until https://github.com/octokit/webhooks.js/issues/1055 is fixed.
       /* eslint-disable @typescript-eslint/no-unsafe-assignment */
