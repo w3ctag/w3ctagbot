@@ -9,7 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "codegen": "graphql-codegen --config gql-codegen.config.ts && prisma generate",
-    "test": "eslint . && tsc && astro check && vitest"
+    "test": "astro check && eslint . && tsc && vitest"
   },
   "dependencies": {
     "@astrojs/node": "^8.3.4",
