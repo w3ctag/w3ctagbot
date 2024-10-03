@@ -1,7 +1,7 @@
 import type { APIRoute } from "astro";
 import { REVIEWS_REPO } from "astro:env/client";
 import { app } from "../lib/github";
-import prisma from "../lib/prisma";
+import { prisma } from "../lib/prisma";
 
 app.webhooks.on("issues.opened", async ({ payload }) => {
   if (payload.repository.full_name !== REVIEWS_REPO) return;
@@ -84,7 +84,8 @@ export async function handleWebHook(request: Request): Promise<Response> {
     await app.webhooks.verifyAndReceive({
       id: request.headers.get("x-github-delivery") ?? "",
       // "as any" until https://github.com/octokit/webhooks.js/issues/1055 is fixed.
-      name: request.headers.get("x-github-event") ?? ("" as any),
+      /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+      name: (request.headers.get("x-github-event") ?? "") as any,
       payload: await request.text(),
       signature: request.headers.get("X-Hub-Signature-256") ?? "",
     });

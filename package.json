@@ -9,7 +9,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "codegen": "graphql-codegen --config gql-codegen.config.ts && prisma generate",
-    "test": "astro check && vitest"
+    "test": "eslint . && tsc && astro check && vitest"
   },
   "dependencies": {
     "@astrojs/node": "^8.3.4",
@@ -29,17 +29,21 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.3",
+    "@eslint/js": "^9.11.1",
     "@graphql-codegen/cli": "^5.0.2",
     "@graphql-codegen/client-preset": "^4.3.3",
     "@graphql-codegen/typescript": "^4.0.9",
     "@graphql-codegen/typescript-document-nodes": "^4.0.9",
     "@octokit/graphql-schema": "^15.25.0",
+    "@types/eslint__js": "^8.42.3",
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.5.5",
     "@types/unist": "^3.0.3",
+    "eslint": "^9.11.1",
     "prettier": "^3.3.3",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.6.2",
+    "typescript-eslint": "^8.8.0",
     "vitest": "^2.1.1"
   },
   "engines": {

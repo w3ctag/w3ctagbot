@@ -285,7 +285,7 @@ The general consensus was that we agree that the functionality is useful, but we
   });
 });
 
-test("can handle multiple discussions with multiple proposed comments", async () => {
+test("can handle multiple discussions with multiple proposed comments", () => {
   expect(
     parseMinutes(`### Breakout A
 

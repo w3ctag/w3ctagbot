@@ -1,7 +1,7 @@
 ---
 import { REVIEWS_REPO } from "astro:env/client";
 import Layout from "../layouts/Layout.astro";
-import prisma from "../lib/prisma";
+import { prisma } from "../lib/prisma";
 
 const openReviews = await prisma.designReview.findMany({
   where: { closed: null },

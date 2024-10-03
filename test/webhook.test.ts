@@ -2,7 +2,7 @@ import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import { REVIEWS_REPO } from "astro:env/client";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { app } from "../src/lib/github";
-import prisma from "../src/lib/prisma";
+import { prisma } from "../src/lib/prisma";
 import { handleWebHook } from "../src/pages/webhook";
 
 beforeEach(async () => {

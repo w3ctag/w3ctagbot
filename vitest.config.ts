@@ -1,6 +1,8 @@
 /// <reference types="vitest" />
-import { getViteConfig } from "astro/config";
+import { getViteConfig, type ViteUserConfigFn } from "astro/config";
 
-export default getViteConfig({
+const config: ViteUserConfigFn = getViteConfig({
   test: {},
 });
+
+export default config;

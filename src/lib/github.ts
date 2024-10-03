@@ -11,9 +11,9 @@ import {
   RecentDesignReviewsDocument,
   TypedDocumentString,
 } from "../gql/graphql";
-import prisma from "./prisma";
+import { prisma } from "./prisma";
 
-export const app = new App({
+export const app: App = new App({
   appId: APP_ID,
   privateKey: PRIVATE_KEY,
   oauth: {
@@ -42,7 +42,7 @@ async function installationOctokit() {
   throw new Error(`App isn't installed.`);
 }
 
-async function query<TData, TVariables>(
+export async function query<TData, TVariables>(
   operation: TypedDocumentString<TData, TVariables>,
   variables?: TVariables,
 ): Promise<TData> {
@@ -51,7 +51,7 @@ async function query<TData, TVariables>(
   });
 }
 
-async function pagedQuery<TData extends object, TVariables>(
+export async function pagedQuery<TData extends object, TVariables>(
   operation: TypedDocumentString<TData, TVariables>,
   variables?: TVariables,
 ): Promise<TData> {
@@ -67,9 +67,9 @@ function notNull<T>(value: T | null | undefined): value is T {
 
 let updateRunning = Promise.resolve();
 
-export async function updateDesignReviews() {
+export async function updateDesignReviews(): Promise<number> {
   await updateRunning;
-  let finished;
+  let finished: () => void;
   updateRunning = new Promise((resolve) => {
     finished = resolve;
   });
@@ -88,7 +88,7 @@ export async function updateDesignReviews() {
   }
   const issues = result.repository.issues.nodes?.filter(notNull);
   if (!issues || issues.length === 0) {
-    return;
+    return 0;
   }
   await prisma.$transaction(
     issues.map((issue) =>
@@ -99,9 +99,9 @@ export async function updateDesignReviews() {
           number: issue.number,
           title: issue.title,
           body: issue.body,
-          created: issue.createdAt,
-          updated: issue.updatedAt,
-          closed: issue.closedAt,
+          created: issue.createdAt as string,
+          updated: issue.updatedAt as string,
+          closed: issue.closedAt as string | undefined,
           labels: {
             create: issue.labels?.nodes
               ?.filter(notNull)
@@ -110,8 +110,8 @@ export async function updateDesignReviews() {
         },
         update: {
           title: issue.title,
-          updated: issue.updatedAt,
-          closed: issue.closedAt,
+          updated: issue.updatedAt as string,
+          closed: issue.closedAt as string | undefined,
           body: issue.body,
           labels: {
             deleteMany: {
@@ -138,4 +138,6 @@ export async function updateDesignReviews() {
   finished!();
   return issues.length;
 }
-updateDesignReviews().catch((e) => console.error(e));
+updateDesignReviews().catch((e: unknown) => {
+  console.error(e);
+});

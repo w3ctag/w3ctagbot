@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import prisma from "../lib/prisma";
+import { prisma } from "../lib/prisma";
 
 const openCloseHistory = (
   await prisma.designReview.findMany({

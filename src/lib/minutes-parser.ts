@@ -59,10 +59,9 @@ function findAttendance(
       if (presentMatch?.groups) {
         return {
           nextIndex: index,
-          attendance:
-            presentMatch.groups.attendees
-              .split(/[\p{Punctuation}+]/v)
-              .map((name) => name.trim()) ?? [],
+          attendance: presentMatch.groups.attendees
+            .split(/[\p{Punctuation}+]/v)
+            .map((name) => name.trim()),
         };
       }
     }
@@ -128,16 +127,12 @@ export type Minutes = {
   discussion: {
     // Each design review can be discussed multiple times in a week, and each discussion can propose
     // multiple comments to post to the issue.
-    [designReviewUrl: string]: {
+    [designReviewUrl: string]: undefined | {
       content: string;
       proposedComments: string[];
     }[];
   };
 };
-
-function last<T>(stack: T[]): T | undefined {
-  return stack[stack.length - 1];
-}
 
 export function parseMinutes(minutes: string): Minutes {
   const tree = fromMarkdown(minutes, {
@@ -179,7 +174,7 @@ export function parseMinutes(minutes: string): Minutes {
             if (!result.discussion[section.review.href]) {
               result.discussion[section.review.href] = [];
             }
-            result.discussion[section.review.href].push({
+            result.discussion[section.review.href]!.push({
               content,
               proposedComments: gatherBlockquoteSources(
                 tree.children,
