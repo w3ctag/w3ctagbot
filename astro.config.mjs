@@ -1,7 +1,20 @@
 // @ts-check
+import node from "@astrojs/node";
 import { defineConfig, envField } from "astro/config";
 
-import node from "@astrojs/node";
+/**
+ * @param {Omit<Parameters<typeof envField.string>[0], 'context'|'optional'>} options
+ * @returns {ReturnType<typeof envField.string>}
+ */
+function optionalServerString(options) {
+  /** @type{Parameters<typeof envField.string>[0]} */
+  const defaultArgs = {
+    context: "server",
+    access: "secret", // Always overwritten, but the types don't check without this.
+    optional: true,
+  };
+  return envField.string(Object.assign(defaultArgs, options));
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -20,16 +33,22 @@ export default defineConfig({
           access: "public",
           default: "w3ctag/design-reviews",
         }),
-        // These are all defined in the Github App registration. TODO: Make them optional so that a
-        // subset of the app's functionality can be tested locally with just a GITHUB_TOKEN.
-        APP_ID: envField.string({ context: "server", access: "public" }),
-        PRIVATE_KEY: envField.string({ context: "server", access: "secret" }),
-        CLIENT_ID: envField.string({ context: "server", access: "public" }),
-        CLIENT_SECRET: envField.string({ context: "server", access: "secret" }),
+        // These are all defined in the Github App registration. The environment must set these or
+        // GITHUB_TOKEN, below.
+        APP_ID: optionalServerString({ access: "public" }),
+        PRIVATE_KEY: optionalServerString({ access: "secret" }),
+        CLIENT_ID: optionalServerString({ access: "public" }),
+        CLIENT_SECRET: optionalServerString({ access: "secret" }),
+
+        // Technically optional when testing the non-webhook parts of the server, but easy enough to
+        // give a fake value.
         WEBHOOK_SECRET: envField.string({
           context: "server",
           access: "secret",
         }),
+
+        // Use a personal token to test the server without registering it as a whole app.
+        GITHUB_TOKEN: optionalServerString({ access: "secret" }),
       },
     },
   },
