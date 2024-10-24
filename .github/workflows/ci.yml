@@ -6,6 +6,7 @@ on:
     branches: ["main"]
 
 # These are the IDs for https://github.com/organizations/w3ctag/settings/apps/w3c-tag-bot.
+# They're captured at build time and aren't configurable on the server.
 env:
   APP_ID: "1013567"
   CLIENT_ID: "Iv23liXTAsX4IYm9H6lc"
@@ -62,11 +63,15 @@ jobs:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: [test, build]
     environment:
-      name: production
-      url: "https://github-bot.w3ctag.org/"
+      name: "tag-github-bot.w3"
+      url: "https://tag-github-bot.w3.org/"
     concurrency:
       group: production
     runs-on: ubuntu-latest
+    env:
+      SSH_USER: ${{ vars.SSH_USER }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_PROXY: ${{ secrets.SSH_PROXY }}
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -77,26 +82,18 @@ jobs:
           tar -xf built-server.tar -C built-server
       - name: Store ssh private key and host key
         run: |
+          umask 077
           mkdir ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          echo "[$SSH_HOST]:$SSH_PORT $SSH_HOST_KEY" > ~/.ssh/known_hosts
-          chmod 700 ~/.ssh
-          chmod 600 ~/.ssh/*
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
-          SSH_HOST: ${{ vars.SSH_HOST }}
-          SSH_PORT: ${{ vars.SSH_PORT }}
-          SSH_HOST_KEY: ${{ vars.SSH_HOST_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
       - name: Upload
-        run: rsync -e "ssh -p $SSH_PORT" -azv --safe-links --hard-links --progress --delete  built-server/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
+        run: rsync -e "ssh -o ProxyJump=$SSH_USER@$SSH_PROXY" -azv --safe-links --hard-links --progress --delete  built-server/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
         env:
-          SSH_PORT: ${{ vars.SSH_PORT }}
-          SSH_HOST: ${{ vars.SSH_HOST }}
-          SSH_USER: ${{ vars.SSH_USER }}
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
       - name: Update and Restart
-        run: 'ssh -p $SSH_PORT "$SSH_USER@$SSH_HOST" sh -c "DATABASE_URL=file:/var/local/github-bot/prod.db node_modules/.bin/prisma migrate deploy && sudo /usr/bin/systemctl restart github-bot"'
+        run: 'ssh -o ProxyJump=$SSH_USER@$SSH_PROXY "$SSH_USER@$SSH_HOST" "cd $DEPLOY_PATH && node_modules/.bin/prisma generate && sudo /usr/bin/systemctl restart w3ctagbot"'
         env:
-          SSH_PORT: ${{ vars.SSH_PORT }}
-          SSH_HOST: ${{ vars.SSH_HOST }}
-          SSH_USER: ${{ vars.SSH_USER }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}

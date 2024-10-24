@@ -1,0 +1,30 @@
+# Put this file in /etc/systemd/system/, and customize it as needed.
+
+[Unit]
+Description=Github bot to assist the TAG
+Documentation=https://github.com/w3ctag/w3ctagbot
+After=network.target
+
+[Service]
+Type=exec
+ExecStartPre=/usr/bin/env -C /opt/w3ctagbot node_modules/.bin/prisma migrate deploy
+ExecStart=/usr/bin/node /opt/w3ctagbot/dist/server/entry.mjs
+Restart=on-failure
+
+User=w3ctagbot
+StateDirectory=w3ctagbot
+WorkingDirectory=%S/w3ctagbot
+ProtectSystem=strict
+ProtectHome=yes
+
+Environment=HOST=127.0.0.1
+Environment=PORT=3000
+Environment=DATABASE_URL=file:%S/w3ctagbot/prod.db
+# The APP_ID and CLIENT_IT Github App identifiers are set at build time rather than through
+# environment variables.
+# In theory this ought to use LoadCredential, but I haven't rewritten the server to handle that.
+# /etc/w3ctagbot/secrets.env should define CLIENT_SECRET, WEBHOOK_SECRET, and PRIVATE_KEY.
+EnvironmentFile=/etc/w3ctagbot/secrets.env
+
+[Install]
+WantedBy=multi-user.target
