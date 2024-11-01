@@ -10,16 +10,18 @@ datasource db {
 }
 
 model DesignReview {
-  /// The GraphQL Node ID.
-  id      String        @id
-  number  Int           @unique
-  title   String
+  /// The GraphQL Node ID for an issue in https://github.com/w3ctag/design-reviews.
+  id          String        @id
+  /// The issue number: https://github.com/w3ctag/design-reviews/issues/{number}
+  number      Int           @unique
+  title       String
   /// The initial comment on the issue, in Markdown format.
-  body    String
-  labels  ReviewLabel[]
-  created DateTime
-  updated DateTime
-  closed  DateTime?
+  body        String
+  labels      ReviewLabel[]
+  created     DateTime
+  updated     DateTime
+  closed      DateTime?
+  discussions Discussion[]
 }
 
 model ReviewLabel {
@@ -31,4 +33,77 @@ model ReviewLabel {
   label    String
 
   @@unique([reviewId, labelId])
+}
+
+/// Either an in-person multi-day meeting or a week of telecons.
+model Meeting {
+  year       Int
+  /// For example, "07-seattle" or "02-05".
+  name       String
+  minutesUrl String
+
+  /// The Github node ID for the minutes document. This changes each time a commit updates the minutes.
+  minutesId String
+
+  /// The Github node ID for the minutes document whose contents are cached in the `contents` field.
+  cachedMinutesId String?
+  contents        String?
+
+  sessions    MeetingSession[]
+  discussions Discussion[]
+
+  @@unique([year, name])
+}
+
+/// Represents a single discussion session within a meeting (or within a week of telecons). This is
+/// the level at which attendance is tracked.
+model MeetingSession {
+  id Int @id @default(autoincrement())
+
+  meetingYear Int
+  meetingName String
+  meeting     Meeting @relation(fields: [meetingYear, meetingName], references: [year, name], onDelete: Cascade)
+
+  /// E.g. Plenary, "Breakout A", F2F, etc.
+  type      String
+  attendees MeetingAttendee[]
+
+  @@unique([meetingYear, meetingName, type])
+}
+
+model MeetingAttendee {
+  sessionId  Int
+  session    MeetingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  /// The Github node ID for the TAG member's account there. These are mapped to names in the source
+  /// code rather than in this database.
+  attendeeId String
+
+  @@unique([sessionId, attendeeId])
+}
+
+model Discussion {
+  id             Int          @id @default(autoincrement())
+  designReviewId String
+  designReview   DesignReview @relation(fields: [designReviewId], references: [id], onDelete: Cascade)
+
+  meetingYear Int
+  meetingName String
+  meeting     Meeting @relation(fields: [meetingYear, meetingName], references: [year, name], onDelete: Cascade)
+
+  /// The text of the discussion.
+  markdown         String
+  proposedComments ProposedComment[]
+}
+
+model ProposedComment {
+  id Int @id @default(autoincrement())
+
+  /// A proposed comment might come from a discussion or a comment in
+  /// https://github.com/w3ctag/design-reviews-private-brainstorming. The second isn't wired up yet
+  /// but will be another set of nullable fields here.
+  discussionId Int?
+  discussion   Discussion? @relation(fields: [discussionId], references: [id], onDelete: Cascade)
+
+  /// The text of the proposed comment.
+  markdown String
 }

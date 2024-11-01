@@ -16,6 +16,19 @@ function optionalServerString(options) {
   return envField.string(Object.assign(defaultArgs, options));
 }
 
+/**
+ * @param {Omit<Parameters<typeof envField.string>[0], 'context'|'access'>} options
+ * @returns {ReturnType<typeof envField.string>}
+ */
+function clientString(options) {
+  /** @type{Parameters<typeof envField.string>[0]} */
+  const defaultArgs = {
+    context: "client",
+    access: "public",
+  };
+  return envField.string(Object.assign(defaultArgs, options));
+}
+
 // https://astro.build/config
 export default defineConfig({
   output: "server",
@@ -27,12 +40,12 @@ export default defineConfig({
   experimental: {
     env: {
       schema: {
-        // owner/reponame for the design-reviews repository.
-        REVIEWS_REPO: envField.string({
-          context: "client",
-          access: "public",
-          default: "w3ctag/design-reviews",
-        }),
+        // Names for TAG repositories. These are variables so that development instances can
+        // override them.
+        TAG_ORG: clientString({ default: "w3ctag" }),
+        REVIEWS_REPO: clientString({ default: "design-reviews" }),
+        MEETINGS_REPO: clientString({ default: "meetings" }),
+
         // These are all defined in the Github App registration. The environment must set these or
         // GITHUB_TOKEN, below.
         APP_ID: optionalServerString({ access: "public" }),

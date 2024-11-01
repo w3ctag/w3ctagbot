@@ -4,6 +4,7 @@ import { gfmFromMarkdown } from "mdast-util-gfm";
 import { toString } from "mdast-util-to-string";
 import { gfm } from "micromark-extension-gfm";
 import { CONTINUE, visit } from "unist-util-visit";
+import { setDefault } from "./util";
 
 /** Identifies the type of section that a heading introduces. */
 type Section = {
@@ -60,8 +61,9 @@ function findAttendance(
         return {
           nextIndex: index,
           attendance: presentMatch.groups.attendees
-            .split(/[\p{Punctuation}+]/v)
-            .map((name) => name.trim()),
+            .split(/[\p{Punctuation}+]| and /v)
+            .map((name) => name.trim())
+            .filter((name) => name !== ""),
         };
       }
     }
@@ -127,10 +129,12 @@ export type Minutes = {
   discussion: {
     // Each design review can be discussed multiple times in a week, and each discussion can propose
     // multiple comments to post to the issue.
-    [designReviewUrl: string]: undefined | {
-      content: string;
-      proposedComments: string[];
-    }[];
+    [designReviewUrl: string]:
+      | undefined
+      | {
+          content: string;
+          proposedComments: string[];
+        }[];
   };
 };
 
@@ -157,8 +161,12 @@ export function parseMinutes(minutes: string): Minutes {
 
       const section = classifyHeading(heading, index);
       if (section.session) {
-        ({ nextIndex: index, attendance: result.attendance[section.session] } =
-          findAttendance(tree.children, index + 1));
+        const { nextIndex, attendance } = findAttendance(
+          tree.children,
+          index + 1,
+        );
+        index = nextIndex;
+        setDefault(result.attendance, section.session, []).push(...attendance);
         continue;
       }
       if (section.review) {

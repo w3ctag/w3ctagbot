@@ -1,0 +1,11 @@
+query BlobContents($ids: [ID!]!) {
+  nodes(ids: $ids) {
+    __typename
+    ... on Blob {
+      id
+      isTruncated
+      isBinary
+      text
+    }
+  }
+}

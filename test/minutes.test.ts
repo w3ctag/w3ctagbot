@@ -351,3 +351,61 @@ Comment 4
     },
   });
 });
+
+test("2024-07-08-minutes.md has correct attendance", async () => {
+  expect(
+    parseMinutes(await readFile("test/minutes/2024-07-08-minutes.md", "utf-8"))
+      .attendance,
+  ).toEqual({
+    "Breakout A": ["Yves", "Dan", "Max", "Matthew"],
+    "Breakout B": [
+      "Peter",
+      "Matthew",
+      "Yves",
+      "Lea",
+      "Hadley",
+      "Dan",
+      "Peter",
+      "Matthew",
+      "Yves",
+      "Lea",
+      "Hadley",
+      "Sam Goto",
+      "Michael Knowles",
+      "Yi Gu",
+      "Christian Biesinger",
+      "Ashima",
+      "Johann Hofmann",
+    ],
+    "Breakout C": [],
+    "Breakout D": [],
+    "Breakout E": ["Max", "Hadley", "Dan"],
+    Plenary: [],
+  });
+});
+
+test("2024-02-19-minutes.md has correct attendance", async () => {
+  expect(
+    parseMinutes(await readFile("test/minutes/2024-02-19-minutes.md", "utf-8"))
+      .attendance,
+  ).toEqual({
+    "Breakout A": ["Dan", "Yves", "Matthew", "Amy"],
+    "Breakout B": ["Amy", "Peter", "Yves"],
+    "Breakout C": [],
+    "Breakout D": ["Matthew", "Martin", "Peter"],
+    "Breakout E": ["Dan", "Yves", "Max"],
+    Plenary: ["Amy", "Matthew", "Dan", "Martin", "Yves", "Peter", "Hadley"],
+  });
+});
+
+test("2024-10-14-minutes.md has correct attendance", async () => {
+  expect(
+    parseMinutes(await readFile("test/minutes/2024-10-14-minutes.md", "utf-8"))
+      .attendance,
+  ).toEqual({
+    "Breakout A": ["Tristan", "Peter", "Yves", "Matthew", "Jeffrey", "Lea"],
+    "Breakout B": ["Peter", "Tess", "Martin", "Jeffrey"],
+    "Breakout C": ["Hadley", "Martin", "Tristan", "Liu", "Dan", "Yves"],
+    Plenary: ["Jeffrey", "Martin", "Dan", "Tristan"],
+  });
+});

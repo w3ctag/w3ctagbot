@@ -1,0 +1,9 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { reparseMinutes } from "../lib/github/update";
+
+const count = await reparseMinutes();
+---
+<Layout title="Reparsing minutes">
+    <p>{count} minutes files re-parsed. <a href="/">Go back home.</a></p>
+</Layout>
