@@ -1,0 +1,62 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { summarizeAttendance } from "../lib/attendance";
+import { tagMembers } from "../lib/tag-members";
+
+const attendance = await summarizeAttendance();
+
+const years = Array.from(attendance.byTerm.keys()).sort((a, b) => b - a);
+
+const percentFormatter = new Intl.NumberFormat(undefined, { style: "percent" });
+---
+
+<Layout title="Attendance">
+  <nav><a href="/">Home</a></nav>
+  <main>
+    <h1>Rough meeting attendance by year</h1>
+    <p>
+      This is a very preliminary estimate of how many meetings each TAG member
+      attended during their terms. It currently doesn't count in-person
+      meetings, doesn't count meetings where attendance wasn't captured with a <code
+        >Present:</code
+      > row, doesn't try to analyze which meetings were at a reasonable hour for
+      each member, and of course doesn't capture other ways that each TAG member
+      contributed, like speaking during meetings, doing design review work asynchronously,
+      or contributing to Findings. Take it with many grains of salt.
+    </p>
+    <div class="attendance">
+      {
+        years.map((year) => (
+          <table>
+            <caption>
+              {year}: {attendance.byTerm.get(year)?.totalMeetings} meetings
+            </caption>
+            {attendance.byTerm
+              .get(year)
+              ?.attendance.map(({ memberId, fraction }) => (
+                <tr>
+                  <td>{tagMembers[memberId].name}</td>
+                  <td>{percentFormatter.format(fraction)}</td>
+                </tr>
+              ))}
+          </table>
+        ))
+      }
+    </div>
+  </main>
+</Layout>
+
+<style is:global>
+  div.attendance {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: start;
+  }
+  .attendance table {
+    margin: 1ex;
+    border-collapse: collapse;
+  }
+  .attendance td {
+    border: thin black solid;
+  }
+</style>
