@@ -1,0 +1,115 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { summarizeAttendance } from "../lib/attendance";
+import { tagMembers } from "../lib/tag-members";
+
+const attendance = await summarizeAttendance();
+
+const years = Array.from(attendance.byTerm.keys()).sort((a, b) => b - a);
+
+const percentFormatter = new Intl.NumberFormat(undefined, { style: "percent" });
+---
+
+<Layout title="Attendance">
+  <nav><a href="/">Home</a></nav>
+  <main>
+    <h1>Meeting attendance by year</h1>
+    <p>
+      TAG members aren't expected to attend absolutely every meeting. For
+      example, in 2024, 1/3 of the breakouts were in the middle of the night for
+      any place on Earth, leading to a maximum attendance of 75%. Vacations are
+      also expected.
+    </p>
+    {
+      years.map((year) => (
+        <table>
+          <caption>
+            {year}: {attendance.byTerm.get(year)?.totalMeetings} meetings
+          </caption>
+          {attendance.byTerm
+            .get(year)
+            ?.attendance.map(({ memberId, fraction }) => (
+              <tr>
+                <td>{tagMembers[memberId].name}</td>
+                <td>{percentFormatter.format(fraction)}</td>
+              </tr>
+            ))}
+        </table>
+      ))
+    }
+  </main>
+</Layout>
+
+<script
+  is:inline
+  id="meetingAttendance"
+  data-meetingAttendance={JSON.stringify(attendance.allMeetings)}></script>
+
+<script>
+  import {
+  binX,
+  line,
+  plot,
+  windowY,
+  type LineOptions,
+} from "@observablehq/plot";
+
+  addEventListener("DOMContentLoaded", function () {
+    const openCloseHistory: { created: number; closed?: number }[] = JSON.parse(
+      document.getElementById("openCloseHistory")?.dataset.openclosehistory!
+    );
+    const events: { Date: Date; type: "Opened" | "Closed" }[] = [];
+    for (const { created, closed } of openCloseHistory) {
+      events.push({ Date: new Date(created), type: "Opened" });
+      if (closed) {
+        events.push({ Date: new Date(closed), type: "Closed" });
+      }
+    }
+    events.sort((a, b) => a.Date.getTime() - b.Date.getTime());
+    const totalOpen = events.reduce(
+      ({ result, total }, { Date, type }) => {
+        total += type === "Opened" ? 1 : -1;
+        result.push({ Date, Open: total });
+        return { result, total };
+      },
+      { result: new Array<{ Date: Date; Open: number }>(), total: 0 }
+    ).result;
+    const main = document.querySelector("main")!;
+    main.append(
+      plot({
+        title: "Open reviews",
+        marks: [
+          line(
+            totalOpen,
+            windowY(
+              { k: 7 },
+              {
+                x: "Date",
+                y: "Open",
+                tip: { pointer: "x", format: { x: "%Y %b %d" } },
+              }
+            )
+          ),
+        ],
+      }),
+      plot({
+        title: "Review throughput",
+        color: { legend: true },
+        marks: [
+          line(
+            events,
+            binX<LineOptions>(
+              { y: "count" },
+              {
+                x: "Date",
+                interval: "month",
+                stroke: "type",
+                tip: { pointer: "x", format: { x: "%B %Y" } },
+              }
+            )
+          ),
+        ],
+      })
+    );
+  });
+</script>

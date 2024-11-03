@@ -114,6 +114,8 @@ export const tagMembers = {
   },
 } as const satisfies { [id: string]: TagMember };
 
+export type TagMemberId = keyof typeof tagMembers;
+
 export const tagMemberIdsByAttendanceName: ReadonlyMap<string, string> =
   (function () {
     const result = new Map<string, string>();
@@ -127,3 +129,13 @@ export const tagMemberIdsByAttendanceName: ReadonlyMap<string, string> =
     }
     return result;
   })();
+
+export function membersActiveOnDate(date: Date): Set<TagMemberId> {
+  const result = new Set<TagMemberId>();
+  for (const [memberId, { terms }] of Object.entries(tagMembers)) {
+    if (terms.some((term) => term.end > date && term.start <= date)) {
+      result.add(memberId as TagMemberId);
+    }
+  }
+  return result;
+}
