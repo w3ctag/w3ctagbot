@@ -20,25 +20,41 @@ const percentFormatter = new Intl.NumberFormat(undefined, { style: "percent" });
       any place on Earth, leading to a maximum attendance of 75%. Vacations are
       also expected.
     </p>
-    {
-      years.map((year) => (
-        <table>
-          <caption>
-            {year}: {attendance.byTerm.get(year)?.totalMeetings} meetings
-          </caption>
-          {attendance.byTerm
-            .get(year)
-            ?.attendance.map(({ memberId, fraction }) => (
-              <tr>
-                <td>{tagMembers[memberId].name}</td>
-                <td>{percentFormatter.format(fraction)}</td>
-              </tr>
-            ))}
-        </table>
-      ))
-    }
+    <div class="attendance">
+      {
+        years.map((year) => (
+          <table>
+            <caption>
+              {year}: {attendance.byTerm.get(year)?.totalMeetings} meetings
+            </caption>
+            {attendance.byTerm
+              .get(year)
+              ?.attendance.map(({ memberId, fraction }) => (
+                <tr>
+                  <td>{tagMembers[memberId].name}</td>
+                  <td>{percentFormatter.format(fraction)}</td>
+                </tr>
+              ))}
+          </table>
+        ))
+      }
+    </div>
   </main>
 </Layout>
+
+<style is:global>
+  div.attendance {
+    display: flex;
+    align-items: start;
+  }
+  .attendance table {
+    margin: 1ex;
+    border-collapse: collapse;
+  }
+  .attendance td {
+    border: thin black solid;
+  }
+</style>
 
 <script
   is:inline

@@ -247,36 +247,58 @@ export async function parseNewMinutes(): Promise<void> {
       if (!blob.text) {
         console.error(
           `Blob ${blob.id} for meeting ${year}/${name} has no text. ` +
-            `It may be binary (${blob.isBinary}) or truncated (${blob.isTruncated}).`,
+            `It may be binary (${blob.isBinary}).`,
         );
         continue;
       }
-      const minutes = parseMinutes(blob.text);
-      await prisma.$transaction([
-        // Clear out existing sessions.
-        prisma.meetingSession.deleteMany({
-          where: { meetingYear: year, meetingName: name },
-        }),
-        // And create new ones from the new minutes.
-        prisma.meeting.update({
-          where: { year_name: { year, name } },
-          data: {
-            cachedMinutesId: blob.id,
-            contents: blob.text,
-            sessions: {
-              create: createSessionsFromMinutes(year, name, minutes),
-            },
-            discussions: {
-              create: createDiscussionsFromMinutes(
-                minutes,
-                designReviewIdsByNumber,
-              ),
-            },
-          },
-        }),
-      ]);
+      if (blob.isTruncated) {
+        console.error(
+          `Blob ${blob.id} for meeting ${year}/${name} is truncated.`,
+        );
+        continue;
+      }
+      await updateMinutesInDb(
+        blob.id,
+        blob.text,
+        year,
+        name,
+        designReviewIdsByNumber,
+      );
     }
   }
+}
+
+async function updateMinutesInDb(
+  blobId: string,
+  blobText: string,
+  year: number,
+  name: string,
+  designReviewIdsByNumber: Map<number, string>,
+) {
+  const minutes = parseMinutes(blobText);
+  await prisma.$transaction([
+    // Clear out existing sessions.
+    prisma.meetingSession.deleteMany({
+      where: { meetingYear: year, meetingName: name },
+    }),
+    // And create new ones from the new minutes.
+    prisma.meeting.update({
+      where: { year_name: { year, name } },
+      data: {
+        cachedMinutesId: blobId,
+        contents: blobText,
+        sessions: {
+          create: createSessionsFromMinutes(year, name, minutes),
+        },
+        discussions: {
+          create: createDiscussionsFromMinutes(
+            minutes,
+            designReviewIdsByNumber,
+          ),
+        },
+      },
+    }),
+  ]);
 }
 
 export async function updateMinutes(): Promise<void> {
@@ -351,4 +373,31 @@ export async function updateAll(): Promise<void> {
   await updateDesignReviews();
   await updateMinutes();
   finished!();
+}
+
+/** Reparses all of the minutes in the database, without refetching anything from Github. */
+export async function reparseMinutes(): Promise<number> {
+  const [hasMinutes, designReviewNumbers] = await Promise.all([
+    prisma.meeting.findMany({
+      where: { NOT: { contents: null, cachedMinutesId: null } },
+      select: { year: true, name: true, cachedMinutesId: true, contents: true },
+    }),
+    prisma.designReview.findMany({ select: { id: true, number: true } }),
+  ]);
+  const designReviewIdsByNumber = new Map(
+    designReviewNumbers.map(({ id, number }) => [number, id]),
+  );
+  for (const meeting of hasMinutes) {
+    if (meeting.cachedMinutesId == null || meeting.contents == null) {
+      continue;
+    }
+    await updateMinutesInDb(
+      meeting.cachedMinutesId,
+      meeting.contents,
+      meeting.year,
+      meeting.name,
+      designReviewIdsByNumber,
+    );
+  }
+  return hasMinutes.length;
 }

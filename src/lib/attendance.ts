@@ -1,6 +1,6 @@
 import { prisma } from "./prisma";
 import { membersActiveOnDate, type TagMemberId } from "./tag-members";
-import { notNull } from "./util";
+import { notNull, setMapDefault } from "./util";
 
 /** Returns the TAG term that `date` falls within.
  * The term from 2023-Feb-1 to 2024-Feb-1 is named "2023".
@@ -60,6 +60,7 @@ export async function summarizeAttendance(): Promise<AttendanceSummary> {
       const activeMembers = membersActiveOnDate(date);
       return {
         date,
+        activeMembers,
         attendees: attendees
           .map(({ attendeeId }) => attendeeId)
           // Don't include former or future TAG members who are just visiting a given meeting.
@@ -75,46 +76,52 @@ export async function summarizeAttendance(): Promise<AttendanceSummary> {
     Term,
     {
       totalMeetings: number;
-      attendance: Map<TagMemberId, number>;
+      byMember: Map<
+        TagMemberId,
+        { meetingsInTerm: number; attendance: number }
+      >;
     }
   >();
   for (const meeting of meetingAttendees) {
     const term = dateToTerm(meeting.date);
-    let termInfo = byTerm.get(term);
-    if (termInfo === undefined) {
-      termInfo = {
-        totalMeetings: 0,
-        attendance: new Map<TagMemberId, number>(),
-      };
-      byTerm.set(term, termInfo);
-    }
+    const termInfo = setMapDefault(byTerm, term, {
+      totalMeetings: 0,
+      byMember: new Map<
+        TagMemberId,
+        { meetingsInTerm: number; attendance: number }
+      >(),
+    });
     termInfo.totalMeetings++;
 
-    let termMemberAttendance = termInfo.attendance;
+    const termMemberAttendance = termInfo.byMember;
+    for (const member of meeting.activeMembers) {
+      setMapDefault(termMemberAttendance, member, {
+        meetingsInTerm: 0,
+        attendance: 0,
+      }).meetingsInTerm++;
+    }
     for (const attendee of meeting.attendees) {
-      termMemberAttendance.set(
-        attendee,
-        (termMemberAttendance.get(attendee) ?? 0) + 1,
-      );
+      // Attendees are a subset of active members.
+      termMemberAttendance.get(attendee)!.attendance++;
     }
   }
 
   return {
     byTerm: new Map(
       Array.from(byTerm.entries())
-        .sort(([a, _1], [b, _2]) => b - a)
-        .map(([term, { totalMeetings, attendance }]) => [
+        .sort(([a], [b]) => b - a)
+        .map(([term, { totalMeetings, byMember }]) => [
           term,
           {
             totalMeetings,
             attendance: Array.from(
-              attendance.entries(),
-              ([memberId, attended]) => ({
-                memberId: memberId as TagMemberId,
+              byMember.entries(),
+              ([memberId, { meetingsInTerm, attendance: attended }]) => ({
+                memberId,
                 attended,
-                fraction: attended / totalMeetings,
+                fraction: attended / meetingsInTerm,
               }),
-            ).sort(({ attended: a }, { attended: b }) => b - a),
+            ).sort(({ fraction: a }, { fraction: b }) => b - a),
           },
         ]),
     ),
