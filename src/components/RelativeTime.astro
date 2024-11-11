@@ -1,0 +1,18 @@
+---
+interface Props {
+  datetime: Date;
+}
+const { datetime } = Astro.props;
+
+const defaultFormatter = Intl.DateTimeFormat("en-us", {
+  timeZone: "UTC",
+  dateStyle: "medium",
+});
+---
+
+<script>
+  import "@github/relative-time-element";
+</script>
+<relative-time datetime={datetime.toISOString()}
+  >{defaultFormatter.format(datetime)}</relative-time
+>

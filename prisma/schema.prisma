@@ -18,6 +18,8 @@ model DesignReview {
   /// The initial comment on the issue, in Markdown format.
   body        String
   labels      ReviewLabel[]
+  milestoneId String?
+  milestone   Milestone?    @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
   created     DateTime
   updated     DateTime
   closed      DateTime?
@@ -33,6 +35,13 @@ model ReviewLabel {
   label    String
 
   @@unique([reviewId, labelId])
+}
+
+model Milestone {
+  id            String         @id
+  title         String
+  dueOn         DateTime?
+  designReviews DesignReview[]
 }
 
 /// Either an in-person multi-day meeting or a week of telecons.

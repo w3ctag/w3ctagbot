@@ -1,0 +1,21 @@
+---
+import type { DesignReview } from "@prisma/client";
+
+interface Props {
+  reviews: DesignReview[];
+}
+
+const { reviews } = Astro.props;
+---
+
+{
+  reviews
+    .toSorted((a, b) => a.number - b.number)
+    .map((review) => (
+      <li>
+        <a href={`${import.meta.env.BASE_URL}review/${review.number}`}>
+          #{review.number}: {review.title}
+        </a>
+      </li>
+    ))
+}

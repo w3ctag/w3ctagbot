@@ -1,0 +1,125 @@
+---
+import { REVIEWS_REPO, TAG_ORG } from "astro:env/client";
+import Markdown from "../../components/Markdown.astro";
+import RelativeTime from "../../components/RelativeTime.astro";
+import ReviewList from "../../components/ReviewList.astro";
+import Layout from "../../layouts/Layout.astro";
+import { prisma } from "../../lib/prisma";
+
+const { number } = Astro.params;
+
+const parsedNumber = parseInt(number!);
+if (isNaN(parsedNumber)) {
+  return new Response(undefined, { status: 404 });
+}
+
+const review = await prisma.designReview.findUnique({
+  where: { number: parsedNumber },
+  include: {
+    labels: true,
+    milestone: true,
+    discussions: {
+      include: { meeting: true, proposedComments: true },
+      orderBy: [{ meetingYear: "asc" }, { meetingName: "asc" }],
+    },
+  },
+});
+
+if (review == null) {
+  return new Response(undefined, { status: 404 });
+}
+
+const sameWeek = await prisma.designReview.findMany({
+  where: {
+    milestoneId: review.milestoneId,
+  },
+  orderBy: { created: "desc" },
+});
+---
+
+<Layout title={`Design Review #${review.number}`}>
+  <nav id="top">
+    <a href="/">Home</a>
+  </nav>
+  <nav id="agenda">
+    <ul>
+      <ReviewList reviews={sameWeek} />
+    </ul>
+  </nav>
+  <main>
+    <h2>#{review.number}: {review.title}</h2>
+    <p>
+      <a
+        href={`https://github.com/${TAG_ORG}/${REVIEWS_REPO}/issues/${review.number}`}
+        >Visit on Github.</a
+      >
+    </p>
+    <details class="comment">
+      <summary>Opened <RelativeTime datetime={review.created} /></summary>
+      <Markdown source={review.body} />
+    </details>
+
+    <h3>Discussions</h3>
+    {
+      review.discussions.map((discussion) => (
+        <details class="discussion">
+          <summary>
+            {discussion.meetingYear}-{discussion.meetingName}
+          </summary>
+          <p><a href={discussion.meeting.minutesUrl}>Minutes</a></p>
+          <Markdown source={discussion.markdown} />
+        </details>
+      ))
+    }
+  </main>
+</Layout>
+
+<style is:global>
+  html {
+    height: 100%;
+  }
+  body {
+    height: 100%;
+    margin: 0;
+    display: grid;
+    grid-template-areas:
+      "top top"
+      "agenda main";
+    grid-template-columns: minmax(15em, 1fr) 3fr;
+    grid-template-rows: max-content auto;
+    gap: 1ex;
+  }
+  #top {
+    grid-area: top;
+  }
+  #agenda {
+    grid-area: agenda;
+    height: 100%;
+    overflow: auto;
+
+    & ul {
+      padding-inline-start: 1em;
+    }
+  }
+  main {
+    height: 100%;
+    overflow: auto;
+    grid-area: main;
+    padding: 1ex;
+  }
+  .comment,
+  .discussion {
+    margin-top: 1em;
+    border-radius: 1ex;
+    padding: 1ex;
+    summary {
+      margin-top: -2.9ex;
+      padding: 0.5ex;
+      background-color: white;
+      width: max-content;
+    }
+    &[open] {
+      border: thin black solid;
+    }
+  }
+</style>

@@ -1,17 +1,35 @@
 ---
-import { REVIEWS_REPO, TAG_ORG } from "astro:env/client";
+import { Temporal } from "@js-temporal/polyfill";
+import type { DesignReview } from "@prisma/client";
+import ReviewList from "../components/ReviewList.astro";
 import Layout from "../layouts/Layout.astro";
+import { closestMonday, toPlainDateUTC } from "../lib/date";
 import { prisma } from "../lib/prisma";
+import { setMapDefault } from "../lib/util";
 
 const openReviews = await prisma.designReview.findMany({
   where: { closed: null },
-  orderBy: { created: "desc" },
+  include: { milestone: { select: { dueOn: true } } },
 });
 
 let serverEmpty = false;
 
 if (openReviews.length === 0) {
   serverEmpty = (await prisma.designReview.count()) === 0;
+}
+
+const thisMonday = closestMonday(Temporal.Now.plainDateISO("UTC"));
+const withMilestone = new Map<string, DesignReview[]>();
+const withoutMilestone: DesignReview[] = [];
+for (const review of openReviews) {
+  if (review.milestone?.dueOn) {
+    const due = toPlainDateUTC(review.milestone.dueOn);
+    if (Temporal.PlainDate.compare(due, thisMonday) >= 0) {
+      setMapDefault(withMilestone, due.toString(), []).push(review);
+      continue;
+    }
+  }
+  withoutMilestone.push(review);
 }
 ---
 
@@ -27,19 +45,29 @@ if (openReviews.length === 0) {
           No design reviews have been loaded into this server.
           <a href="/update">Try to load some from Github?</a>
         </p>
-      ) : (
-        <ol>
-          {openReviews.map((review) => (
-            <li>
-              <a
-                href={`https://github.com/${TAG_ORG}/${REVIEWS_REPO}/issues/${review.number}`}
-              >
-                {review.title}
-              </a>
-            </li>
-          ))}
-        </ol>
-      )
+      ) : null
+    }
+    {
+      Array.from(withMilestone.entries())
+        .sort(([m1], [m2]) => Temporal.PlainDate.compare(m1, m2))
+        .map(([milestone, reviews]) => (
+          <>
+            <h3>Scheduled for {milestone}</h3>
+            <ol>
+              <ReviewList {reviews} />
+            </ol>
+          </>
+        ))
+    }
+    {
+      withoutMilestone.length > 0 ? (
+        <>
+          <h3>Backlog</h3>
+          <ol>
+            <ReviewList reviews={withoutMilestone} />
+          </ol>
+        </>
+      ) : null
     }
   </main>
 </Layout>

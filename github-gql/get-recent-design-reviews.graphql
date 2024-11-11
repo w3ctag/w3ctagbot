@@ -30,6 +30,11 @@ query RecentDesignReviews(
             name
           }
         }
+        milestone {
+          id
+          title
+          dueOn
+        }
       }
     }
   }

@@ -31540,7 +31540,7 @@ export type RecentDesignReviewsQueryVariables = Exact<{
 }>;
 
 
-export type RecentDesignReviewsQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, body: string, createdAt: any, updatedAt: any, closedAt?: any | null, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | null> | null } } | null };
+export type RecentDesignReviewsQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, body: string, createdAt: any, updatedAt: any, closedAt?: any | null, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null } | null> | null } } | null };
 
 export type ListMinutesQueryVariables = Exact<{
   owner: Scalars['String']['input'];
@@ -31556,7 +31556,7 @@ export class TypedDocumentString<TResult, TVariables>
 {
   __apiType?: DocumentTypeDecoration<TResult, TVariables>['__apiType'];
 
-  constructor(private value: string, public __meta__?: Record<string, any>) {
+  constructor(private value: string, public __meta__?: Record<string, any> | undefined) {
     super(value);
   }
 
@@ -31605,6 +31605,11 @@ export const RecentDesignReviewsDocument = new TypedDocumentString(`
             id
             name
           }
+        }
+        milestone {
+          id
+          title
+          dueOn
         }
       }
     }

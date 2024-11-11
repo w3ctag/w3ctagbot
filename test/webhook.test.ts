@@ -247,6 +247,7 @@ describe("issues", () => {
         updated: new Date("2024-09-20T19:38:15"),
         closed: null,
         labels: [{ label: "Label 1" }, { label: "Label 2" }],
+        milestoneId: null,
       } satisfies typeof result);
     });
   });

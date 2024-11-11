@@ -17,6 +17,9 @@ export async function updateDesignReviews(): Promise<number> {
     orderBy: { updated: "desc" },
     select: { updated: true },
   });
+  console.log(
+    `Querying design reviews after ${latestKnownReview?.updated.toISOString()}`,
+  );
   const result = await pagedQuery(RecentDesignReviewsDocument, {
     since: latestKnownReview?.updated,
     owner: TAG_ORG,
@@ -29,6 +32,8 @@ export async function updateDesignReviews(): Promise<number> {
   if (!issues || issues.length === 0) {
     return 0;
   }
+  console.log(`Inserting ${issues.length} reviews.`);
+
   await prisma.$transaction(
     issues.map((issue) =>
       prisma.designReview.upsert({
@@ -46,6 +51,18 @@ export async function updateDesignReviews(): Promise<number> {
               ?.filter(notNull)
               .map((label) => ({ label: label.name, labelId: label.id })),
           },
+          milestone: issue.milestone
+            ? {
+                connectOrCreate: {
+                  where: { id: issue.milestone.id },
+                  create: {
+                    id: issue.milestone.id,
+                    dueOn: issue.milestone.dueOn as string | null,
+                    title: issue.milestone.title,
+                  },
+                },
+              }
+            : undefined,
         },
         update: {
           title: issue.title,
@@ -69,6 +86,18 @@ export async function updateDesignReviews(): Promise<number> {
               update: {},
             })),
           },
+          milestone: issue.milestone
+            ? {
+                connectOrCreate: {
+                  where: { id: issue.milestone.id },
+                  create: {
+                    id: issue.milestone.id,
+                    dueOn: issue.milestone.dueOn as string | null,
+                    title: issue.milestone.title,
+                  },
+                },
+              }
+            : undefined,
         },
         select: null,
       }),

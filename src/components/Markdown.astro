@@ -1,0 +1,17 @@
+---
+import { micromark } from "micromark";
+import { gfm, gfmHtml } from "micromark-extension-gfm";
+
+interface Props {
+  source: string;
+}
+
+const { source } = Astro.props;
+
+const html = micromark(source, {
+  extensions: [gfm()],
+  htmlExtensions: [gfmHtml()],
+});
+---
+
+<div set:html={html} />

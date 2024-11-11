@@ -79,6 +79,31 @@ webhooks.on("issues.unlabeled", async ({ payload }) => {
   });
 });
 
+webhooks.on("issues.milestoned", async ({ payload }) => {
+  await prisma.designReview.update({
+    where: { id: payload.issue.node_id },
+    data: {
+      milestone: {
+        connectOrCreate: {
+          where: { id: payload.milestone.node_id },
+          create: {
+            id: payload.milestone.node_id,
+            dueOn: payload.milestone.due_on,
+            title: payload.milestone.title,
+          },
+        },
+      },
+    },
+  });
+});
+
+webhooks.on("issues.demilestoned", async ({ payload }) => {
+  await prisma.designReview.update({
+    where: { id: payload.issue.node_id },
+    data: { milestoneId: null },
+  });
+});
+
 export async function handleWebHook(request: Request): Promise<Response> {
   try {
     await webhooks.verifyAndReceive({
