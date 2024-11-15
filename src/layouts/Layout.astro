@@ -1,9 +1,15 @@
 ---
+import { CLIENT_ID } from "astro:env/server";
+import { app } from "../lib/github/auth";
+import type { User } from "../lib/login";
+import { buildUrl } from "../lib/util";
+
 interface Props {
   title: string;
+  user: User | null;
 }
 
-const { title } = Astro.props;
+const { title, user } = Astro.props;
 ---
 
 <!doctype html>
@@ -17,6 +23,42 @@ const { title } = Astro.props;
     <title>{title}</title>
   </head>
   <body>
+    <nav id="topnav">
+      <a href="/">Home</a>
+      <a href="/metrics">Metrics</a>
+      <span id="login"
+        >{
+          user ? (
+            <>
+              <a href={`https://github.com/${user.username}`}>
+                <b>@{user.username}</b>
+              </a>
+              (
+              <a
+                href={buildUrl(new URL("/api/logout", Astro.url), {
+                  next: Astro.request.url,
+                })}
+              >
+                Logout
+              </a>
+              )
+            </>
+          ) : CLIENT_ID && app ? (
+            <a
+              href={
+                app.oauth.getWebFlowAuthorizationUrl({
+                  redirectUrl: new URL("/api/github/oauth/callback", Astro.url)
+                    .href,
+                  state: Astro.request.url,
+                }).url
+              }
+            >
+              Login
+            </a>
+          ) : null
+        }</span
+      >
+    </nav>
     <slot />
   </body>
 </html>
@@ -27,9 +69,9 @@ const { title } = Astro.props;
   }
 
   :first-child {
-	margin-block-start: 0;
+    margin-block-start: 0;
   }
   :last-child {
-	margin-block-end: 0;
+    margin-block-end: 0;
   }
 </style>

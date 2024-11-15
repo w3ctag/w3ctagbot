@@ -1,7 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { summarizeAttendance } from "../lib/attendance";
+import { getLogin } from "../lib/login";
 import { tagMembers } from "../lib/tag-members";
+
+const user = await getLogin(Astro.cookies);
 
 const attendance = await summarizeAttendance();
 
@@ -10,8 +13,7 @@ const years = Array.from(attendance.byTerm.keys()).sort((a, b) => b - a);
 const percentFormatter = new Intl.NumberFormat(undefined, { style: "percent" });
 ---
 
-<Layout title="Attendance">
-  <nav><a href="/">Home</a></nav>
+<Layout title="Attendance" {user}>
   <main>
     <h1>Rough meeting attendance by year</h1>
     <p>

@@ -23,6 +23,9 @@ importers:
       '@observablehq/plot':
         specifier: ^0.6.16
         version: 0.6.16
+      '@octokit/auth-oauth-app':
+        specifier: ^8.1.1
+        version: 8.1.1
       '@octokit/webhooks':
         specifier: ^13.3.0
         version: 13.3.0

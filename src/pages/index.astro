@@ -4,8 +4,11 @@ import type { DesignReview } from "@prisma/client";
 import ReviewList from "../components/ReviewList.astro";
 import Layout from "../layouts/Layout.astro";
 import { closestMonday, toPlainDateUTC } from "../lib/date";
+import { getLogin } from "../lib/login";
 import { prisma } from "../lib/prisma";
 import { setMapDefault } from "../lib/util";
+
+const user = await getLogin(Astro.cookies);
 
 const openReviews = await prisma.designReview.findMany({
   where: { closed: null },
@@ -33,10 +36,7 @@ for (const review of openReviews) {
 }
 ---
 
-<Layout title="Open design reviews">
-  <nav>
-    <a href="/metrics">Metrics</a>
-  </nav>
+<Layout title="Open design reviews" {user}>
   <main>
     <h2>Open reviews</h2>
     {

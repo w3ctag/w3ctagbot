@@ -4,9 +4,12 @@ import Markdown from "../../components/Markdown.astro";
 import RelativeTime from "../../components/RelativeTime.astro";
 import ReviewList from "../../components/ReviewList.astro";
 import Layout from "../../layouts/Layout.astro";
+import { getLogin } from "../../lib/login";
 import { prisma } from "../../lib/prisma";
 
 const { number } = Astro.params;
+
+const user = await getLogin(Astro.cookies);
 
 const parsedNumber = parseInt(number!);
 if (isNaN(parsedNumber)) {
@@ -37,10 +40,7 @@ const sameWeek = await prisma.designReview.findMany({
 });
 ---
 
-<Layout title={`Design Review #${review.number}`}>
-  <nav id="top">
-    <a href="/">Home</a>
-  </nav>
+<Layout title={`Design Review #${review.number}`} {user}>
   <nav id="agenda">
     <ul>
       <ReviewList reviews={sameWeek} />
@@ -66,7 +66,9 @@ const sameWeek = await prisma.designReview.findMany({
           <summary>
             {discussion.meetingYear}-{discussion.meetingName}
           </summary>
-          <p><a href={discussion.meeting.minutesUrl}>Minutes</a></p>
+          <p>
+            <a href={discussion.meeting.minutesUrl}>Minutes</a>
+          </p>
           <Markdown source={discussion.markdown} />
         </details>
       ))

@@ -31,3 +31,12 @@ export function setMapDefault<K, V>(map: Map<K, V>, key: K, deflt: V): V {
   }
   return val;
 }
+
+export function buildUrl(
+  base: string | URL,
+  params: Record<string, string>,
+): URL {
+  const result = new URL(base);
+  result.search = new URLSearchParams(params).toString();
+  return result;
+}

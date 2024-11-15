@@ -9,20 +9,22 @@ import {
 } from "astro:env/server";
 import { App, Octokit } from "octokit";
 
-let app: App | undefined = undefined;
-if (APP_ID && CLIENT_ID && CLIENT_SECRET && PRIVATE_KEY) {
-  app = new App({
-    appId: APP_ID,
-    privateKey: PRIVATE_KEY,
-    oauth: {
-      clientId: CLIENT_ID,
-      clientSecret: CLIENT_SECRET,
-    },
-    webhooks: {
-      secret: WEBHOOK_SECRET,
-    },
-  });
-}
+export const app: App | undefined = (function () {
+  if (APP_ID && CLIENT_ID && CLIENT_SECRET && PRIVATE_KEY) {
+    return new App({
+      appId: APP_ID,
+      privateKey: PRIVATE_KEY,
+      oauth: {
+        clientId: CLIENT_ID,
+        clientSecret: CLIENT_SECRET,
+      },
+      webhooks: {
+        secret: WEBHOOK_SECRET,
+      },
+    });
+  }
+  return undefined;
+})();
 
 export const webhooks: Webhooks =
   app?.webhooks ?? new Webhooks({ secret: WEBHOOK_SECRET });

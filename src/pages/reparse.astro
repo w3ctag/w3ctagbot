@@ -1,9 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { reparseMinutes } from "../lib/github/update";
+import { getLogin } from "../lib/login";
+
+const user = await getLogin(Astro.cookies);
 
 const count = await reparseMinutes();
 ---
-<Layout title="Reparsing minutes">
-    <p>{count} minutes files re-parsed. <a href="/">Go back home.</a></p>
+
+<Layout title="Reparsing minutes" {user}>
+  <p>{count} minutes files re-parsed. <a href="/">Go back home.</a></p>
 </Layout>

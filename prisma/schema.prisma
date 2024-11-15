@@ -116,3 +116,32 @@ model ProposedComment {
   /// The text of the proposed comment.
   markdown String
 }
+
+/// Logins only support Github oauth login, since this bot is solely for mediating access to Github
+/// data.
+model GithubUser {
+  /// The GraphQL node ID of this user.
+  id       String @id
+  /// Github login name, for display in the UI.
+  username String
+
+  // Tokens used for acting as this user. E.g. posting comments and updating labels.
+  accessToken         String?
+  refreshToken        String?
+  /// When the accessToken needs to be refreshed.
+  accessTokenExpires  DateTime?
+  /// When the user will need to log in again from scratch.
+  refreshTokenExpires DateTime?
+
+  sessions Session[]
+}
+
+/// One user can have multiple active sessions in different browsers.
+model Session {
+  /// Cryptographically random identifier for storage in a cookie.
+  id     String     @id
+  userId String
+  user   GithubUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  expires DateTime
+}

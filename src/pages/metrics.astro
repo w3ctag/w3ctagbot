@@ -1,6 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { getLogin } from "../lib/login";
 import { prisma } from "../lib/prisma";
+
+const user = await getLogin(Astro.cookies);
 
 const openCloseHistory = (
   await prisma.designReview.findMany({
@@ -12,7 +15,7 @@ const openCloseHistory = (
 }));
 ---
 
-<Layout title="Design review metrics">
+<Layout title="Design review metrics" {user}>
   <nav><a href="/">Home</a></nav>
   <main></main>
 </Layout>

@@ -1,9 +1,12 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { updateAll } from "../lib/github/update";
+import { getLogin } from "../lib/login";
+
+const user = await getLogin(Astro.cookies);
 
 await updateAll();
 ---
-<Layout title="Updating from Github">
+<Layout title="Updating from Github" {user}>
     <p>Github state updated. <a href="/">Go back home.</a></p>
 </Layout>
