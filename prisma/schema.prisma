@@ -23,7 +23,22 @@ model DesignReview {
   created     DateTime
   updated     DateTime
   closed      DateTime?
+
+  /// We get an initial set of timeline items when querying the issue, but there may be more pages
+  /// of results. This is the `endCursor` value from the first page until we've fetched the
+  /// remaining pages.
+  pendingCommentsFrom String?
+
+  /// If there's a mirror of this issue in the private brainstorming repo, this is that issue's
+  /// GraphQL node ID.
+  privateBrainstormingIssueId             String? @unique
+  /// We get an initial set of timeline items when querying the mirrored private brainstorming
+  /// issue, but there may be more pages of results. This is the `endCursor` value from the first
+  /// page until we've fetched the remaining pages.
+  pendingPrivateBrainstormingCommentsFrom String?
+
   discussions Discussion[]
+  comments    ReviewComment[]
 }
 
 model ReviewLabel {
@@ -42,6 +57,27 @@ model Milestone {
   title         String
   dueOn         DateTime?
   designReviews DesignReview[]
+}
+
+/// Represents a GraphQL
+/// [IssueComment](https://docs.github.com/en/graphql/reference/objects#issuecomment) on either the
+/// main design review or the associated private brainstorming thread.
+model ReviewComment {
+  /// The GraphQL ID of the IssueComment.
+  id                     String       @id
+  reviewId               String
+  review                 DesignReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  publishedAt            DateTime
+  updatedAt              DateTime
+  url                    String
+  /// The contents of the comment, in Markdown format.
+  body                   String
+  /// Can be undefined if the author's account was deleted.
+  authorId               String?
+  author                 GithubUser?  @relation(fields: [authorId], references: [id])
+  isMinimized            Boolean
+  /// Private brainstorming issues should only be shown to logged in TAG members and associates.
+  isPrivateBrainstorming Boolean
 }
 
 /// Either an in-person multi-day meeting or a week of telecons.
@@ -134,6 +170,8 @@ model GithubUser {
   refreshTokenExpires DateTime?
 
   sessions Session[]
+
+  reviewComments ReviewComment[]
 }
 
 /// One user can have multiple active sessions in different browsers.

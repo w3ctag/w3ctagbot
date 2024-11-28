@@ -1,10 +1,18 @@
 import type { Prisma } from "@prisma/client";
-import { MEETINGS_REPO, REVIEWS_REPO, TAG_ORG } from "astro:env/client";
+import {
+  MEETINGS_REPO,
+  PRIVATE_BRAINSTORMING_REPO,
+  REVIEWS_REPO,
+  TAG_ORG,
+} from "astro:env/client";
+import { z } from "zod";
 import {
   BlobContentsDocument,
+  IssueCommentsDocument,
   ListMinutesDocument,
   RecentDesignReviewsDocument,
   type ListMinutesQuery,
+  type RecentDesignReviewsQuery,
 } from "../../gql/graphql";
 import { pagedQuery, query } from "../github";
 import { parseMinutes, type Minutes } from "../minutes-parser";
@@ -12,11 +20,58 @@ import { prisma } from "../prisma";
 import { tagMemberIdsByAttendanceName } from "../tag-members";
 import { notNull } from "../util";
 
-export async function updateDesignReviews(): Promise<number> {
-  const latestKnownReview = await prisma.designReview.findFirst({
-    orderBy: { updated: "desc" },
-    select: { updated: true },
-  });
+type IssueList = NonNullable<
+  NonNullable<RecentDesignReviewsQuery["repository"]>["issues"]["nodes"]
+>;
+type CommentsType = NonNullable<IssueList[0]>["comments"]["nodes"];
+
+function makeCommentUpserts(
+  comments: CommentsType,
+  { isPrivateBrainstorming }: { isPrivateBrainstorming: boolean },
+): Prisma.ReviewCommentUpsertWithWhereUniqueWithoutReviewInput[] | undefined {
+  return comments
+    ?.filter(notNull)
+    .map(({ id, url, author, publishedAt, updatedAt, body, isMinimized }) => {
+      const typedPublishedAt = z.string().parse(publishedAt);
+      const typedUpdatedAt = z.string().parse(updatedAt);
+      const typedUrl = z.string().parse(url);
+      const create = {
+        id,
+        url: typedUrl,
+        publishedAt: typedPublishedAt,
+        updatedAt: typedUpdatedAt,
+        body,
+        author: author
+          ? {
+              connectOrCreate: {
+                where: { id: author.id },
+                create: { id: author.id, username: author.login },
+              },
+            }
+          : undefined,
+        isMinimized,
+        isPrivateBrainstorming,
+      };
+      return {
+        where: { id: create.id },
+        create,
+        update: { updatedAt: typedUpdatedAt, body, isMinimized },
+      };
+    });
+}
+
+export async function updateDesignReviews(): Promise<void> {
+  const [latestKnownReview, latestPrivateComment] = await Promise.all([
+    prisma.designReview.findFirst({
+      orderBy: { updated: "desc" },
+      select: { updated: true },
+    }),
+    prisma.reviewComment.findFirst({
+      where: { isPrivateBrainstorming: true },
+      orderBy: { updatedAt: "desc" },
+      select: { updatedAt: true },
+    }),
+  ]);
   console.log(
     `Querying design reviews after ${latestKnownReview?.updated.toISOString()}`,
   );
@@ -30,45 +85,55 @@ export async function updateDesignReviews(): Promise<number> {
   }
   const issues = result.repository.issues.nodes?.filter(notNull);
   if (!issues || issues.length === 0) {
-    return 0;
+    return;
   }
   console.log(`Inserting ${issues.length} reviews.`);
 
   await prisma.$transaction(
-    issues.map((issue) =>
-      prisma.designReview.upsert({
+    issues.map((issue) => {
+      const update: Omit<
+        Prisma.DesignReviewCreateInput,
+        "id" | "number" | "created"
+      > = {
+        title: issue.title,
+        updated: issue.updatedAt as string,
+        closed: issue.closedAt as string | undefined,
+        body: issue.body,
+        milestone: issue.milestone
+          ? {
+              connectOrCreate: {
+                where: { id: issue.milestone.id },
+                create: {
+                  id: issue.milestone.id,
+                  dueOn: issue.milestone.dueOn as string | null,
+                  title: issue.milestone.title,
+                },
+              },
+            }
+          : undefined,
+        pendingCommentsFrom: issue.comments.pageInfo.hasNextPage
+          ? issue.comments.pageInfo.endCursor
+          : null,
+      };
+      const commentUpsert = makeCommentUpserts(issue.comments.nodes, {
+        isPrivateBrainstorming: false,
+      });
+      return prisma.designReview.upsert({
         where: { id: issue.id },
         create: {
           id: issue.id,
           number: issue.number,
-          title: issue.title,
-          body: issue.body,
           created: issue.createdAt as string,
-          updated: issue.updatedAt as string,
-          closed: issue.closedAt as string | undefined,
+          ...update,
           labels: {
             create: issue.labels?.nodes
               ?.filter(notNull)
               .map((label) => ({ label: label.name, labelId: label.id })),
           },
-          milestone: issue.milestone
-            ? {
-                connectOrCreate: {
-                  where: { id: issue.milestone.id },
-                  create: {
-                    id: issue.milestone.id,
-                    dueOn: issue.milestone.dueOn as string | null,
-                    title: issue.milestone.title,
-                  },
-                },
-              }
-            : undefined,
+          comments: { create: commentUpsert?.map((comment) => comment.create) },
         },
         update: {
-          title: issue.title,
-          updated: issue.updatedAt as string,
-          closed: issue.closedAt as string | undefined,
-          body: issue.body,
+          ...update,
           labels: {
             deleteMany: {
               labelId: {
@@ -86,24 +151,145 @@ export async function updateDesignReviews(): Promise<number> {
               update: {},
             })),
           },
-          milestone: issue.milestone
-            ? {
-                connectOrCreate: {
-                  where: { id: issue.milestone.id },
-                  create: {
-                    id: issue.milestone.id,
-                    dueOn: issue.milestone.dueOn as string | null,
-                    title: issue.milestone.title,
-                  },
-                },
-              }
-            : undefined,
+          comments: { upsert: commentUpsert },
         },
         select: null,
-      }),
-    ),
+      });
+    }),
   );
-  return issues.length;
+  await updatePrivateBrainstorming(latestPrivateComment?.updatedAt);
+  await updateRemainingComments();
+}
+
+async function updatePrivateBrainstorming(
+  since: Date | undefined,
+): Promise<void> {
+  console.log(
+    `Querying private brainstorming threads after ${since?.toISOString()}.`,
+  );
+  const result = await pagedQuery(RecentDesignReviewsDocument, {
+    since,
+    owner: TAG_ORG,
+    repo: PRIVATE_BRAINSTORMING_REPO,
+  });
+  if (!result.repository) {
+    throw new Error(
+      `${TAG_ORG}/${PRIVATE_BRAINSTORMING_REPO} repository is missing!`,
+    );
+  }
+  const issues = result.repository.issues.nodes?.filter(notNull);
+  if (!issues || issues.length === 0) {
+    return;
+  }
+  await prisma.$transaction(
+    issues.flatMap((issue) => {
+      const mirroredFromMatch = issue.body.match(
+        /Mirrored from: (?<org>\w+)\/(?<repo>[\w-]+)#(?<number>\d+)/u,
+      );
+      if (
+        !mirroredFromMatch ||
+        mirroredFromMatch.groups?.org !== TAG_ORG ||
+        mirroredFromMatch.groups.repo !== REVIEWS_REPO
+      ) {
+        return [];
+      }
+      const number = parseInt(mirroredFromMatch.groups.number);
+      return prisma.designReview.update({
+        where: { number },
+        data: {
+          privateBrainstormingIssueId: issue.id,
+          pendingPrivateBrainstormingCommentsFrom: issue.comments.pageInfo
+            .hasNextPage
+            ? issue.comments.pageInfo.endCursor
+            : null,
+          comments: {
+            upsert: makeCommentUpserts(issue.comments.nodes, {
+              isPrivateBrainstorming: true,
+            }),
+          },
+        },
+      });
+    }),
+  );
+}
+
+async function updateRemainingComments() {
+  const withPendingComments = await prisma.designReview.findMany({
+    where: {
+      OR: [
+        { pendingCommentsFrom: { not: null } },
+        { pendingPrivateBrainstormingCommentsFrom: { not: null } },
+      ],
+    },
+  });
+  const publicComments = await Promise.all(
+    withPendingComments
+      .filter((review) => review.pendingCommentsFrom != null)
+      .map((review) =>
+        pagedQuery(IssueCommentsDocument, {
+          cursor: review.pendingCommentsFrom,
+          id: review.id,
+        }),
+      ),
+  );
+  await Promise.all(
+    publicComments
+      .map((query) => query.node)
+      .filter(
+        (issue): issue is typeof issue & { __typename: "Issue" } =>
+          issue?.__typename === "Issue",
+      )
+      .map((issue) =>
+        prisma.designReview.update({
+          where: { id: issue.id },
+          data: {
+            pendingCommentsFrom: null,
+            comments: {
+              upsert: makeCommentUpserts(issue.comments.nodes, {
+                isPrivateBrainstorming: false,
+              }),
+            },
+          },
+        }),
+      ),
+  );
+  const brainstormingComments = await Promise.all(
+    withPendingComments
+      .filter(
+        (
+          review,
+        ): review is typeof review & { privateBrainstormingIssueId: string } =>
+          review.privateBrainstormingIssueId != null &&
+          review.pendingPrivateBrainstormingCommentsFrom != null,
+      )
+      .map((review) =>
+        pagedQuery(IssueCommentsDocument, {
+          cursor: review.pendingPrivateBrainstormingCommentsFrom,
+          id: review.privateBrainstormingIssueId,
+        }),
+      ),
+  );
+  await Promise.all(
+    brainstormingComments
+      .map((query) => query.node)
+      .filter(
+        (issue): issue is typeof issue & { __typename: "Issue" } =>
+          issue?.__typename === "Issue",
+      )
+      .map((issue) =>
+        prisma.designReview.update({
+          where: { privateBrainstormingIssueId: issue.id },
+          data: {
+            pendingPrivateBrainstormingCommentsFrom: null,
+            comments: {
+              upsert: makeCommentUpserts(issue.comments.nodes, {
+                isPrivateBrainstorming: true,
+              }),
+            },
+          },
+        }),
+      ),
+  );
 }
 
 function getMinutesFromGithubResponse(

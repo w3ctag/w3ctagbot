@@ -1,3 +1,5 @@
+import { hasOwn } from "./util";
+
 export type TagMember = {
   name: string;
   ghLogin: string;
@@ -150,4 +152,12 @@ export function membersActiveOnDate(date: Date): Set<TagMemberId> {
     }
   }
   return result;
+}
+
+export function githubIdIsTagMemberOnDate(id: string, date: Date): boolean {
+  if (!hasOwn(tagMembers, id)) {
+    return false;
+  }
+  const member = tagMembers[id];
+  return member.terms.some((term) => term.end > date && term.start <= date);
 }

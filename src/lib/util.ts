@@ -40,3 +40,10 @@ export function buildUrl(
   result.search = new URLSearchParams(params).toString();
   return result;
 }
+
+export function hasOwn<K extends PropertyKey, V>(
+  obj: Record<K, V>,
+  key: PropertyKey,
+): key is K {
+  return Object.hasOwn(obj, key);
+}

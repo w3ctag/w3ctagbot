@@ -3,9 +3,10 @@ import type {
   GitHubAppUserAuthenticationWithExpiration,
 } from "@octokit/auth-oauth-app";
 import type { Prisma } from "@prisma/client";
-import type { AstroCookies } from "astro";
+import type { AstroCookies, AstroGlobal } from "astro";
 import crypto from "node:crypto";
 import util from "node:util";
+import type { App } from "octokit";
 import { app } from "./github/auth";
 import { prisma } from "./prisma";
 
@@ -107,4 +108,14 @@ export async function logout(cookies: AstroCookies): Promise<void> {
       refreshTokenExpires: null,
     },
   });
+}
+
+export function getLoginUrl(
+  astro: Pick<AstroGlobal, "url" | "request">,
+  app: App,
+): string {
+  return app.oauth.getWebFlowAuthorizationUrl({
+    redirectUrl: new URL("/api/github/oauth/callback", astro.url).href,
+    state: astro.request.url,
+  }).url;
 }

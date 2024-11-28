@@ -44,6 +44,9 @@ export default defineConfig({
         // override them.
         TAG_ORG: clientString({ default: "w3ctag" }),
         REVIEWS_REPO: clientString({ default: "design-reviews" }),
+        PRIVATE_BRAINSTORMING_REPO: clientString({
+          default: "design-reviews-private-brainstorming",
+        }),
         MEETINGS_REPO: clientString({ default: "meetings" }),
 
         // These are all defined in the Github App registration. The environment must set these or

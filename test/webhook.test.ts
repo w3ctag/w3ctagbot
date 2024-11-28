@@ -248,6 +248,9 @@ describe("issues", () => {
         closed: null,
         labels: [{ label: "Label 1" }, { label: "Label 2" }],
         milestoneId: null,
+        pendingCommentsFrom: null,
+        privateBrainstormingIssueId: null,
+        pendingPrivateBrainstormingCommentsFrom: null,
       } satisfies typeof result);
     });
   });

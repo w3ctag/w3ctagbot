@@ -35,6 +35,15 @@ query RecentDesignReviews(
           title
           dueOn
         }
+        comments(first: 20, orderBy: { field: UPDATED_AT, direction: DESC }) {
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+          nodes {
+            ...CommentDetails
+          }
+        }
       }
     }
   }

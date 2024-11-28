@@ -1,0 +1,37 @@
+query IssueComments($id: ID!, $cursor: String) {
+  node(id: $id) {
+    __typename
+    ... on Issue {
+      id
+      # This query has to match the comments() query in get-recent-design-reviews.graphql.
+      comments(
+        after: $cursor
+        first: 100
+        orderBy: { field: UPDATED_AT, direction: DESC }
+      ) {
+        pageInfo {
+          hasNextPage
+          endCursor
+        }
+        nodes {
+          ...CommentDetails
+        }
+      }
+    }
+  }
+}
+
+fragment CommentDetails on IssueComment {
+  id
+  url
+  author {
+    login
+    ... on Node {
+      id
+    }
+  }
+  body
+  publishedAt
+  updatedAt
+  isMinimized
+}

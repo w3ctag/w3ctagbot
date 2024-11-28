@@ -4,12 +4,16 @@ import Markdown from "../../components/Markdown.astro";
 import RelativeTime from "../../components/RelativeTime.astro";
 import ReviewList from "../../components/ReviewList.astro";
 import Layout from "../../layouts/Layout.astro";
-import { getLogin } from "../../lib/login";
+import { app } from "../../lib/github/auth";
+import { getLogin, getLoginUrl } from "../../lib/login";
 import { prisma } from "../../lib/prisma";
+import { githubIdIsTagMemberOnDate } from "../../lib/tag-members";
 
 const { number } = Astro.params;
 
 const user = await getLogin(Astro.cookies);
+const userIsOnTag =
+  user && githubIdIsTagMemberOnDate(user.githubId, new Date());
 
 const parsedNumber = parseInt(number!);
 if (isNaN(parsedNumber)) {
@@ -21,6 +25,7 @@ const review = await prisma.designReview.findUnique({
   include: {
     labels: true,
     milestone: true,
+    comments: { include: { author: { select: { username: true } } } },
     discussions: {
       include: { meeting: true, proposedComments: true },
       orderBy: [{ meetingYear: "asc" }, { meetingName: "asc" }],
@@ -38,6 +43,47 @@ const sameWeek = await prisma.designReview.findMany({
   },
   orderBy: { created: "desc" },
 });
+
+let hasTagPrivateComment = false;
+
+const unifiedDiscussions = review.comments
+  .filter(({ isPrivateBrainstorming }) => {
+    if (isPrivateBrainstorming) {
+      hasTagPrivateComment = true;
+      return userIsOnTag;
+    }
+    return true;
+  })
+  .map(
+    ({
+      body,
+      publishedAt,
+      isMinimized,
+      url,
+      author,
+      isPrivateBrainstorming,
+    }) => ({
+      type: "comment" as "comment" | "meeting",
+      isPrivate: isPrivateBrainstorming,
+      body,
+      timestamp: publishedAt,
+      url,
+      isMinimized,
+      author: author?.username,
+    })
+  )
+  .concat(
+    review.discussions.map(({ markdown, meeting }) => ({
+      type: "meeting",
+      isPrivate: false,
+      body: markdown,
+      timestamp: new Date(`${meeting.year}-${meeting.name}`),
+      url: meeting.minutesUrl,
+      isMinimized: false,
+      author: undefined,
+    }))
+  )
+  .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 ---
 
 <Layout title={`Design Review #${review.number}`} {user}>
@@ -54,24 +100,46 @@ const sameWeek = await prisma.designReview.findMany({
         >Visit on Github.</a
       >
     </p>
-    <details class="comment">
+    <details open class="comment">
       <summary>Opened <RelativeTime datetime={review.created} /></summary>
       <Markdown source={review.body} />
     </details>
 
     <h3>Discussions</h3>
     {
-      review.discussions.map((discussion) => (
-        <details class="discussion">
-          <summary>
-            {discussion.meetingYear}-{discussion.meetingName}
-          </summary>
-          <p>
-            <a href={discussion.meeting.minutesUrl}>Minutes</a>
-          </p>
-          <Markdown source={discussion.markdown} />
-        </details>
-      ))
+      hasTagPrivateComment && !user && app ? (
+        <p>
+          <a href={getLoginUrl(Astro, app)}>Log in</a> to see TAG-private
+          discussions.
+        </p>
+      ) : null
+    }
+    {
+      unifiedDiscussions.map(
+        ({ type, url, author, body, isMinimized, timestamp, isPrivate }) => (
+          <details class="discussion" open={!isMinimized}>
+            {type === "comment" ? (
+              <>
+                <summary>
+                  {isPrivate ? "Private comment" : "Comment"}
+                  {author ? `by @${author}` : null}
+                  <RelativeTime datetime={timestamp} />
+                  {/* prettier-ignore */}(<a href={url}>See Github</a>)
+                </summary>
+              </>
+            ) : (
+              <>
+                <summary>
+                  Discussed
+                  <RelativeTime datetime={timestamp} />
+                  {/* prettier-ignore */}(<a href={url}>See Github</a>)
+                </summary>
+              </>
+            )}
+            <Markdown source={body} />
+          </details>
+        )
+      )
     }
   </main>
 </Layout>

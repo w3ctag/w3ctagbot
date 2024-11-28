@@ -1,7 +1,7 @@
 ---
 import { CLIENT_ID } from "astro:env/server";
 import { app } from "../lib/github/auth";
-import type { User } from "../lib/login";
+import { getLoginUrl, type User } from "../lib/login";
 import { buildUrl } from "../lib/util";
 
 interface Props {
@@ -44,17 +44,7 @@ const { title, user } = Astro.props;
               )
             </>
           ) : CLIENT_ID && app ? (
-            <a
-              href={
-                app.oauth.getWebFlowAuthorizationUrl({
-                  redirectUrl: new URL("/api/github/oauth/callback", Astro.url)
-                    .href,
-                  state: Astro.request.url,
-                }).url
-              }
-            >
-              Login
-            </a>
+            <a href={getLoginUrl(Astro, app)}>Login</a>
           ) : null
         }</span
       >
