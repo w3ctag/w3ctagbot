@@ -73,15 +73,32 @@ const unifiedDiscussions = review.comments
     })
   )
   .concat(
-    review.discussions.map(({ markdown, meeting }) => ({
-      type: "meeting",
-      isPrivate: false,
-      body: markdown,
-      timestamp: new Date(`${meeting.year}-${meeting.name}`),
-      url: meeting.minutesUrl,
-      isMinimized: false,
-      author: undefined,
-    }))
+    review.discussions.map(({ markdown, meeting }) => {
+      const dateInName = meeting.name.match(
+        /^(?<month>\d+)-(?:(?<day>\d+)-)?.*/
+      );
+      // TODO: Turn this into a Temporal of the right granularity.
+      let timestamp: Date;
+      if (dateInName && dateInName.groups) {
+        if (dateInName.groups.day) {
+          const { month, day } = dateInName.groups;
+          timestamp = new Date(`${meeting.year}-${month}-${day}`);
+        } else {
+          timestamp = new Date(`${meeting.year}-${dateInName.groups.month}`);
+        }
+      } else {
+        timestamp = new Date(meeting.year);
+      }
+      return {
+        type: "meeting",
+        isPrivate: false,
+        body: markdown,
+        timestamp,
+        url: meeting.minutesUrl,
+        isMinimized: false,
+        author: undefined,
+      };
+    })
   )
   .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 ---
