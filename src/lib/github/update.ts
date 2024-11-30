@@ -1,3 +1,4 @@
+import { GraphqlResponseError } from "@octokit/graphql";
 import type { Prisma } from "@prisma/client";
 import {
   MEETINGS_REPO,
@@ -167,11 +168,20 @@ async function updatePrivateBrainstorming(
   console.log(
     `Querying private brainstorming threads after ${since?.toISOString()}.`,
   );
-  const result = await pagedQuery(RecentDesignReviewsDocument, {
-    since,
-    owner: TAG_ORG,
-    repo: PRIVATE_BRAINSTORMING_REPO,
-  });
+  let result: RecentDesignReviewsQuery;
+  try {
+    result = await pagedQuery(RecentDesignReviewsDocument, {
+      since,
+      owner: TAG_ORG,
+      repo: PRIVATE_BRAINSTORMING_REPO,
+    });
+  } catch (e: unknown) {
+    if (e instanceof GraphqlResponseError) {
+      console.error(e.message);
+      return;
+    }
+    throw e;
+  }
   if (!result.repository) {
     throw new Error(
       `${TAG_ORG}/${PRIVATE_BRAINSTORMING_REPO} repository is missing!`,
