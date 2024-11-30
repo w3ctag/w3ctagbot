@@ -90,7 +90,7 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY }}
           SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
       - name: Upload
-        run: rsync -e "ssh -o ProxyJump=$SSH_USER@$SSH_PROXY" -azv --safe-links --hard-links --progress --delete  built-server/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
+        run: rsync -e "ssh -o ProxyJump=$SSH_USER@$SSH_PROXY" -az --safe-links --hard-links --delete  built-server/ "$SSH_USER@$SSH_HOST:$DEPLOY_PATH"
         env:
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
       - name: Update and Restart
