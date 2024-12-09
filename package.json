@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@astrojs/node": "^8.3.4",
-    "@github/relative-time-element": "^4.4.3",
+    "@github/relative-time-element": "^4.4.4",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@js-temporal/polyfill": "^0.4.4",
     "@observablehq/plot": "^0.6.16",
@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
-    "@eslint/js": "^9.15.0",
+    "@eslint/js": "^9.16.0",
     "@graphql-codegen/cli": "^5.0.3",
     "@graphql-codegen/client-preset": "^4.5.1",
     "@graphql-codegen/typescript": "^4.1.2",
@@ -45,12 +45,12 @@
     "@types/mdast": "^4.0.4",
     "@types/node": "^22.10.1",
     "@types/unist": "^3.0.3",
-    "eslint": "^9.15.0",
-    "prettier": "^3.4.1",
+    "eslint": "^9.16.0",
+    "prettier": "^3.4.2",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.16.0",
-    "vitest": "^2.1.6"
+    "typescript-eslint": "^8.17.0",
+    "vitest": "^2.1.8"
   },
   "engines": {
     "node": "22"
