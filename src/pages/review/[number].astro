@@ -134,7 +134,15 @@ const unifiedDiscussions = review.comments
     {
       unifiedDiscussions.map(
         ({ type, url, author, body, isMinimized, timestamp, isPrivate }) => (
-          <details class="discussion" open={!isMinimized}>
+          <details
+            open={!isMinimized}
+            class:list={{
+              comment: true,
+              discussion: type === "meeting",
+              "public-comment": type === "comment" && !isPrivate,
+              "private-comment": type === "comment" && isPrivate,
+            }}
+          >
             {type === "comment" ? (
               <>
                 <summary>
@@ -201,12 +209,22 @@ const unifiedDiscussions = review.comments
     padding: 1ex;
     summary {
       margin-top: -2.9ex;
+      border-radius: 1ex;
       padding: 0.5ex;
       background-color: white;
       width: max-content;
     }
     &[open] {
       border: thin black solid;
+    }
+    &.discussion {
+      background-color: hsl(0, 100%, 95%);
+    }
+    &.public-comment {
+      background-color: hsl(120, 100%, 95%);
+    }
+    &.private-comment {
+      background-color: hsl(240, 100%, 95%);
     }
   }
 </style>
