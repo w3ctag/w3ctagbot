@@ -37,35 +37,33 @@ export default defineConfig({
     mode: "standalone",
   }),
 
-  experimental: {
-    env: {
-      schema: {
-        // Names for TAG repositories. These are variables so that development instances can
-        // override them.
-        TAG_ORG: clientString({ default: "w3ctag" }),
-        REVIEWS_REPO: clientString({ default: "design-reviews" }),
-        PRIVATE_BRAINSTORMING_REPO: clientString({
-          default: "design-reviews-private-brainstorming",
-        }),
-        MEETINGS_REPO: clientString({ default: "meetings" }),
+  env: {
+    schema: {
+      // Names for TAG repositories. These are variables so that development instances can
+      // override them.
+      TAG_ORG: clientString({ default: "w3ctag" }),
+      REVIEWS_REPO: clientString({ default: "design-reviews" }),
+      PRIVATE_BRAINSTORMING_REPO: clientString({
+        default: "design-reviews-private-brainstorming",
+      }),
+      MEETINGS_REPO: clientString({ default: "meetings" }),
 
-        // These are all defined in the Github App registration. The environment must set these or
-        // GITHUB_TOKEN, below.
-        APP_ID: optionalServerString({ access: "public" }),
-        PRIVATE_KEY: optionalServerString({ access: "secret" }),
-        CLIENT_ID: optionalServerString({ access: "public" }),
-        CLIENT_SECRET: optionalServerString({ access: "secret" }),
+      // These are all defined in the Github App registration. The environment must set these or
+      // GITHUB_TOKEN, below.
+      APP_ID: optionalServerString({ access: "public" }),
+      PRIVATE_KEY: optionalServerString({ access: "secret" }),
+      CLIENT_ID: optionalServerString({ access: "public" }),
+      CLIENT_SECRET: optionalServerString({ access: "secret" }),
 
-        // Technically optional when testing the non-webhook parts of the server, but easy enough to
-        // give a fake value.
-        WEBHOOK_SECRET: envField.string({
-          context: "server",
-          access: "secret",
-        }),
+      // Technically optional when testing the non-webhook parts of the server, but easy enough to
+      // give a fake value.
+      WEBHOOK_SECRET: envField.string({
+        context: "server",
+        access: "secret",
+      }),
 
-        // Use a personal token to test the server without registering it as a whole app.
-        GITHUB_TOKEN: optionalServerString({ access: "secret" }),
-      },
+      // Use a personal token to test the server without registering it as a whole app.
+      GITHUB_TOKEN: optionalServerString({ access: "secret" }),
     },
   },
 });
