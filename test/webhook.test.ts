@@ -1,15 +1,28 @@
+import { tagMemberIdsByAttendanceName } from "@lib/tag-members";
 import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import { REVIEWS_REPO, TAG_ORG } from "astro:env/client";
+import nock from "nock";
+import {
+  FileContentDocument,
+  type FileContentQuery,
+  type FileContentQueryVariables,
+} from "src/gql/graphql";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { webhooks } from "../src/lib/github/auth";
 import { prisma } from "../src/lib/prisma";
-import { handleWebHook } from "../src/pages/webhook";
+import { handleWebHook, webhookProcessingComplete } from "../src/pages/webhook";
+import pushPayload from "./payloads/push.json" with { type: "json" };
 
 beforeEach(async () => {
   await prisma.issue.deleteMany();
+  await prisma.meeting.deleteMany();
+  nock.disableNetConnect();
 });
 afterEach(async () => {
   await prisma.issue.deleteMany();
+  await prisma.meeting.deleteMany();
+  nock.cleanAll();
+  nock.enableNetConnect();
 });
 
 const reviewsRepoFullName = `${TAG_ORG}/${REVIEWS_REPO}`;
@@ -253,5 +266,107 @@ describe("issues", () => {
         pendingCommentsFrom: null,
       } satisfies typeof result);
     });
+  });
+});
+
+describe("push", () => {
+  test("refetches minutes", async () => {
+    // Pre-populate the issue mentioned in the fake discussion.
+    await prisma.issue.create({
+      data: {
+        id: "I_kwDOAKfwGc6IdpC7",
+        org: "w3ctag",
+        repo: "design-reviews",
+        number: 954,
+        title: "Element Capture",
+        body: "I'm requesting a TAG review of Element Capture.",
+        created: "2024-05-10T10:37:41Z",
+        updated: "2024-11-19T11:48:39Z",
+      },
+    });
+
+    const payload = JSON.stringify(pushPayload);
+    const minutesMd = `## Breakout A
+
+Present: Tristan, Peter
+
+### [Element Capture](https://github.com/w3ctag/design-reviews/issues/954) - @LeaVerou, @matatk
+
+Still waiting for a reply from proponents.
+`;
+    const scope = nock("https://api.github.com")
+      .post("/graphql", {
+        query: FileContentDocument.toString(),
+        variables: {
+          owner: "w3ctag",
+          repo: "meetings",
+          expression: "HEAD:2024/telcons/12-09-minutes.md",
+        } satisfies FileContentQueryVariables,
+      })
+      .reply(200, {
+        data: {
+          repository: {
+            defaultBranchRef: { name: "main" },
+            object: {
+              __typename: "Blob",
+              id: "fakeID",
+              isTruncated: false,
+              isBinary: false,
+              text: minutesMd,
+            },
+          },
+        } satisfies FileContentQuery,
+      });
+    const response = await handleWebHook(
+      new Request("https://example.com/webhook", {
+        method: "POST",
+        headers: {
+          "x-github-delivery": "unique id",
+          "x-github-event": "push",
+          "X-Hub-Signature-256": await webhooks.sign(payload),
+        },
+        body: payload,
+      }),
+    );
+    expect(await response.text()).toEqual("");
+    expect(response).toHaveProperty("status", 200);
+    await webhookProcessingComplete();
+    expect(
+      await prisma.meeting.findUnique({
+        where: { year_name: { year: 2024, name: "12-09" } },
+        include: {
+          sessions: {
+            select: {
+              type: true,
+              attendees: { select: { attendeeId: true } },
+            },
+          },
+          discussions: { select: { markdown: true, proposedComments: true } },
+        },
+      }),
+    ).toEqual({
+      year: 2024,
+      name: "12-09",
+      minutesId: "fakeID",
+      minutesUrl:
+        "https://github.com/w3ctag/meetings/blob/main/2024/telcons/12-09-minutes.md",
+      cachedMinutesId: "fakeID",
+      contents: minutesMd,
+      sessions: [
+        {
+          type: "Breakout A",
+          attendees: ["peter", "tristan"].map((name) => ({
+            attendeeId: tagMemberIdsByAttendanceName.get(name),
+          })),
+        },
+      ],
+      discussions: [
+        {
+          markdown: `Still waiting for a reply from proponents.`,
+          proposedComments: []
+        },
+      ],
+    });
+    scope.done();
   });
 });

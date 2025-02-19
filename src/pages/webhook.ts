@@ -1,4 +1,8 @@
+import { query } from "@lib/github";
+import { parseNewMinutes } from "@lib/github/update";
 import type { APIRoute } from "astro";
+import { MEETINGS_REPO, TAG_ORG } from "astro:env/client";
+import { FileContentDocument, type FileContentQuery } from "src/gql/graphql";
 import { webhooks } from "../lib/github/auth";
 import { prisma } from "../lib/prisma";
 
@@ -104,6 +108,110 @@ webhooks.on("issues.demilestoned", async ({ payload }) => {
   });
 });
 
+function addAll<T>(set: Set<T>, array: T[] | null | undefined) {
+  if (array) {
+    for (const item of array) {
+      set.add(item);
+    }
+  }
+}
+
+webhooks.on("push", async ({ payload }) => {
+  const repository = payload.repository.full_name;
+  if (repository === `${TAG_ORG}/${MEETINGS_REPO}`) {
+    const touched = new Set<string>();
+    for (const commit of payload.commits) {
+      addAll(touched, commit.added);
+      addAll(touched, commit.modified);
+      addAll(touched, commit.removed);
+    }
+
+    const newContents = new Map<string, FileContentQuery>();
+    for (const path of touched) {
+      newContents.set(
+        path,
+        await query(FileContentDocument, {
+          owner: payload.repository.owner!.login,
+          repo: payload.repository.name,
+          expression: `HEAD:${path}`,
+        }),
+      );
+    }
+
+    const knownBlobContents = new Map<string, string>();
+
+    for (const [path, content] of newContents.entries()) {
+      const object = content.repository?.object;
+      const parts =
+        /(?<yearStr>\d+)\/(?<meetingType>[^/]+)\/(?<filename>[^.]+)\.md$/.exec(
+          path,
+        );
+      if (!parts?.groups) continue;
+      const { yearStr, meetingType, filename } = parts.groups;
+      const year = parseInt(yearStr);
+      const filename_date = /^(?<month>\d+)-(?<day>\d+)-minutes$/.exec(
+        filename,
+      );
+      let name = meetingType;
+      if (name === "telcons") {
+        if (!filename_date?.groups) continue;
+        const { month, day } = filename_date.groups;
+        name = `${month}-${day}`;
+      }
+      if (object?.__typename !== "Blob" || !object.text) {
+        // Remove any record of this file in the database.
+        await prisma.meeting.delete({
+          where: {
+            year_name: { year, name },
+          },
+        });
+      } else {
+        // Schedule the content to be updated.
+        const minutesUrl =
+          `https://github.com/${TAG_ORG}/${MEETINGS_REPO}/` +
+          `blob/${content.repository?.defaultBranchRef?.name ?? "HEAD"}/${path}`;
+
+        await prisma.meeting.upsert({
+          where: { year_name: { year, name } },
+          create: { year, name, minutesUrl, minutesId: object.id },
+          update: { minutesId: object.id },
+        });
+        knownBlobContents.set(object.id, object.text);
+      }
+    }
+
+    runAsyncWebhookWork(async () => {
+      await parseNewMinutes(knownBlobContents);
+    });
+  }
+});
+
+let webhooksCompletePromise: Promise<void> = Promise.resolve();
+
+function runAsyncWebhookWork(work: () => Promise<void>): void {
+  const nextPromise = work().then(
+    () => {},
+    (e: unknown) => {
+      console.error(e instanceof Error ? e.stack : e);
+    },
+  );
+  webhooksCompletePromise = webhooksCompletePromise.then(() => nextPromise);
+}
+
+/**
+ * Webhooks return a 200 response when they've finished accepting the work implied by the event,
+ * which often means they've successfully inserted the work into the database so it doesn't get
+ * lost. They then kick off asynchronous tasks to finish the work. Tests often need to wait until
+ * all of the asynchronous tasks are finished.
+ *
+ * When `webhookProcessingComplete()` is called, it effectively records the set of webhook events
+ * that have returned their response before the call. It returns a `Promise` that will fulfil when
+ * all the asynchronous work caused by those events has finished.
+ */
+export function webhookProcessingComplete(): Promise<void> {
+  return webhooksCompletePromise;
+}
+
 export async function handleWebHook(request: Request): Promise<Response> {
   try {
     await webhooks.verifyAndReceive({
@@ -117,8 +225,10 @@ export async function handleWebHook(request: Request): Promise<Response> {
 
     return new Response(null, { status: 200 });
   } catch (e) {
+    // eslint-disable-next-line no-ex-assign
+    if (e instanceof AggregateError) e = e.errors[0];
     return new Response(
-      e instanceof Error ? e.message : "Unexpected webhook call.",
+      e instanceof Error ? e.stack : "Unexpected webhook call.",
       { status: 400 },
     );
   }

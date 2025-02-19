@@ -438,7 +438,11 @@ function createDiscussionsFromMinutes(
   );
 }
 
-export async function parseNewMinutes(): Promise<void> {
+/**
+ * @param knownBlobContents Maps blob IDs to their contents. Any unknown blobs will be fetched from
+ * Github.
+ */
+export async function parseNewMinutes(knownBlobContents: Map<string, string> = new Map()): Promise<void> {
   const [newMinutes, issueNames] = await Promise.all([
     prisma.meeting.findMany({
       where: {
@@ -459,43 +463,56 @@ export async function parseNewMinutes(): Promise<void> {
   const issueIdsByName = new Map<`${string}/${string}#${number}`, string>(
     issueNames.map(({ id, org, repo, number }) => [`${org}/${repo}#${number}`, id]),
   );
-  console.log(`Fetching and parsing ${newMinutes.length} minutes documents.`);
+  console.log(`Loading ${newMinutes.length} minutes documents.`);
   while (newMinutes.length > 0) {
     const chunk = newMinutes.splice(0, 20);
-    console.log(
-      `Fetching ${chunk.length} minutes documents from Github: ${chunk[0].year}/${chunk[0].name}...`,
+    const unknownChunk = chunk.filter(
+      ({ minutesId }) => !knownBlobContents.has(minutesId),
     );
-    const contents = await query(BlobContentsDocument, {
-      ids: chunk.map((item) => item.minutesId),
-    });
-    for (let i = 0; i < chunk.length; i++) {
-      const blob = contents.nodes[i];
-      if (blob?.__typename !== "Blob" || chunk[i].minutesId !== blob.id) {
-        console.error(
-          `Github returned unexpected results when getting contents for ${JSON.stringify(chunk)}[${i}]: ` +
-            `${JSON.stringify(blob)}.`,
-        );
-        return;
+    if (unknownChunk.length > 0) {
+      console.log(
+        `Fetching ${unknownChunk.length} minutes documents from Github: ${unknownChunk[0].year}/${unknownChunk[0].name}...`,
+      );
+      const contents = await query(BlobContentsDocument, {
+          ids: unknownChunk.map((item) => item.minutesId),
+        });
+      for (let i = 0; i < unknownChunk.length; i++) {
+        const blob = contents.nodes[i];
+        if (
+          blob?.__typename !== "Blob" ||
+          unknownChunk[i].minutesId !== blob.id
+        ) {
+          console.error(
+            `Github returned unexpected results when getting contents for ${JSON.stringify(chunk)}[${i}]: ` +
+              `${JSON.stringify(blob)}.`,
+          );
+          return;
+        }
+        const { year, name } = unknownChunk[i];
+        if (!blob.text) {
+          console.error(
+            `Blob ${blob.id} for meeting ${year}/${name} has no text. ` +
+              `It may be binary (${blob.isBinary}).`,
+          );
+          continue;
+        }
+        if (blob.isTruncated) {
+          console.error(
+            `Blob ${blob.id} for meeting ${year}/${name} is truncated.`,
+          );
+          continue;
+        }
+        knownBlobContents.set(blob.id, blob.text);
       }
-      const { year, name } = chunk[i];
-      if (!blob.text) {
-        console.error(
-          `Blob ${blob.id} for meeting ${year}/${name} has no text. ` +
-            `It may be binary (${blob.isBinary}).`,
-        );
-        continue;
-      }
-      if (blob.isTruncated) {
-        console.error(
-          `Blob ${blob.id} for meeting ${year}/${name} is truncated.`,
-        );
-        continue;
-      }
+    }
+    for (const minutes of chunk) {
+      const content = knownBlobContents.get(minutes.minutesId);
+      if (!content) continue;
       await updateMinutesInDb(
-        blob.id,
-        blob.text,
-        year,
-        name,
+        minutes.minutesId,
+        content,
+        minutes.year,
+        minutes.name,
         issueIdsByName,
       );
     }
@@ -525,10 +542,7 @@ async function updateMinutesInDb(
           create: createSessionsFromMinutes(year, name, minutes),
         },
         discussions: {
-          create: createDiscussionsFromMinutes(
-            minutes,
-            issueIdsByName,
-          ),
+          create: createDiscussionsFromMinutes(minutes, issueIdsByName),
         },
       },
     }),

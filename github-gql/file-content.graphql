@@ -1,0 +1,17 @@
+# $expression should be "HEAD:path/filename".
+query FileContent($owner: String!, $repo: String!, $expression: String!) {
+  repository(owner: $owner, name: $repo) {
+    defaultBranchRef {
+      name
+    }
+    object(expression: $expression) {
+      __typename
+      ... on Blob {
+        id
+        isTruncated
+        isBinary
+        text
+      }
+    }
+  }
+}
