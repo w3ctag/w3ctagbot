@@ -1,0 +1,75 @@
+---
+import { Code } from "astro:components";
+
+const title = "Scheduling aid for TAG meetings";
+---
+
+<title>{title}</title>
+<script src="../../elements/scheduler.ts"></script>
+<h1>{title}</h1>
+<details>
+  <summary>Availability format details</summary>
+  <p>
+    The availability data is a markdown document where each person is the
+    heading for a section containing the hours they're available. Headings are
+    of the form:
+  </p>
+  <Code lang="markdown" theme="github-light" code={`## Name (timezone)`} />
+  <p>
+    Where the timezone needs to be one of the <a
+      href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones"
+      >identifiers from the IANA timezone database</a
+    >.
+  </p>
+
+  <p>Available hours are described in 3 lines:</p>
+  <Code
+    lang="markdown"
+    theme="github-light"
+    code={`* Core: <hours>
+* Rare: <hours>
+* Except: <hours>`}
+  />
+  <p>
+    <code>Core</code> hours are those you're happy meeting every week. <code
+      >Rare</code
+    > hours are those you'd rather keep to every other week, at most. Times that
+    you don't list are considered off-limits. <code>Except</code> times are taken
+    out of the other two sets.
+  </p>
+  <p>
+    <code>&lt;hours></code> strings are semicolon (<code>;</code>)-separated
+    lists of <code
+      >startDay[-endDay] startTime1-endTime1, startTime2-endTime2, ...</code
+    >. Days are <code>M</code>, <code>T</code>, <code>W</code>, <code>Th</code>,
+    or <code>F</code>, and times are <code><var>HH</var>:<var>MM</var></code>,
+    with <code>00:00</code> usable as the midnight at the end of a day.
+  </p>
+  <p>
+    If the person is a <a href="https://tag.w3.org/associates/">TAG Associate</a
+    >, that can be marked with a <Code
+      inline
+      lang="markdown"
+      theme="github-light"
+      code={`* Associate`}
+    /> line, although this is currently ignored.
+  </p>
+  <p>
+    Other lines in the block are ignored. So a reasonable availability block for
+    a person would be:
+  </p>
+  <Code
+    lang="markdown"
+    theme="github-light"
+    code={`## First Last (America/Los_Angeles)
+
+I prefer to spread my TAG meetings across the week.
+
+* Core: M-Th 08:00-17:30, 20:00-22:00
+* Rare: M-Th 06:00-07:00, 19:00-20:00, 22:00-00:00; F 08:00-11:00
+* Except: M 12:00-12:30, W 13:00-14:00
+`}
+  />
+</details>
+
+<tag-scheduler></tag-scheduler>
