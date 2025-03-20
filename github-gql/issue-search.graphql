@@ -1,0 +1,55 @@
+query IssueSearch($query_: String!, $cursor: String) {
+  search(type: ISSUE, query: $query_, first: 100, after: $cursor) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    nodes {
+      __typename
+      ... on Node {
+        id
+      }
+      ... on UniformResourceLocatable {
+        url
+      }
+      ... on RepositoryNode {
+        repository {
+            owner {
+                login
+            }
+            name
+        }
+      }
+      ... on Issue {
+        title
+        number
+      }
+      ... on PullRequest {
+        title
+        number
+        author {
+            login
+        }
+      }
+      ... on Assignable {
+        assignees(first: 10) {
+          nodes {
+            login
+          }
+        }
+      }
+      ... on Labelable {
+        labels(first: 50) {
+          nodes {
+            name
+          }
+        }
+      }
+    }
+  }
+  rateLimit {
+    cost
+    remaining
+    resetAt
+  }
+}
