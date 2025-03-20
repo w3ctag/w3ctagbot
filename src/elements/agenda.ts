@@ -107,12 +107,12 @@ export class TagAgenda extends LitElement {
   private _callTimes() {
     const monday = this._weekOf;
     if (monday < new Date("2025-04-06")) {
-      let breakoutA = new Date(monday);
+      const breakoutA = new Date(monday);
       breakoutA.setUTCHours(17); // 17:30 Mon GMT
       breakoutA.setUTCMinutes(30); //
-      let breakoutB = new Date(monday);
+      const breakoutB = new Date(monday);
       breakoutB.setUTCHours(47); // 22:00 Tue GMT
-      let breakoutC = new Date(monday);
+      const breakoutC = new Date(monday);
       breakoutC.setUTCHours(56); // 08:00 Wed GMT
       const plenary = new Date(monday);
       plenary.setUTCHours(this._plenaryHours < 24 * 3 ? 79 : 69); // 22:00 Wednesday GMT / 0600 Thursday GMT
