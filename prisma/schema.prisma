@@ -9,17 +9,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model DesignReview {
-  /// The GraphQL Node ID for an issue in https://github.com/w3ctag/design-reviews.
-  id          String        @id
-  /// The issue number: https://github.com/w3ctag/design-reviews/issues/{number}
-  number      Int           @unique
+/// A Github issue or PR that needs TAG discussion. May have more detail in a DesignReview record.
+model Issue {
+  /// The GraphQL Node ID for an issue or PR.
+  id     String @id
+  org    String
+  repo   String
+  /// The issue or PR number: https://github.com/{org}/{repo}/issues/{number}
+  number Int
+
   title       String
   /// The initial comment on the issue, in Markdown format.
   body        String
-  labels      ReviewLabel[]
+  labels      Label[]
   milestoneId String?
-  milestone   Milestone?    @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  milestone   Milestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
   created     DateTime
   updated     DateTime
   closed      DateTime?
@@ -29,6 +33,21 @@ model DesignReview {
   /// remaining pages.
   pendingCommentsFrom String?
 
+  discussions Discussion[]
+  comments    IssueComment[]
+
+  // Subclasses:
+  designReview DesignReview?
+
+  @@unique([org, repo, number])
+}
+
+/// An issue in https://github.com/w3ctag/design-reviews.
+model DesignReview {
+  /// The GraphQL Node ID for an issue in https://github.com/w3ctag/design-reviews.
+  id    String @id
+  issue Issue  @relation(fields: [id], references: [id], onDelete: Cascade)
+
   /// If there's a mirror of this issue in the private brainstorming repo, this is that issue's
   /// GraphQL node ID.
   privateBrainstormingIssueId             String? @unique
@@ -36,37 +55,34 @@ model DesignReview {
   /// issue, but there may be more pages of results. This is the `endCursor` value from the first
   /// page until we've fetched the remaining pages.
   pendingPrivateBrainstormingCommentsFrom String?
-
-  discussions Discussion[]
-  comments    ReviewComment[]
 }
 
-model ReviewLabel {
-  reviewId String
-  review   DesignReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+model Label {
+  issueId String
+  issue   Issue? @relation(fields: [issueId], references: [id], onDelete: Cascade)
   /// This label's global node ID, which lets us track name changes.
-  labelId  String
+  labelId String
   /// The label's name, which can in theory change over time and is determined by the labelId.
-  label    String
+  label   String
 
-  @@unique([reviewId, labelId])
+  @@unique([issueId, labelId])
 }
 
 model Milestone {
-  id            String         @id
-  title         String
-  dueOn         DateTime?
-  designReviews DesignReview[]
+  id    String    @id
+  title String
+  dueOn DateTime?
+  issue Issue[]
 }
 
 /// Represents a GraphQL
 /// [IssueComment](https://docs.github.com/en/graphql/reference/objects#issuecomment) on either the
 /// main design review or the associated private brainstorming thread.
-model ReviewComment {
+model IssueComment {
   /// The GraphQL ID of the IssueComment.
-  id                     String       @id
-  reviewId               String
-  review                 DesignReview @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  id                     String      @id
+  issueId                String
+  issue                  Issue       @relation(fields: [issueId], references: [id], onDelete: Cascade)
   publishedAt            DateTime
   updatedAt              DateTime
   url                    String
@@ -74,7 +90,7 @@ model ReviewComment {
   body                   String
   /// Can be undefined if the author's account was deleted.
   authorId               String?
-  author                 GithubUser?  @relation(fields: [authorId], references: [id])
+  author                 GithubUser? @relation(fields: [authorId], references: [id])
   isMinimized            Boolean
   /// Private brainstorming issues should only be shown to logged in TAG members and associates.
   isPrivateBrainstorming Boolean
@@ -127,9 +143,9 @@ model MeetingAttendee {
 }
 
 model Discussion {
-  id             Int          @id @default(autoincrement())
-  designReviewId String
-  designReview   DesignReview @relation(fields: [designReviewId], references: [id], onDelete: Cascade)
+  id      Int    @id @default(autoincrement())
+  issueId String
+  issue   Issue  @relation(fields: [issueId], references: [id], onDelete: Cascade)
 
   meetingYear Int
   meetingName String
@@ -171,7 +187,7 @@ model GithubUser {
 
   sessions Session[]
 
-  reviewComments ReviewComment[]
+  issueComments IssueComment[]
 }
 
 /// One user can have multiple active sessions in different browsers.

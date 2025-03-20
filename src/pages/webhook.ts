@@ -1,13 +1,13 @@
 import type { APIRoute } from "astro";
-import { REVIEWS_REPO, TAG_ORG } from "astro:env/client";
 import { webhooks } from "../lib/github/auth";
 import { prisma } from "../lib/prisma";
 
 webhooks.on("issues.opened", async ({ payload }) => {
-  if (payload.repository.full_name !== `${TAG_ORG}/${REVIEWS_REPO}`) return;
-  await prisma.designReview.create({
+  await prisma.issue.create({
     data: {
       id: payload.issue.node_id,
+      org: payload.repository.owner.login,
+      repo: payload.repository.name,
       number: payload.issue.number,
       title: payload.issue.title,
       body: payload.issue.body ?? "",
@@ -25,7 +25,7 @@ webhooks.on("issues.opened", async ({ payload }) => {
 });
 
 webhooks.on(["issues.closed", "issues.reopened"], async ({ payload }) => {
-  await prisma.designReview.update({
+  await prisma.issue.update({
     where: {
       id: payload.issue.node_id,
     },
@@ -37,7 +37,7 @@ webhooks.on(["issues.closed", "issues.reopened"], async ({ payload }) => {
 });
 
 webhooks.on("issues.edited", async ({ payload }) => {
-  await prisma.designReview.update({
+  await prisma.issue.update({
     where: {
       id: payload.issue.node_id,
     },
@@ -51,15 +51,15 @@ webhooks.on("issues.edited", async ({ payload }) => {
 
 webhooks.on("issues.labeled", async ({ payload }) => {
   if (!payload.label) return;
-  await prisma.reviewLabel.upsert({
+  await prisma.label.upsert({
     where: {
-      reviewId_labelId: {
-        reviewId: payload.issue.node_id,
+      issueId_labelId: {
+        issueId: payload.issue.node_id,
         labelId: payload.label.node_id,
       },
     },
     create: {
-      reviewId: payload.issue.node_id,
+      issueId: payload.issue.node_id,
       label: payload.label.name,
       labelId: payload.label.node_id,
     },
@@ -69,10 +69,10 @@ webhooks.on("issues.labeled", async ({ payload }) => {
 
 webhooks.on("issues.unlabeled", async ({ payload }) => {
   if (!payload.label) return;
-  await prisma.reviewLabel.delete({
+  await prisma.label.delete({
     where: {
-      reviewId_labelId: {
-        reviewId: payload.issue.node_id,
+      issueId_labelId: {
+        issueId: payload.issue.node_id,
         labelId: payload.label.node_id,
       },
     },
@@ -80,7 +80,7 @@ webhooks.on("issues.unlabeled", async ({ payload }) => {
 });
 
 webhooks.on("issues.milestoned", async ({ payload }) => {
-  await prisma.designReview.update({
+  await prisma.issue.update({
     where: { id: payload.issue.node_id },
     data: {
       milestone: {
@@ -98,7 +98,7 @@ webhooks.on("issues.milestoned", async ({ payload }) => {
 });
 
 webhooks.on("issues.demilestoned", async ({ payload }) => {
-  await prisma.designReview.update({
+  await prisma.issue.update({
     where: { id: payload.issue.node_id },
     data: { milestoneId: null },
   });

@@ -32415,7 +32415,7 @@ export type IssueCommentsQuery = { __typename?: 'Query', node?: { __typename: 'A
 
 export type CommentDetailsFragment = { __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null };
 
-export type RecentDesignReviewsQueryVariables = Exact<{
+export type RecentIssuesQueryVariables = Exact<{
   owner: Scalars['String']['input'];
   repo: Scalars['String']['input'];
   since?: InputMaybe<Scalars['DateTime']['input']>;
@@ -32423,7 +32423,7 @@ export type RecentDesignReviewsQueryVariables = Exact<{
 }>;
 
 
-export type RecentDesignReviewsQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, body: string, createdAt: any, updatedAt: any, closedAt?: any | null, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, comments: { __typename?: 'IssueCommentConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null } | null> | null } } | null> | null } } | null };
+export type RecentIssuesQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, body: string, createdAt: any, updatedAt: any, closedAt?: any | null, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, comments: { __typename?: 'IssueCommentConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null } | null> | null } } | null> | null } } | null };
 
 export type IssueSearchQueryVariables = Exact<{
   query_: Scalars['String']['input'];
@@ -32524,8 +32524,8 @@ export const IssueCommentsDocument = new TypedDocumentString(`
   updatedAt
   isMinimized
 }`) as unknown as TypedDocumentString<IssueCommentsQuery, IssueCommentsQueryVariables>;
-export const RecentDesignReviewsDocument = new TypedDocumentString(`
-    query RecentDesignReviews($owner: String!, $repo: String!, $since: DateTime, $cursor: String) {
+export const RecentIssuesDocument = new TypedDocumentString(`
+    query RecentIssues($owner: String!, $repo: String!, $since: DateTime, $cursor: String) {
   repository(owner: $owner, name: $repo) {
     issues(
       states: [OPEN, CLOSED]
@@ -32583,7 +32583,7 @@ export const RecentDesignReviewsDocument = new TypedDocumentString(`
   publishedAt
   updatedAt
   isMinimized
-}`) as unknown as TypedDocumentString<RecentDesignReviewsQuery, RecentDesignReviewsQueryVariables>;
+}`) as unknown as TypedDocumentString<RecentIssuesQuery, RecentIssuesQueryVariables>;
 export const IssueSearchDocument = new TypedDocumentString(`
     query IssueSearch($query_: String!, $cursor: String) {
   search(type: ISSUE, query: $query_, first: 100, after: $cursor) {

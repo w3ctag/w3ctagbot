@@ -11,9 +11,9 @@ import {
   BlobContentsDocument,
   IssueCommentsDocument,
   ListMinutesDocument,
-  RecentDesignReviewsDocument,
+  RecentIssuesDocument,
   type ListMinutesQuery,
-  type RecentDesignReviewsQuery,
+  type RecentIssuesQuery,
 } from "../../gql/graphql";
 import { pagedQuery, query } from "../github";
 import { parseMinutes, type Minutes } from "../minutes-parser";
@@ -22,14 +22,14 @@ import { tagMemberIdsByAttendanceName } from "../tag-members";
 import { notNull } from "../util";
 
 type IssueList = NonNullable<
-  NonNullable<RecentDesignReviewsQuery["repository"]>["issues"]["nodes"]
+  NonNullable<RecentIssuesQuery["repository"]>["issues"]["nodes"]
 >;
 type CommentsType = NonNullable<IssueList[0]>["comments"]["nodes"];
 
 function makeCommentUpserts(
   comments: CommentsType,
   { isPrivateBrainstorming }: { isPrivateBrainstorming: boolean },
-): Prisma.ReviewCommentUpsertWithWhereUniqueWithoutReviewInput[] | undefined {
+): Prisma.IssueCommentUpsertWithWhereUniqueWithoutIssueInput[] | undefined {
   return comments
     ?.filter(notNull)
     .map(({ id, url, author, publishedAt, updatedAt, body, isMinimized }) => {
@@ -61,13 +61,13 @@ function makeCommentUpserts(
     });
 }
 
-export async function updateDesignReviews(): Promise<void> {
+export async function updateIssues(org: string, repo: string): Promise<void> {
   const [latestKnownReview, latestPrivateComment] = await Promise.all([
-    prisma.designReview.findFirst({
+    prisma.issue.findFirst({
       orderBy: { updated: "desc" },
       select: { updated: true },
     }),
-    prisma.reviewComment.findFirst({
+    prisma.issueComment.findFirst({
       where: { isPrivateBrainstorming: true },
       orderBy: { updatedAt: "desc" },
       select: { updatedAt: true },
@@ -76,13 +76,13 @@ export async function updateDesignReviews(): Promise<void> {
   console.log(
     `Querying design reviews after ${latestKnownReview?.updated.toISOString()}`,
   );
-  const result = await pagedQuery(RecentDesignReviewsDocument, {
+  const result = await pagedQuery(RecentIssuesDocument, {
     since: latestKnownReview?.updated,
-    owner: TAG_ORG,
-    repo: REVIEWS_REPO,
+    owner: org,
+    repo,
   });
   if (!result.repository) {
-    throw new Error(`${TAG_ORG}/${REVIEWS_REPO} repository is missing!`);
+    throw new Error(`${org}/${repo} repository is missing!`);
   }
   const issues = result.repository.issues.nodes?.filter(notNull);
   if (!issues || issues.length === 0) {
@@ -93,8 +93,8 @@ export async function updateDesignReviews(): Promise<void> {
   await prisma.$transaction(
     issues.map((issue) => {
       const update: Omit<
-        Prisma.DesignReviewCreateInput,
-        "id" | "number" | "created"
+        Prisma.IssueCreateInput,
+        "id" | "org" | "repo" | "number" | "created"
       > = {
         title: issue.title,
         updated: issue.updatedAt as string,
@@ -119,10 +119,12 @@ export async function updateDesignReviews(): Promise<void> {
       const commentUpsert = makeCommentUpserts(issue.comments.nodes, {
         isPrivateBrainstorming: false,
       });
-      return prisma.designReview.upsert({
+      return prisma.issue.upsert({
         where: { id: issue.id },
         create: {
           id: issue.id,
+          org,
+          repo,
           number: issue.number,
           created: issue.createdAt as string,
           ...update,
@@ -146,7 +148,7 @@ export async function updateDesignReviews(): Promise<void> {
             },
             upsert: issue.labels?.nodes?.filter(notNull).map((label) => ({
               where: {
-                reviewId_labelId: { reviewId: issue.id, labelId: label.id },
+                issueId_labelId: { issueId: issue.id, labelId: label.id },
               },
               create: { labelId: label.id, label: label.name },
               update: {},
@@ -168,9 +170,9 @@ async function updatePrivateBrainstorming(
   console.log(
     `Querying private brainstorming threads after ${since?.toISOString()}.`,
   );
-  let result: RecentDesignReviewsQuery;
+  let result: RecentIssuesQuery;
   try {
-    result = await pagedQuery(RecentDesignReviewsDocument, {
+    result = await pagedQuery(RecentIssuesDocument, {
       since,
       owner: TAG_ORG,
       repo: PRIVATE_BRAINSTORMING_REPO,
@@ -204,18 +206,25 @@ async function updatePrivateBrainstorming(
         return [];
       }
       const number = parseInt(mirroredFromMatch.groups.number);
-      return prisma.designReview.update({
-        where: { number },
+      const designReviewCreate: Prisma.DesignReviewCreateWithoutIssueInput = {
+        privateBrainstormingIssueId: issue.id,
+        pendingPrivateBrainstormingCommentsFrom: issue.comments.pageInfo
+          .hasNextPage
+          ? issue.comments.pageInfo.endCursor
+          : null,
+      };
+      return prisma.issue.update({
+        where: {
+          org_repo_number: { org: TAG_ORG, repo: REVIEWS_REPO, number },
+        },
         data: {
-          privateBrainstormingIssueId: issue.id,
-          pendingPrivateBrainstormingCommentsFrom: issue.comments.pageInfo
-            .hasNextPage
-            ? issue.comments.pageInfo.endCursor
-            : null,
           comments: {
             upsert: makeCommentUpserts(issue.comments.nodes, {
               isPrivateBrainstorming: true,
             }),
+          },
+          designReview: {
+            upsert: { create: designReviewCreate, update: designReviewCreate },
           },
         },
       });
@@ -224,13 +233,18 @@ async function updatePrivateBrainstorming(
 }
 
 async function updateRemainingComments() {
-  const withPendingComments = await prisma.designReview.findMany({
+  const withPendingComments = await prisma.issue.findMany({
     where: {
       OR: [
         { pendingCommentsFrom: { not: null } },
-        { pendingPrivateBrainstormingCommentsFrom: { not: null } },
+        {
+          designReview: {
+            pendingPrivateBrainstormingCommentsFrom: { not: null },
+          },
+        },
       ],
     },
+    include: { designReview: true },
   });
   const publicComments = await Promise.all(
     withPendingComments
@@ -242,64 +256,59 @@ async function updateRemainingComments() {
         }),
       ),
   );
-  await Promise.all(
-    publicComments
-      .map((query) => query.node)
-      .filter(
-        (issue): issue is typeof issue & { __typename: "Issue" } =>
-          issue?.__typename === "Issue",
-      )
-      .map((issue) =>
-        prisma.designReview.update({
-          where: { id: issue.id },
-          data: {
-            pendingCommentsFrom: null,
-            comments: {
-              upsert: makeCommentUpserts(issue.comments.nodes, {
-                isPrivateBrainstorming: false,
-              }),
-            },
-          },
-        }),
-      ),
-  );
+  for (const issue of publicComments) {
+    if (issue.node?.__typename !== "Issue") continue;
+    await prisma.issue.update({
+      where: { id: issue.node.id },
+      data: {
+        pendingCommentsFrom: null,
+        comments: {
+          upsert: makeCommentUpserts(issue.node.comments.nodes, {
+            isPrivateBrainstorming: false,
+          }),
+        },
+      },
+    });
+  }
+
   const brainstormingComments = await Promise.all(
     withPendingComments
       .filter(
         (
           review,
-        ): review is typeof review & { privateBrainstormingIssueId: string } =>
-          review.privateBrainstormingIssueId != null &&
-          review.pendingPrivateBrainstormingCommentsFrom != null,
+        ): review is typeof review & {
+          designReview: { privateBrainstormingIssueId: string };
+        } =>
+          review.designReview?.privateBrainstormingIssueId != null &&
+          review.designReview.pendingPrivateBrainstormingCommentsFrom != null,
       )
       .map((review) =>
         pagedQuery(IssueCommentsDocument, {
-          cursor: review.pendingPrivateBrainstormingCommentsFrom,
-          id: review.privateBrainstormingIssueId,
+          cursor: review.designReview.pendingPrivateBrainstormingCommentsFrom,
+          id: review.designReview.privateBrainstormingIssueId,
         }),
       ),
   );
-  await Promise.all(
-    brainstormingComments
-      .map((query) => query.node)
-      .filter(
-        (issue): issue is typeof issue & { __typename: "Issue" } =>
-          issue?.__typename === "Issue",
-      )
-      .map((issue) =>
-        prisma.designReview.update({
-          where: { privateBrainstormingIssueId: issue.id },
-          data: {
-            pendingPrivateBrainstormingCommentsFrom: null,
-            comments: {
-              upsert: makeCommentUpserts(issue.comments.nodes, {
-                isPrivateBrainstorming: true,
-              }),
+  for (const issue of brainstormingComments) {
+    if (issue.node?.__typename !== "Issue") continue;
+    await prisma.designReview.update({
+      where: { privateBrainstormingIssueId: issue.node.id },
+      data: {
+        pendingPrivateBrainstormingCommentsFrom: null,
+        issue: {
+          update: {
+            data: {
+              comments: {
+                upsert: makeCommentUpserts(issue.node.comments.nodes, {
+                  isPrivateBrainstorming: true,
+                }),
+              },
             },
           },
-        }),
-      ),
-  );
+        },
+      },
+    });
+  }
 }
 
 function getMinutesFromGithubResponse(
@@ -392,32 +401,32 @@ function createSessionsFromMinutes(
   }));
 }
 
-function getReviewNumberFromUrl(url: string): number | null {
-  const match = /\/(?<number>\d+)(?:#.*)?$/.exec(url);
+function getReviewNameFromUrl(url: string): `${string}/${string}#${string}` | null {
+  const match = /\/(?<org>[^/]+)\/(?<repo>[^/]+)\/(?:issues|pull)\/(?<number>\d+)(?:#.*)?$/.exec(url);
   if (!match || !match.groups) {
     console.warn(`Ignoring discussion about URL ${url}`);
     return null;
   }
-  return parseInt(match.groups.number);
+  return `${match.groups.org}/${match.groups.repo}#${match.groups.number}`;
 }
 
 function createDiscussionsFromMinutes(
   minutes: Minutes,
-  designReviewIdsByNumber: Map<number, string>,
+  issueIdsByName: Map<`${string}/${string}#${string}`, string>
 ): Prisma.DiscussionCreateWithoutMeetingInput[] {
   return Object.entries(minutes.discussion).flatMap(
     ([designReviewUrl, discussions]) => {
-      const reviewNumber = getReviewNumberFromUrl(designReviewUrl);
+      const reviewNumber = getReviewNameFromUrl(designReviewUrl);
       if (reviewNumber == null) {
         return [];
       }
-      const designReviewId = designReviewIdsByNumber.get(reviewNumber);
-      if (!discussions || !designReviewId) {
+      const issueId = issueIdsByName.get(reviewNumber);
+      if (!discussions || !issueId) {
         // Just drop discussions about design reviews that were closed before this server started.
         return [];
       }
       return discussions.map((discussion) => ({
-        designReview: { connect: { id: designReviewId } },
+        issue: { connect: { id: issueId } },
         markdown: discussion.content,
         proposedComments: {
           create: discussion.proposedComments.map((markdown) => ({
@@ -430,7 +439,7 @@ function createDiscussionsFromMinutes(
 }
 
 export async function parseNewMinutes(): Promise<void> {
-  const [newMinutes, designReviewNumbers] = await Promise.all([
+  const [newMinutes, issueNames] = await Promise.all([
     prisma.meeting.findMany({
       where: {
         OR: [
@@ -445,10 +454,10 @@ export async function parseNewMinutes(): Promise<void> {
       select: { year: true, name: true, minutesId: true },
       orderBy: [{ year: "asc" }, { name: "asc" }],
     }),
-    prisma.designReview.findMany({ select: { id: true, number: true } }),
+    prisma.issue.findMany({ select: { id: true, org: true, repo: true, number: true } }),
   ]);
-  const designReviewIdsByNumber = new Map(
-    designReviewNumbers.map(({ id, number }) => [number, id]),
+  const issueIdsByName = new Map<`${string}/${string}#${number}`, string>(
+    issueNames.map(({ id, org, repo, number }) => [`${org}/${repo}#${number}`, id]),
   );
   console.log(`Fetching and parsing ${newMinutes.length} minutes documents.`);
   while (newMinutes.length > 0) {
@@ -487,7 +496,7 @@ export async function parseNewMinutes(): Promise<void> {
         blob.text,
         year,
         name,
-        designReviewIdsByNumber,
+        issueIdsByName,
       );
     }
   }
@@ -498,7 +507,7 @@ async function updateMinutesInDb(
   blobText: string,
   year: number,
   name: string,
-  designReviewIdsByNumber: Map<number, string>,
+  issueIdsByName: Map<`${string}/${string}#${number}`, string>,
 ) {
   const minutes = parseMinutes(blobText);
   await prisma.$transaction([
@@ -518,7 +527,7 @@ async function updateMinutesInDb(
         discussions: {
           create: createDiscussionsFromMinutes(
             minutes,
-            designReviewIdsByNumber,
+            issueIdsByName,
           ),
         },
       },
@@ -595,22 +604,22 @@ export async function updateAll(): Promise<void> {
   updateRunning = new Promise((resolve) => {
     finished = resolve;
   });
-  await updateDesignReviews();
+  await updateIssues(TAG_ORG, REVIEWS_REPO);
   await updateMinutes();
   finished!();
 }
 
 /** Reparses all of the minutes in the database, without refetching anything from Github. */
 export async function reparseMinutes(): Promise<number> {
-  const [hasMinutes, designReviewNumbers] = await Promise.all([
+  const [hasMinutes, issueNames] = await Promise.all([
     prisma.meeting.findMany({
       where: { NOT: { contents: null, cachedMinutesId: null } },
       select: { year: true, name: true, cachedMinutesId: true, contents: true },
     }),
-    prisma.designReview.findMany({ select: { id: true, number: true } }),
+    prisma.issue.findMany({ select: { id: true, org: true, repo: true, number: true } }),
   ]);
-  const designReviewIdsByNumber = new Map(
-    designReviewNumbers.map(({ id, number }) => [number, id]),
+  const issueIdsByName = new Map<`${string}/${string}#${number}`, string>(
+    issueNames.map(({ id, org, repo, number }) => [`${org}/${repo}#${number}`, id]),
   );
   for (const meeting of hasMinutes) {
     if (meeting.cachedMinutesId == null || meeting.contents == null) {
@@ -621,7 +630,7 @@ export async function reparseMinutes(): Promise<number> {
       meeting.contents,
       meeting.year,
       meeting.name,
-      designReviewIdsByNumber,
+      issueIdsByName,
     );
   }
   return hasMinutes.length;

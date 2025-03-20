@@ -1,0 +1,24 @@
+---
+import type { Issue } from "@prisma/client";
+
+interface Props {
+  issues: Issue[];
+}
+
+const { issues } = Astro.props;
+---
+
+{
+  issues
+    .toSorted((a, b) => a.number - b.number)
+    .map((issue) => (
+      <li>
+        <a
+          href={`${import.meta.env.BASE_URL}gh/${issue.org}/${issue.repo}/${issue.number}`}
+        >
+          {issue.org === "w3ctag" ? "" : issue.org + "/"}
+          {issue.repo}#{issue.number}: {issue.title}
+        </a>
+      </li>
+    ))
+}

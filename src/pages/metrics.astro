@@ -6,7 +6,8 @@ import { prisma } from "../lib/prisma";
 const user = await getLogin(Astro.cookies);
 
 const openCloseHistory = (
-  await prisma.designReview.findMany({
+  await prisma.issue.findMany({
+    where: {org: 'w3ctag', repo: 'design-reviews'},
     select: { created: true, closed: true },
   })
 ).map(({ created, closed }) => ({
@@ -27,11 +28,11 @@ const openCloseHistory = (
 
 <script>
   import {
-  binX,
-  line,
-  plot,
-  windowY,
-  type LineOptions,
+binX,
+line,
+plot,
+windowY,
+type LineOptions,
 } from "@observablehq/plot";
 
   addEventListener("DOMContentLoaded", function () {

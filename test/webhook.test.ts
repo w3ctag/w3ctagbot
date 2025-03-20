@@ -6,10 +6,10 @@ import { prisma } from "../src/lib/prisma";
 import { handleWebHook } from "../src/pages/webhook";
 
 beforeEach(async () => {
-  await prisma.designReview.deleteMany();
+  await prisma.issue.deleteMany();
 });
 afterEach(async () => {
-  await prisma.designReview.deleteMany();
+  await prisma.issue.deleteMany();
 });
 
 const reviewsRepoFullName = `${TAG_ORG}/${REVIEWS_REPO}`;
@@ -234,12 +234,14 @@ describe("issues", () => {
       );
       expect(await response.text()).toEqual("");
       expect(response).toHaveProperty("status", 200);
-      const result = await prisma.designReview.findUniqueOrThrow({
+      const result = await prisma.issue.findUniqueOrThrow({
         where: { id: "Issue9Id" },
         include: { labels: { select: { label: true } } },
       });
       expect(result).toEqual({
         id: "Issue9Id",
+        org: "jyasskin",
+        repo: "test-design-reviews",
         number: 9,
         title: "Test specification review",
         body,
@@ -249,8 +251,6 @@ describe("issues", () => {
         labels: [{ label: "Label 1" }, { label: "Label 2" }],
         milestoneId: null,
         pendingCommentsFrom: null,
-        privateBrainstormingIssueId: null,
-        pendingPrivateBrainstormingCommentsFrom: null,
       } satisfies typeof result);
     });
   });

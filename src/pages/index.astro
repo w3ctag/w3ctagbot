@@ -1,7 +1,7 @@
 ---
+import IssueList from "@components/IssueList.astro";
 import { Temporal } from "@js-temporal/polyfill";
-import type { DesignReview } from "@prisma/client";
-import ReviewList from "../components/ReviewList.astro";
+import type { Issue } from "@prisma/client";
 import Layout from "../layouts/Layout.astro";
 import { closestMonday, toPlainDateUTC } from "../lib/date";
 import { getLogin } from "../lib/login";
@@ -10,8 +10,8 @@ import { setMapDefault } from "../lib/util";
 
 const user = await getLogin(Astro.cookies);
 
-const openReviews = await prisma.designReview.findMany({
-  where: { closed: null },
+const openReviews = await prisma.issue.findMany({
+  where: { closed: null, org: "w3ctag", repo: "design-reviews" },
   include: { milestone: { select: { dueOn: true } } },
 });
 
@@ -22,8 +22,8 @@ if (openReviews.length === 0) {
 }
 
 const thisMonday = closestMonday(Temporal.Now.plainDateISO("UTC"));
-const withMilestone = new Map<string, DesignReview[]>();
-const withoutMilestone: DesignReview[] = [];
+const withMilestone = new Map<string, Issue[]>();
+const withoutMilestone: Issue[] = [];
 for (const review of openReviews) {
   if (review.milestone?.dueOn) {
     const due = toPlainDateUTC(review.milestone.dueOn);
@@ -50,11 +50,11 @@ for (const review of openReviews) {
     {
       Array.from(withMilestone.entries())
         .sort(([m1], [m2]) => Temporal.PlainDate.compare(m1, m2))
-        .map(([milestone, reviews]) => (
+        .map(([milestone, issues]) => (
           <>
             <h3>Scheduled for {milestone}</h3>
             <ol>
-              <ReviewList {reviews} />
+              <IssueList {issues} />
             </ol>
           </>
         ))
@@ -64,7 +64,7 @@ for (const review of openReviews) {
         <>
           <h3>Backlog</h3>
           <ol>
-            <ReviewList reviews={withoutMilestone} />
+            <IssueList issues={withoutMilestone} />
           </ol>
         </>
       ) : null

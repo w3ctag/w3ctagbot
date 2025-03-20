@@ -1,4 +1,4 @@
-query RecentDesignReviews(
+query RecentIssues(
   $owner: String!
   $repo: String!
   $since: DateTime
