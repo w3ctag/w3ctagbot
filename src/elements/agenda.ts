@@ -104,9 +104,26 @@ export class TagAgenda extends LitElement {
     }
   }
 
-  protected willUpdate(): void {
+  private _callTimes() {
     const monday = this._weekOf;
-    this._year = monday.getUTCFullYear();
+    if (monday < new Date("2025-04-06")) {
+      let breakoutA = new Date(monday);
+      breakoutA.setUTCHours(17); // 17:30 Mon GMT
+      breakoutA.setUTCMinutes(30); //
+      let breakoutB = new Date(monday);
+      breakoutB.setUTCHours(47); // 22:00 Tue GMT
+      let breakoutC = new Date(monday);
+      breakoutC.setUTCHours(56); // 08:00 Wed GMT
+      const plenary = new Date(monday);
+      plenary.setUTCHours(this._plenaryHours < 24 * 3 ? 79 : 69); // 22:00 Wednesday GMT / 0600 Thursday GMT
+
+      return [
+        { time: breakoutA, label: "Breakout A (California / Europe)" },
+        { time: breakoutB, label: "Breakout B (California / Australia)" },
+        { time: breakoutC, label: "Breakout C (Europe / China)" },
+        { time: plenary, label: "Plenary Session" },
+      ];
+    }
     const breakoutA = new Date(monday);
     breakoutA.setUTCHours(24 + 3); // 03:00 Tue GMT
     const breakoutB = new Date(monday);
@@ -116,7 +133,7 @@ export class TagAgenda extends LitElement {
     const plenary = new Date(monday);
     plenary.setUTCHours(this._plenaryHours);
 
-    const calls = [
+    return [
       {
         time: breakoutA,
         label: "Breakout A (Asia / Australia / West America)",
@@ -125,7 +142,12 @@ export class TagAgenda extends LitElement {
       { time: breakoutC, label: "Breakout C (Europe / Asia / Australia)" },
       { time: plenary, label: "Plenary Session" },
     ];
+  }
 
+  protected willUpdate(): void {
+    const monday = this._weekOf;
+    this._year = monday.getUTCFullYear();
+    const calls = this._callTimes();
     this._filename = `${monday.toISOString().slice(5, 10)}-agenda.md`;
     const minutesFilename = `${monday.toISOString().slice(5, 10)}-minutes.md`;
 
@@ -277,7 +299,9 @@ ${calls
         <a
           href="https://github.com/w3ctag/meetings/new/gh-pages/?filename=${encodeURIComponent(
             `/${this._year}/telcons/${this._filename}`,
-          )}&amp;value=${encodeURIComponent("The agenda was copied; paste it here.")}"
+          )}&amp;value=${encodeURIComponent(
+            "The agenda was copied; paste it here.",
+          )}"
           target="_blank"
           @click=${this.copyContents}
           >Click here to create file.</a
