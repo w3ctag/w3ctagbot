@@ -111,8 +111,8 @@ importers:
         specifier: ^9.24.0
         version: 9.24.0(jiti@2.4.2)
       eslint-plugin-lit:
-        specifier: ^1.15.0
-        version: 1.15.0(eslint@9.24.0(jiti@2.4.2))
+        specifier: ^2.1.1
+        version: 2.1.1(eslint@9.24.0(jiti@2.4.2))
       prettier:
         specifier: ^3.5.3
         version: 3.5.3
@@ -1982,11 +1982,11 @@ packages:
     resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
     engines: {node: '>=12'}
 
-  eslint-plugin-lit@1.15.0:
-    resolution: {integrity: sha512-Yhr2MYNz6Ln8megKcX503aVZQln8wsywCG49g0heiJ/Qr5UjkE4pGr4Usez2anNcc7NvlvHbQWMYwWcgH3XRKA==}
-    engines: {node: '>= 12'}
+  eslint-plugin-lit@2.1.1:
+    resolution: {integrity: sha512-qmyAOnnTCdS+vDnNxtCoF0icSKIio4GUv6ZLnaCtTX6G/YezRa6Ag6tOQ+MfV5Elvtw9CIXeliRX4mIBSwrPIA==}
+    engines: {node: '>= 18'}
     peerDependencies:
-      eslint: '>= 5'
+      eslint: '>= 8'
 
   eslint-scope@8.3.0:
     resolution: {integrity: sha512-pUNxi75F8MJ/GdeKtVLSbYg4ZI34J6C0C7sbL4YOp2exGwen7ZsuBqKzUhXd0qMQ362yET3z+uPwKeg/0C2XCQ==}
@@ -3078,10 +3078,6 @@ packages:
   require-from-string@2.0.2:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
-
-  requireindex@1.2.0:
-    resolution: {integrity: sha512-L9jEkOi3ASd9PYit2cwRfyppc9NoABujTP8/5gFcbERmo5jUoAKovIC3fsF17pkTnGsrByysqX+Kxd2OTNI1ww==}
-    engines: {node: '>=0.10.5'}
 
   resolve-from@4.0.0:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
@@ -6133,12 +6129,11 @@ snapshots:
 
   escape-string-regexp@5.0.0: {}
 
-  eslint-plugin-lit@1.15.0(eslint@9.24.0(jiti@2.4.2)):
+  eslint-plugin-lit@2.1.1(eslint@9.24.0(jiti@2.4.2)):
     dependencies:
       eslint: 9.24.0(jiti@2.4.2)
       parse5: 6.0.1
       parse5-htmlparser2-tree-adapter: 6.0.1
-      requireindex: 1.2.0
 
   eslint-scope@8.3.0:
     dependencies:
@@ -7494,8 +7489,6 @@ snapshots:
   require-directory@2.1.1: {}
 
   require-from-string@2.0.2: {}
-
-  requireindex@1.2.0: {}
 
   resolve-from@4.0.0: {}
 
