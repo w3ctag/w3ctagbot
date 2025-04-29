@@ -67,6 +67,13 @@ export const tagMembers = {
     terms: [term("2025-02-01", "2027-02-01")],
     attendanceAliases: ["sarven"],
   },
+  "MDQ6VXNlcjY5MTI0NzQ=": {
+    name: "Serena Chen",
+    ghLogin: "heisenburger",
+    terms: [term("2025-03-31", "2026-02-01")],
+    attendanceAliases: ["serena"],
+    associate: true,
+  },
   "MDQ6VXNlcjExMDEzMzk=": {
     name: "Kenneth Rohde Christiansen",
     ghLogin: "kenchris",
