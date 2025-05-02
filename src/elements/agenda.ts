@@ -84,7 +84,7 @@ export class TagAgenda extends LitElement {
   private _year: number = this._weekOf.getUTCFullYear();
 
   @state()
-  private _plenaryHours: number = wedMornPlenaryHours;
+  private _plenaryHours: number | null = wedMornPlenaryHours;
 
   @state()
   private _filename: string = "";
@@ -96,7 +96,11 @@ export class TagAgenda extends LitElement {
   private _contentsTextArea: HTMLTextAreaElement | undefined;
 
   private _plenaryChange(e: Event & { target: HTMLSelectElement }) {
-    this._plenaryHours = parseInt(e.target.value);
+    if (e.target.value == "") {
+      this._plenaryHours = null;
+    } else {
+      this._plenaryHours = parseInt(e.target.value);
+    }
   }
 
   private _dateChange(e: Event & { target: HTMLInputElement }) {
@@ -105,34 +109,24 @@ export class TagAgenda extends LitElement {
     }
   }
 
+  private _computePlenary(monday: Date): Date | null {
+    if (this._plenaryHours === null) {
+      return null;
+    }
+    const plenary = new Date(monday);
+    plenary.setUTCHours(this._plenaryHours);
+    return plenary;
+  }
+
   private _callTimes() {
     const monday = this._weekOf;
-    if (monday < new Date("2025-04-06")) {
-      const breakoutA = new Date(monday);
-      breakoutA.setUTCHours(17); // 17:30 Mon GMT
-      breakoutA.setUTCMinutes(30); //
-      const breakoutB = new Date(monday);
-      breakoutB.setUTCHours(47); // 22:00 Tue GMT
-      const breakoutC = new Date(monday);
-      breakoutC.setUTCHours(56); // 08:00 Wed GMT
-      const plenary = new Date(monday);
-      plenary.setUTCHours(this._plenaryHours < 24 * 3 ? 79 : 69); // 22:00 Wednesday GMT / 0600 Thursday GMT
-
-      return [
-        { time: breakoutA, label: "Breakout A (California / Europe)" },
-        { time: breakoutB, label: "Breakout B (California / Australia)" },
-        { time: breakoutC, label: "Breakout C (Europe / China)" },
-        { time: plenary, label: "Plenary Session" },
-      ];
-    }
     const breakoutA = new Date(monday);
     breakoutA.setUTCHours(24 + 3); // 03:00 Tue GMT
     const breakoutB = new Date(monday);
     breakoutB.setUTCHours(24 * 2 + 17); // 17:00 Wed GMT
     const breakoutC = new Date(monday);
     breakoutC.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
-    const plenary = new Date(monday);
-    plenary.setUTCHours(this._plenaryHours);
+    const plenary = this._computePlenary(monday);
 
     return [
       {
@@ -215,11 +209,15 @@ If you would like to add an item to the agenda or volunteer to scribe please ope
 ${calls
   .map(
     ({ time, label }) => `
-### ${label} - [${utcDate(
-      time,
-    )}](https://www.timeanddate.com/worldclock/converter.html?iso=${dateURL(
-      time,
-    )}&p1=224&p2=43&p3=136&p4=195&p5=33&p6=248&p7=240)
+### ${label} - ${
+      time
+        ? `[${utcDate(
+            time,
+          )}](https://www.timeanddate.com/worldclock/converter.html?iso=${dateURL(
+            time,
+          )}&p1=224&p2=43&p3=136&p4=195&p5=33&p6=248&p7=240)`
+        : "None"
+    }
 `,
   )
   .join("")}
@@ -249,31 +247,35 @@ ${calls
     ({ time, label }) => `
 #### ${label}
 
-<table>
+${
+  time
+    ? `<table>
 <tr><td> San Francisco (U.S.A. - California) <td> ${printTime(
-      time,
-      "America/Los_Angeles",
-      "en-US",
-    )}</td></tr>
+        time,
+        "America/Los_Angeles",
+        "en-US",
+      )}</td></tr>
 <tr><td> Boston (U.S.A. - Massachusetts) <td> ${printTime(
-      time,
-      "America/New_York",
-      "en-US",
-    )}</td></tr>
+        time,
+        "America/New_York",
+        "en-US",
+      )}</td></tr>
 <tr><td> London (United Kingdom - England) <td> ${printTime(
-      time,
-      "Europe/London",
-      "en-GB",
-    )}</td></tr>
+        time,
+        "Europe/London",
+        "en-GB",
+      )}</td></tr>
 <tr><td> Paris (France) <td> ${printTime(time, "Europe/Paris", "fr-FR")}</td></tr>
 <tr><td> Beijing (China) <td> ${printTime(time, "Asia/Shanghai", "zh-CN")}</td></tr>
 <tr><td> Sydney (Australia) <td> ${printTime(
-      time,
-      "Australia/Sydney",
-      "en-AU",
-    )}</td></tr>
+        time,
+        "Australia/Sydney",
+        "en-AU",
+      )}</td></tr>
 <tr><td> Corresponding UTC (GMT) <td> ${printTime(time, "UTC", "en-GB")}</td></tr>
-</table>
+</table>`
+    : "None"
+}
 `,
   )
   .join("")}
@@ -286,6 +288,7 @@ ${calls
       <select id="plenary" @change=${this._plenaryChange}>
         <option value=${wedMornPlenaryHours}>Wednesday Morning UTC</option>
         <option value=${thurAftPlenaryHours}>Thursday Afternoon UTC</option>
+        <option value="">No Plenary</option>
       </select>
 
       <label for="week">Week</label>
