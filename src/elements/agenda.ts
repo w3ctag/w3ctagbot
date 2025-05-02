@@ -22,6 +22,7 @@ function printTime(date: Date, timeZone: string, locale: string) {
     month: "long",
     day: "numeric",
     hour: "numeric",
+    hour12: false,
     minute: "numeric",
     timeZoneName: "short",
   });
