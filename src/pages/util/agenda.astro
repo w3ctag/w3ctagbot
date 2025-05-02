@@ -8,13 +8,13 @@ const user = await getLogin(Astro.cookies);
 
 const [agendaPRs, agendaIssues, pendingPRs, openReviews] = await Promise.all([
   pagedQuery(IssueSearchDocument, {
-    query_: "org:w3ctag label:agenda+ is:open is:pr sort:updated",
+    query_: "org:w3ctag archived:false label:agenda+ is:open is:pr sort:updated",
   }),
   pagedQuery(IssueSearchDocument, {
-    query_: "org:w3ctag label:agenda+ is:open is:issue sort:updated",
+    query_: "org:w3ctag archived:false label:agenda+ is:open is:issue sort:updated",
   }),
   pagedQuery(IssueSearchDocument, {
-    query_: "org:w3ctag is:pr is:open -is:draft sort:updated",
+    query_: "org:w3ctag archived:false is:pr is:open -is:draft sort:updated",
   }),
   pagedQuery(IssueSearchDocument, {
     query_:
