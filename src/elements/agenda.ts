@@ -302,7 +302,7 @@ ${
       <p>
         <a
           href="https://github.com/w3ctag/meetings/new/gh-pages/?filename=${encodeURIComponent(
-            `/${this._year}/telcons/${this._filename}`,
+            `${this._year}/telcons/${this._filename}`,
           )}&amp;value=${encodeURIComponent(
             "The agenda was copied; paste it here.",
           )}"
