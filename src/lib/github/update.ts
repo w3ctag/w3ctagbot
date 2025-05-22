@@ -532,6 +532,9 @@ async function updateMinutesInDb(
     prisma.meetingSession.deleteMany({
       where: { meetingYear: year, meetingName: name },
     }),
+    prisma.discussion.deleteMany({
+      where: { meetingYear: year, meetingName: name },
+    }),
     // And create new ones from the new minutes.
     prisma.meeting.update({
       where: { year_name: { year, name } },
