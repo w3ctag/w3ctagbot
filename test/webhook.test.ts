@@ -17,6 +17,16 @@ beforeEach(async () => {
   await prisma.issue.deleteMany();
   await prisma.meeting.deleteMany();
   nock.disableNetConnect();
+  nock("https://api.github.com")
+    .get("/app/installations")
+    .optionally()
+    .reply(200, [{ id: 12345 }])
+    .persist();
+  nock("https://api.github.com")
+    .post("/app/installations/12345/access_tokens")
+    .optionally()
+    .reply(201, { token: "FakeAccessToken" })
+    .persist();
 });
 afterEach(async () => {
   await prisma.issue.deleteMany();
