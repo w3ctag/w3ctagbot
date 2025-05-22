@@ -270,7 +270,8 @@ describe("issues", () => {
 });
 
 describe("push", () => {
-  test("refetches minutes", async () => {
+  // Long timeout to handle octokit doing exponential backoff on network errors.
+  test("refetches minutes", {timeout: 20000}, async () => {
     // Pre-populate the issue mentioned in the fake discussion.
     await prisma.issue.create({
       data: {
