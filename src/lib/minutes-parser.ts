@@ -30,7 +30,7 @@ function classifyHeading(heading: Heading, index: number): Section {
     }
     if (node.type === "link") {
       const link = node;
-      if (/github.com\/w3ctag\/design-reviews/i.test(link.url)) {
+      if (/github.com\/w3ctag\/(?<repo>[^/]+)\/(pull|issues)\/(?<number>\d+)/i.test(link.url)) {
         try {
           section.review = new URL(link.url);
         } catch {

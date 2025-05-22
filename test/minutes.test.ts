@@ -285,6 +285,63 @@ The general consensus was that we agree that the functionality is useful, but we
   });
 });
 
+test("2025-05-19-minutes-subset.md parses correctly", async () => {
+  expect(
+    parseMinutes(await readFile("test/minutes/2025-05-19-minutes-subset.md", "utf-8")),
+  ).toEqual({
+    attendance: {
+      "Breakout A": ["Xiaocheng", "Jeffrey", "Max", "Marcos", "Martin"],
+      "Breakout B": ["DanA", "Sarven", "Yves", "DanC", "Jeffrey", "Matthew", "Hadley", "Serena"],
+      "Breakout C": [],
+      Plenary: ["Dan", "Hadley", "Jeffrey", "Martin", "Max", "Sarven", "Lola", "Serena"],
+    },
+    discussion: {
+      "https://github.com/w3ctag/design-reviews/issues/1090": [
+        {
+          content: `Xiaocheng: Conventional CSS proposal. Extension to border-radius to create smoother corners. Fully scoped within CSS; no other concerns. Good extension to existing features? Yes. Compatible with border-radius; default value gives the same behavior as border-radius; allows customization.`,
+          proposedComments: [],
+        },
+      ],
+      "https://github.com/w3ctag/design-reviews/issues/1015": [
+        {
+          content: `Marcos to draft something on this and the Web Payments charter.`,
+          proposedComments: [],
+        },
+      ],
+      "https://github.com/w3ctag/design-reviews/issues/906": [
+        {
+          content: `DanA: We needed to talk with Anusha.`,
+          proposedComments: [],
+        },
+      ],
+      "https://github.com/w3ctag/design-reviews/issues/1057": [
+        {
+          content: `*consensus to close*`,
+          proposedComments: [],
+        },
+      ],
+      "https://github.com/w3ctag/design-reviews/pull/1094": [
+        {
+          content: `Martin: this is for Jeffrey to take another look at this....`,
+          proposedComments: [],
+        },
+      ],
+      "https://github.com/w3ctag/design-reviews/issues/991": [
+        {
+          content: `Jeffrey: several issues that weren't contentious... and writing assistance APIs... I have a draft...  depending on what we settle on we can decide if it's a comment or a separate document...`,
+          proposedComments: [],
+        },
+      ],
+      "https://github.com/w3ctag/design-reviews/issues/1097": [
+        {
+          content: `Jeffrey: do we want to review this?`,
+          proposedComments: [],
+        },
+      ],
+    },
+  });
+});
+
 test("can handle multiple discussions with multiple proposed comments", () => {
   expect(
     parseMinutes(`### Breakout A
