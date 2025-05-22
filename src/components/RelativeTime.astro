@@ -2,8 +2,9 @@
 interface Props {
   // TODO: Accept appropriate Temporal types, and display them at the right resolution.
   datetime: Date;
+  precision?: "year" | "month" | "day" | "hour" | "minute" | "second";
 }
-const { datetime } = Astro.props;
+const { datetime, precision } = Astro.props;
 
 const defaultFormatter = Intl.DateTimeFormat("en-us", {
   timeZone: "UTC",
@@ -19,6 +20,6 @@ const defaultFormatter = Intl.DateTimeFormat("en-us", {
     "<Invalid Date>"
   ) : (
     /*prettier-ignore */
-    <relative-time datetime={datetime.toISOString()}>{defaultFormatter.format(datetime)}</relative-time>
+    <relative-time datetime={datetime.toISOString()} {precision}>{defaultFormatter.format(datetime)}</relative-time>
   )
 }

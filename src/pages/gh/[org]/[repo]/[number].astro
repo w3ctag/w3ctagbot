@@ -75,7 +75,7 @@ const unifiedDiscussions = review.comments
   .concat(
     review.discussions.map(({ markdown, meeting }) => {
       const dateInName = meeting.name.match(
-        /^(?<month>\d+)-(?:(?<day>\d+)-)?.*/
+        /^(?<month>\d+)-(?:(?<day>\d+))?.*/
       );
       // TODO: Turn this into a Temporal of the right granularity.
       let timestamp: Date;
@@ -156,7 +156,7 @@ const unifiedDiscussions = review.comments
               <>
                 <summary>
                   Discussed
-                  <RelativeTime datetime={timestamp} />
+                  <RelativeTime datetime={timestamp} precision="day" />
                   {/* prettier-ignore */}(<a href={url}>See Github</a>)
                 </summary>
               </>
