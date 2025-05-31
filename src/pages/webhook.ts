@@ -1,8 +1,15 @@
 import { query } from "@lib/github";
 import { parseNewMinutes } from "@lib/github/update";
+import { githubIdIsTagMemberOnDate } from "@lib/tag-members";
+import { notNull } from "@lib/util";
+import type { Prisma } from "@prisma/client";
 import type { APIRoute } from "astro";
-import { MEETINGS_REPO, TAG_ORG } from "astro:env/client";
-import { FileContentDocument, type FileContentQuery } from "src/gql/graphql";
+import { MEETINGS_REPO, REVIEWS_REPO, TAG_ORG } from "astro:env/client";
+import {
+  FileContentDocument,
+  RemoveLabelsDocument,
+  type FileContentQuery,
+} from "src/gql/graphql";
 import { webhooks } from "../lib/github/auth";
 import { prisma } from "../lib/prisma";
 
@@ -106,6 +113,59 @@ webhooks.on("issues.demilestoned", async ({ payload }) => {
     where: { id: payload.issue.node_id },
     data: { milestoneId: null },
   });
+});
+
+webhooks.on("issue_comment.created", async ({ payload }) => {
+  if (payload.repository.owner.login !== TAG_ORG) {
+    return;
+  }
+
+  if (payload.repository.name === REVIEWS_REPO) {
+    const authorId = payload.comment.user?.node_id;
+    if (!authorId || !githubIdIsTagMemberOnDate(authorId, new Date())) {
+      // This looks like a response, so remove any 'Progress' labels that are waiting on a response
+      // so we re-discuss the new comment.
+      const pendingLabels: string[] = [];
+      for (const label of payload.issue.labels) {
+        // See https://github.com/w3ctag/design-reviews/labels.
+        if (
+          label.name === "Progress: pending external feedback" ||
+          label.name === "Progress: pending editor update"
+        ) {
+          pendingLabels.push(label.node_id);
+        }
+      }
+      if (pendingLabels.length > 0) {
+        const issueId = payload.issue.node_id;
+        console.log(
+          `Removing labels from issue ${payload.repository.full_name}#${payload.issue.number}: ${JSON.stringify(pendingLabels)}`,
+        );
+        const result = await query(RemoveLabelsDocument, {
+          labelableId: issueId,
+          labelIds: pendingLabels,
+        });
+        const newLabels =
+          result.removeLabelsFromLabelable?.labelable?.labels?.nodes?.filter(
+            notNull,
+          );
+        if (newLabels) {
+          await prisma.$transaction([
+            prisma.label.deleteMany({ where: { issueId } }),
+            prisma.label.createMany({
+              data: newLabels.map(
+                (label) =>
+                  ({
+                    issueId,
+                    labelId: label.id,
+                    label: label.name,
+                  }) satisfies Prisma.LabelCreateManyInput,
+              ),
+            }),
+          ]);
+        }
+      }
+    }
+  }
 });
 
 function addAll<T>(set: Set<T>, array: T[] | null | undefined) {
