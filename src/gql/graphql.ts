@@ -32450,6 +32450,14 @@ export type ListMinutesQueryVariables = Exact<{
 
 export type ListMinutesQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', defaultBranchRef?: { __typename?: 'Ref', name: string } | null, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, path?: string | null, object?: { __typename: 'Blob', id: string } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree' } | null }> | null } | null }> | null } | null }> | null } | null } | null };
 
+export type RemoveLabelsMutationVariables = Exact<{
+  labelableId: Scalars['ID']['input'];
+  labelIds: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type RemoveLabelsMutation = { __typename?: 'Mutation', removeLabelsFromLabelable?: { __typename?: 'RemoveLabelsFromLabelablePayload', labelable?: { __typename: 'Discussion', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'Issue', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'PullRequest', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | null } | null };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -32708,3 +32716,20 @@ export const ListMinutesDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<ListMinutesQuery, ListMinutesQueryVariables>;
+export const RemoveLabelsDocument = new TypedDocumentString(`
+    mutation removeLabels($labelableId: ID!, $labelIds: [ID!]!) {
+  removeLabelsFromLabelable(
+    input: {labelableId: $labelableId, labelIds: $labelIds}
+  ) {
+    labelable {
+      __typename
+      labels {
+        nodes {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<RemoveLabelsMutation, RemoveLabelsMutationVariables>;

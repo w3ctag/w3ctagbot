@@ -4,13 +4,17 @@ import { REVIEWS_REPO, TAG_ORG } from "astro:env/client";
 import nock from "nock";
 import {
   FileContentDocument,
+  RemoveLabelsDocument,
   type FileContentQuery,
   type FileContentQueryVariables,
+  type RemoveLabelsMutation,
+  type RemoveLabelsMutationVariables,
 } from "src/gql/graphql";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { webhooks } from "../src/lib/github/auth";
 import { prisma } from "../src/lib/prisma";
 import { handleWebHook, webhookProcessingComplete } from "../src/pages/webhook";
+import issueResponsePayload from "./payloads/issue-response.json" with { type: "json" };
 import pushPayload from "./payloads/push.json" with { type: "json" };
 
 beforeEach(async () => {
@@ -275,6 +279,145 @@ describe("issues", () => {
         milestoneId: null,
         pendingCommentsFrom: null,
       } satisfies typeof result);
+    });
+  });
+});
+
+describe("issue_comment", () => {
+  describe("created", () => {
+    describe("'pending' progress", () => {
+      const issueId = "I_kwDOAKfwGc6slrgI";
+      beforeEach(async () => {
+        await prisma.issue.create({
+          data: {
+            id: issueId,
+            org: "w3ctag",
+            repo: "design-reviews",
+            number: 1064,
+            title: "Expose contentEncoding in resourceTiming",
+            body: "Please review my feature",
+            created: "2025-03-04T22:13:33Z",
+            updated: "2025-05-28T19:49:16Z",
+            labels: {
+              create: [
+                {
+                  labelId: "MDU6TGFiZWwzNTA1NTg4Nzk=",
+                  label: "Progress: pending external feedback",
+                },
+                {
+                  labelId: "MDU6TGFiZWwxMTExMTYxMDg0",
+                  label: "Venue: WHATWG",
+                },
+                {
+                  labelId: "MDU6TGFiZWwxMzcyNDgyNjU5",
+                  label: "Venue: Web Performance WG",
+                },
+                {
+                  labelId: "MDU6TGFiZWwxMzcyNzA4NjE1",
+                  label: "Topic: performance",
+                },
+                {
+                  labelId: "MDU6TGFiZWwxOTkzNDMxMTc4",
+                  label: "security-tracker",
+                },
+                {
+                  labelId: "LA_kwDOAKfwGc8AAAABnB4hng",
+                  label: "Focus: Security (pending)",
+                },
+              ],
+            },
+          },
+        });
+      });
+      test("removes 'pending' progress", { timeout: 20000 }, async () => {
+        const payload = JSON.stringify(issueResponsePayload);
+        const scope = nock("https://api.github.com")
+          .post("/graphql", {
+            query: RemoveLabelsDocument.toString(),
+            variables: {
+              labelableId: issueId,
+              labelIds: ["MDU6TGFiZWwzNTA1NTg4Nzk="],
+            } satisfies RemoveLabelsMutationVariables,
+          })
+          .reply(200, {
+            data: {
+              removeLabelsFromLabelable: {
+                labelable: {
+                  __typename: "Issue",
+                  labels: {
+                    nodes: [
+                      {
+                        id: "MDU6TGFiZWwxMzcyNDgyNjU5",
+                        name: "Venue: Web Performance WG",
+                      },
+                    ],
+                  },
+                },
+              },
+            } satisfies RemoveLabelsMutation,
+          });
+        const response = await handleWebHook(
+          new Request("https://example.com/webhook", {
+            method: "POST",
+            headers: {
+              "x-github-delivery": "unique id",
+              "x-github-event": "issue_comment",
+              "X-Hub-Signature-256": await webhooks.sign(payload),
+            },
+            body: payload,
+          }),
+        );
+        expect(await response.text()).toEqual("");
+        expect(response).toHaveProperty("status", 200);
+        await webhookProcessingComplete();
+        expect(
+          await prisma.issue.findUnique({
+            where: { id: issueId },
+            select: { labels: true },
+          }),
+        ).toEqual({
+          labels: [
+            {
+              issueId,
+              labelId: "MDU6TGFiZWwxMzcyNDgyNjU5",
+              label: "Venue: Web Performance WG",
+            },
+          ],
+        });
+        scope.done();
+      });
+      test(
+        "doesn't respond to TAG discussion",
+        { timeout: 20000 },
+        async () => {
+          const payloadCopy = structuredClone(issueResponsePayload);
+          payloadCopy.comment.user.node_id = tagMemberIdsByAttendanceName.get('jeffrey')!;
+          const payload = JSON.stringify(payloadCopy);
+          // No resulting request to Github.
+          const response = await handleWebHook(
+            new Request("https://example.com/webhook", {
+              method: "POST",
+              headers: {
+                "x-github-delivery": "unique id",
+                "x-github-event": "issue_comment",
+                "X-Hub-Signature-256": await webhooks.sign(payload),
+              },
+              body: payload,
+            }),
+          );
+          expect(await response.text()).toEqual("");
+          expect(response).toHaveProperty("status", 200);
+          await webhookProcessingComplete();
+          expect(
+            (
+              await prisma.issue.findUnique({
+                where: { id: issueId },
+                select: { labels: true },
+              })
+            )?.labels,
+          ).toHaveLength(6);
+        },
+      );
     });
   });
 });
