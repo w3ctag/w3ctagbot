@@ -16,8 +16,8 @@ export const tagMembers = {
   "MDQ6VXNlcjI4NzUyNg==": {
     name: "Daniel Appelquist",
     ghLogin: "torgo",
-    terms: [term("2010-02-01", "2012-02-01"), term("2013-06-01", "2026-02-01")],
-    attendanceAliases: ["dan", "torgo"],
+    terms: [term("2010-02-01", "2012-02-01"), term("2013-06-01", "2025-07-01")],
+    attendanceAliases: ["dan", "dana", "torgo"],
   },
   "MDQ6VXNlcjU0NTA5NTA=": {
     name: "Rossen Atanassov",
