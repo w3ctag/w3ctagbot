@@ -90,7 +90,7 @@ model IssueComment {
   body                   String
   /// Can be undefined if the author's account was deleted.
   authorId               String?
-  author                 GithubUser? @relation(fields: [authorId], references: [id])
+  author                 GithubUser? @relation(fields: [authorId], references: [id], onDelete: SetNull)
   isMinimized            Boolean
   /// Private brainstorming issues should only be shown to logged in TAG members and associates.
   isPrivateBrainstorming Boolean

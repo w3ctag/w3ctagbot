@@ -2,9 +2,15 @@ import { query } from "@lib/github";
 import { parseNewMinutes } from "@lib/github/update";
 import { githubIdIsTagMemberOnDate } from "@lib/tag-members";
 import { notNull } from "@lib/util";
+import type { WebhookEventDefinition } from "@octokit/webhooks/types";
 import type { Prisma } from "@prisma/client";
 import type { APIRoute } from "astro";
-import { MEETINGS_REPO, REVIEWS_REPO, TAG_ORG } from "astro:env/client";
+import {
+  MEETINGS_REPO,
+  PRIVATE_BRAINSTORMING_REPO,
+  REVIEWS_REPO,
+  TAG_ORG,
+} from "astro:env/client";
 import {
   FileContentDocument,
   RemoveLabelsDocument,
@@ -13,12 +19,55 @@ import {
 import { webhooks } from "../lib/github/auth";
 import { prisma } from "../lib/prisma";
 
+const mirroredFromRE = new RegExp(
+  `Mirrored from: ${TAG_ORG}/${REVIEWS_REPO}#(?<number>\\d+)`,
+);
+
+async function recordBrainstormingIssue(
+  payload: WebhookEventDefinition<"issues-opened">,
+) {
+  // Find the issue this was mirrored from.
+  const match = mirroredFromRE.exec(payload.issue.body ?? "");
+  if (!match?.groups) return;
+  const designReviewUpdate: Prisma.DesignReviewCreateWithoutIssueInput = {
+    privateBrainstormingIssueId: payload.issue.node_id,
+  };
+  await prisma.issue.update({
+    where: {
+      org_repo_number: {
+        org: TAG_ORG,
+        repo: REVIEWS_REPO,
+        number: parseInt(match.groups.number),
+      },
+    },
+    data: {
+      designReview: {
+        upsert: { create: designReviewUpdate, update: designReviewUpdate },
+      },
+    },
+  });
+}
+
 webhooks.on("issues.opened", async ({ payload }) => {
+  const repository = payload.repository;
+  if (
+    repository.owner.login === TAG_ORG &&
+    repository.name === PRIVATE_BRAINSTORMING_REPO
+  ) {
+    await recordBrainstormingIssue(payload);
+    return;
+  }
+  let designReview:
+    | Prisma.DesignReviewCreateNestedOneWithoutIssueInput
+    | undefined = undefined;
+  if (repository.owner.login === TAG_ORG && repository.name === REVIEWS_REPO) {
+    designReview = { create: {} };
+  }
   await prisma.issue.create({
     data: {
       id: payload.issue.node_id,
-      org: payload.repository.owner.login,
-      repo: payload.repository.name,
+      org: repository.owner.login,
+      repo: repository.name,
       number: payload.issue.number,
       title: payload.issue.title,
       body: payload.issue.body ?? "",
@@ -31,6 +80,7 @@ webhooks.on("issues.opened", async ({ payload }) => {
           label: label.name,
         })),
       },
+      designReview,
     },
   });
 });
@@ -115,6 +165,96 @@ webhooks.on("issues.demilestoned", async ({ payload }) => {
   });
 });
 
+async function removePendingReplyLabels(
+  payload: WebhookEventDefinition<"issue-comment-created">,
+) {
+  // This looks like a response, so remove any 'Progress' labels that are waiting on a response
+  // so we re-discuss the new comment.
+  const pendingLabels: string[] = [];
+  for (const label of payload.issue.labels) {
+    // See https://github.com/w3ctag/design-reviews/labels.
+    if (
+      label.name === "Progress: pending external feedback" ||
+      label.name === "Progress: pending editor update"
+    ) {
+      pendingLabels.push(label.node_id);
+    }
+  }
+  if (pendingLabels.length > 0) {
+    const issueId = payload.issue.node_id;
+    console.log(
+      `Removing labels from issue ${payload.repository.full_name}#${payload.issue.number}: ${JSON.stringify(pendingLabels)}`,
+    );
+    const result = await query(RemoveLabelsDocument, {
+      labelableId: issueId,
+      labelIds: pendingLabels,
+    });
+    const newLabels =
+      result.removeLabelsFromLabelable?.labelable?.labels?.nodes?.filter(
+        notNull,
+      );
+    if (newLabels) {
+      await prisma.$transaction([
+        prisma.label.deleteMany({ where: { issueId } }),
+        prisma.label.createMany({
+          data: newLabels.map(
+            (label) =>
+              ({
+                issueId,
+                labelId: label.id,
+                label: label.name,
+              }) satisfies Prisma.LabelCreateManyInput,
+          ),
+        }),
+      ]);
+    }
+  }
+}
+
+async function addIssueComment(
+  payload: WebhookEventDefinition<"issue-comment-created">,
+) {
+  let issueId = payload.issue.node_id;
+  if (payload.repository.name === PRIVATE_BRAINSTORMING_REPO) {
+    // Look up the issue this one is mirrored from.
+    const mainIssue = await prisma.designReview.findUnique({
+      where: { privateBrainstormingIssueId: payload.issue.node_id },
+      select: { issue: { select: { id: true } } },
+    });
+    if (!mainIssue) {
+      console.warn(
+        `Couldn't find issue that ${payload.issue.html_url} was mirrored from. Ignoring new comment.`,
+      );
+      return;
+    }
+    issueId = mainIssue.issue.id;
+  }
+  await prisma.issueComment.create({
+    data: {
+      id: payload.comment.node_id,
+      issue: { connect: { id: issueId } },
+      author: payload.comment.user?.node_id
+        ? {
+            connectOrCreate: {
+              where: { id: payload.comment.user.node_id },
+              create: {
+                id: payload.comment.user.node_id,
+                username: payload.comment.user.login,
+              },
+            },
+          }
+        : undefined,
+      body: payload.comment.body,
+      publishedAt: payload.comment.created_at,
+      updatedAt: payload.comment.updated_at,
+      url: payload.comment.url,
+      isMinimized: false,
+      isPrivateBrainstorming:
+        payload.repository.name === PRIVATE_BRAINSTORMING_REPO,
+    },
+  });
+}
+
 webhooks.on("issue_comment.created", async ({ payload }) => {
   if (payload.repository.owner.login !== TAG_ORG) {
     return;
@@ -123,48 +263,15 @@ webhooks.on("issue_comment.created", async ({ payload }) => {
   if (payload.repository.name === REVIEWS_REPO) {
     const authorId = payload.comment.user?.node_id;
     if (!authorId || !githubIdIsTagMemberOnDate(authorId, new Date())) {
-      // This looks like a response, so remove any 'Progress' labels that are waiting on a response
-      // so we re-discuss the new comment.
-      const pendingLabels: string[] = [];
-      for (const label of payload.issue.labels) {
-        // See https://github.com/w3ctag/design-reviews/labels.
-        if (
-          label.name === "Progress: pending external feedback" ||
-          label.name === "Progress: pending editor update"
-        ) {
-          pendingLabels.push(label.node_id);
-        }
-      }
-      if (pendingLabels.length > 0) {
-        const issueId = payload.issue.node_id;
-        console.log(
-          `Removing labels from issue ${payload.repository.full_name}#${payload.issue.number}: ${JSON.stringify(pendingLabels)}`,
-        );
-        const result = await query(RemoveLabelsDocument, {
-          labelableId: issueId,
-          labelIds: pendingLabels,
-        });
-        const newLabels =
-          result.removeLabelsFromLabelable?.labelable?.labels?.nodes?.filter(
-            notNull,
-          );
-        if (newLabels) {
-          await prisma.$transaction([
-            prisma.label.deleteMany({ where: { issueId } }),
-            prisma.label.createMany({
-              data: newLabels.map(
-                (label) =>
-                  ({
-                    issueId,
-                    labelId: label.id,
-                    label: label.name,
-                  }) satisfies Prisma.LabelCreateManyInput,
-              ),
-            }),
-          ]);
-        }
-      }
+      await removePendingReplyLabels(payload);
     }
+  }
+
+  if (
+    payload.repository.name === REVIEWS_REPO ||
+    payload.repository.name === PRIVATE_BRAINSTORMING_REPO
+  ) {
+    await addIssueComment(payload);
   }
 });
 

@@ -1,6 +1,4 @@
 import { tagMemberIdsByAttendanceName } from "@lib/tag-members";
-import type { EmitterWebhookEvent } from "@octokit/webhooks";
-import { REVIEWS_REPO, TAG_ORG } from "astro:env/client";
 import nock from "nock";
 import {
   FileContentDocument,
@@ -14,6 +12,9 @@ import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { webhooks } from "../src/lib/github/auth";
 import { prisma } from "../src/lib/prisma";
 import { handleWebHook, webhookProcessingComplete } from "../src/pages/webhook";
+import brainstormingDiscussionPayload from "./payloads/brainstorming-discussion.json" with { type: "json" };
+import brainstormingMirrorCreatedPayload from "./payloads/brainstorming-mirror-created.json" with { type: "json" };
+import designReviewCreatedPayload from "./payloads/design-review-created.json" with { type: "json" };
 import issueResponsePayload from "./payloads/issue-response.json" with { type: "json" };
 import pushPayload from "./payloads/push.json" with { type: "json" };
 
@@ -39,215 +40,11 @@ afterEach(async () => {
   nock.enableNetConnect();
 });
 
-const reviewsRepoFullName = `${TAG_ORG}/${REVIEWS_REPO}`;
-
 describe("issues", () => {
   describe("opened", () => {
-    test("creates the issue in the database", async () => {
-      const body =
-        "こんにちは TAG-さん!\r\n\r\nI'm requesting a TAG review of Test feature.\r\n\r\nExplainer\r\n\r\n  - Explainer¹ (minimally containing user needs and example code): http://go/this-link-is-private\r\n  - Specification URL: [specification link](https://docs.google.com/document/d/1zEP8y1aWd3LSsX7tiHUf3nlLbyYF2LznlZ_pZ-ErWpc/edit)\r\n  - Tests: [wpt folder(s), if available]\r\n  - User research: [url to public summary/results of research]\r\n  - Security and Privacy self-review²: [url]\r\n  - GitHub repo: [url]\r\n  - Primary contacts (and their relationship to the specification):\r\n      - [name] ([github username]), [organization/s] (repeat as necessary, we recommend including group chairs and editors in this list)\r\n  - Organization(s)/project(s) driving the specification: [organization and/or project name]\r\n  - Key pieces of existing multi-stakeholder (e.g. developers, implementers, civil society) support, review or discussion of this specification\r\n  - Key pieces of multi-implementer support:\r\n    - Chromium comments: [url]\r\n    - Mozilla comments: https://github.com/mozilla/standards-positions/issues/NNN\r\n    - WebKit comments: https://github.com/WebKit/standards-positions/issues/NNN\r\n    - etc...\r\n  - External status/issue trackers for this specification (publicly visible, e.g. Chrome Status):\r\n\r\nFurther details:\r\n\r\n  - [ ] I have reviewed the TAG's [Web Platform Design Principles](https://www.w3.org/TR/design-principles/)\r\n  - Relevant time constraints or deadlines: [please provide]\r\n  - The group where the work on this specification is currently being done:\r\n  - The group where standardization of this work is intended to be done (if current group is a community group or other incubation venue):\r\n  - Major unresolved issues with or opposition to this specification:\r\n  - This work is being funded by:\r\n\r\nYou should also know that...\r\n\r\n[please tell us anything you think is relevant to this review]\r\n";
-      const payload = JSON.stringify({
-        action: "opened",
-        issue: {
-          url: `https://api.github.com/repos/${reviewsRepoFullName}/issues/9`,
-          repository_url: `https://api.github.com/repos/${reviewsRepoFullName}`,
-          labels_url: `https://api.github.com/repos/${reviewsRepoFullName}/issues/9/labels{/name}`,
-          comments_url: `https://api.github.com/repos/${reviewsRepoFullName}/issues/9/comments`,
-          events_url: `https://api.github.com/repos/${reviewsRepoFullName}/issues/9/events`,
-          html_url: `https://github.com/${reviewsRepoFullName}/issues/9`,
-          id: 2539552022,
-          node_id: "Issue9Id",
-          number: 9,
-          title: "Test specification review",
-          user: {
-            login: "jyasskin",
-            id: 83420,
-            node_id: "MDQ6VXNlcjgzNDIw",
-            avatar_url: "https://avatars.githubusercontent.com/u/83420?v=4",
-            gravatar_id: "",
-            url: "https://api.github.com/users/jyasskin",
-            html_url: "https://github.com/jyasskin",
-            type: "User",
-            site_admin: false,
-          },
-          labels: [
-            {
-              color: "ff0000",
-              default: false,
-              description: null,
-              id: 1,
-              name: "Label 1",
-              node_id: "Label Node Id",
-              url: "",
-            },
-            {
-              color: "00ff00",
-              default: false,
-              description: null,
-              id: 1,
-              name: "Label 2",
-              node_id: "Label2 Node Id",
-              url: "",
-            },
-          ],
-          state: "open",
-          locked: false,
-          assignee: null,
-          assignees: [],
-          milestone: null,
-          comments: 0,
-          created_at: "2024-09-20T19:38:15Z",
-          updated_at: "2024-09-20T19:38:15Z",
-          closed_at: null,
-          author_association: "OWNER",
-          active_lock_reason: null,
-          body,
-          reactions: {
-            url: `https://api.github.com/repos/${reviewsRepoFullName}/issues/9/reactions`,
-            total_count: 0,
-            "+1": 0,
-            "-1": 0,
-            laugh: 0,
-            hooray: 0,
-            confused: 0,
-            heart: 0,
-            rocket: 0,
-            eyes: 0,
-          },
-          timeline_url: `https://api.github.com/repos/${reviewsRepoFullName}/issues/9/timeline`,
-          performed_via_github_app: null,
-          state_reason: null,
-        },
-        repository: {
-          id: 849574210,
-          node_id: "R_kgDOMqN5Qg",
-          name: "test-design-reviews",
-          full_name: reviewsRepoFullName,
-          private: false,
-          owner: {
-            login: "jyasskin",
-            id: 83420,
-            node_id: "MDQ6VXNlcjgzNDIw",
-            avatar_url: "https://avatars.githubusercontent.com/u/83420?v=4",
-            gravatar_id: "",
-            url: "https://api.github.com/users/jyasskin",
-            html_url: "https://github.com/jyasskin",
-            followers_url: "https://api.github.com/users/jyasskin/followers",
-            following_url:
-              "https://api.github.com/users/jyasskin/following{/other_user}",
-            gists_url: "https://api.github.com/users/jyasskin/gists{/gist_id}",
-            starred_url:
-              "https://api.github.com/users/jyasskin/starred{/owner}{/repo}",
-            subscriptions_url:
-              "https://api.github.com/users/jyasskin/subscriptions",
-            organizations_url: "https://api.github.com/users/jyasskin/orgs",
-            repos_url: "https://api.github.com/users/jyasskin/repos",
-            events_url:
-              "https://api.github.com/users/jyasskin/events{/privacy}",
-            received_events_url:
-              "https://api.github.com/users/jyasskin/received_events",
-            type: "User",
-            site_admin: false,
-          },
-          html_url: `https://github.com/${reviewsRepoFullName}`,
-          description: "Repository to test cloning design-reviews issues",
-          fork: false,
-          url: `https://api.github.com/repos/${reviewsRepoFullName}`,
-          forks_url: `https://api.github.com/repos/${reviewsRepoFullName}/forks`,
-          keys_url: `https://api.github.com/repos/${reviewsRepoFullName}/keys{/key_id}`,
-          collaborators_url: `https://api.github.com/repos/${reviewsRepoFullName}/collaborators{/collaborator}`,
-          teams_url: `https://api.github.com/repos/${reviewsRepoFullName}/teams`,
-          hooks_url: `https://api.github.com/repos/${reviewsRepoFullName}/hooks`,
-          issue_events_url: `https://api.github.com/repos/${reviewsRepoFullName}/issues/events{/number}`,
-          events_url: `https://api.github.com/repos/${reviewsRepoFullName}/events`,
-          assignees_url: `https://api.github.com/repos/${reviewsRepoFullName}/assignees{/user}`,
-          branches_url: `https://api.github.com/repos/${reviewsRepoFullName}/branches{/branch}`,
-          tags_url: `https://api.github.com/repos/${reviewsRepoFullName}/tags`,
-          blobs_url: `https://api.github.com/repos/${reviewsRepoFullName}/git/blobs{/sha}`,
-          git_tags_url: `https://api.github.com/repos/${reviewsRepoFullName}/git/tags{/sha}`,
-          git_refs_url: `https://api.github.com/repos/${reviewsRepoFullName}/git/refs{/sha}`,
-          trees_url: `https://api.github.com/repos/${reviewsRepoFullName}/git/trees{/sha}`,
-          statuses_url: `https://api.github.com/repos/${reviewsRepoFullName}/statuses/{sha}`,
-          languages_url: `https://api.github.com/repos/${reviewsRepoFullName}/languages`,
-          stargazers_url: `https://api.github.com/repos/${reviewsRepoFullName}/stargazers`,
-          contributors_url: `https://api.github.com/repos/${reviewsRepoFullName}/contributors`,
-          subscribers_url: `https://api.github.com/repos/${reviewsRepoFullName}/subscribers`,
-          subscription_url: `https://api.github.com/repos/${reviewsRepoFullName}/subscription`,
-          commits_url: `https://api.github.com/repos/${reviewsRepoFullName}/commits{/sha}`,
-          git_commits_url: `https://api.github.com/repos/${reviewsRepoFullName}/git/commits{/sha}`,
-          comments_url: `https://api.github.com/repos/${reviewsRepoFullName}/comments{/number}`,
-          issue_comment_url: `https://api.github.com/repos/${reviewsRepoFullName}/issues/comments{/number}`,
-          contents_url: `https://api.github.com/repos/${reviewsRepoFullName}/contents/{+path}`,
-          compare_url: `https://api.github.com/repos/${reviewsRepoFullName}/compare/{base}...{head}`,
-          merges_url: `https://api.github.com/repos/${reviewsRepoFullName}/merges`,
-          archive_url: `https://api.github.com/repos/${reviewsRepoFullName}/{archive_format}{/ref}`,
-          downloads_url: `https://api.github.com/repos/${reviewsRepoFullName}/downloads`,
-          issues_url: `https://api.github.com/repos/${reviewsRepoFullName}/issues{/number}`,
-          pulls_url: `https://api.github.com/repos/${reviewsRepoFullName}/pulls{/number}`,
-          milestones_url: `https://api.github.com/repos/${reviewsRepoFullName}/milestones{/number}`,
-          notifications_url: `https://api.github.com/repos/${reviewsRepoFullName}/notifications{?since,all,participating}`,
-          labels_url: `https://api.github.com/repos/${reviewsRepoFullName}/labels{/name}`,
-          releases_url: `https://api.github.com/repos/${reviewsRepoFullName}/releases{/id}`,
-          deployments_url: `https://api.github.com/repos/${reviewsRepoFullName}/deployments`,
-          created_at: "2024-08-29T20:54:51Z",
-          updated_at: "2024-08-30T17:23:30Z",
-          pushed_at: "2024-08-30T17:23:27Z",
-          git_url: `git://github.com/${reviewsRepoFullName}.git`,
-          ssh_url: `git@github.com:${reviewsRepoFullName}.git`,
-          clone_url: `https://github.com/${reviewsRepoFullName}.git`,
-          svn_url: `https://github.com/${reviewsRepoFullName}`,
-          homepage: null,
-          size: 11,
-          stargazers_count: 0,
-          watchers_count: 0,
-          language: null,
-          has_issues: true,
-          has_projects: true,
-          has_downloads: true,
-          has_wiki: true,
-          has_pages: false,
-          has_discussions: true,
-          forks_count: 0,
-          mirror_url: null,
-          archived: false,
-          disabled: false,
-          open_issues_count: 8,
-          license: null,
-          allow_forking: true,
-          is_template: false,
-          web_commit_signoff_required: false,
-          topics: [],
-          visibility: "public",
-          forks: 0,
-          open_issues: 8,
-          watchers: 0,
-          default_branch: "main",
-        },
-        sender: {
-          login: "jyasskin",
-          id: 83420,
-          node_id: "MDQ6VXNlcjgzNDIw",
-          avatar_url: "https://avatars.githubusercontent.com/u/83420?v=4",
-          gravatar_id: "",
-          url: "https://api.github.com/users/jyasskin",
-          html_url: "https://github.com/jyasskin",
-          followers_url: "https://api.github.com/users/jyasskin/followers",
-          following_url:
-            "https://api.github.com/users/jyasskin/following{/other_user}",
-          gists_url: "https://api.github.com/users/jyasskin/gists{/gist_id}",
-          starred_url:
-            "https://api.github.com/users/jyasskin/starred{/owner}{/repo}",
-          subscriptions_url:
-            "https://api.github.com/users/jyasskin/subscriptions",
-          organizations_url: "https://api.github.com/users/jyasskin/orgs",
-          repos_url: "https://api.github.com/users/jyasskin/repos",
-          events_url: "https://api.github.com/users/jyasskin/events{/privacy}",
-          received_events_url:
-            "https://api.github.com/users/jyasskin/received_events",
-          type: "User",
-          site_admin: false,
-        },
-      } satisfies EmitterWebhookEvent<"issues.opened">["payload"]);
+    test("creates a design review in the database", async () => {
+      const payload = JSON.stringify(designReviewCreatedPayload);
+      const issueId = designReviewCreatedPayload.issue.node_id;
       const response = await handleWebHook(
         new Request("https://example.com/webhook", {
           method: "POST",
@@ -262,29 +59,176 @@ describe("issues", () => {
       expect(await response.text()).toEqual("");
       expect(response).toHaveProperty("status", 200);
       const result = await prisma.issue.findUniqueOrThrow({
-        where: { id: "Issue9Id" },
-        include: { labels: { select: { label: true } } },
+        where: { id: issueId },
+        include: {
+          labels: { select: { label: true } },
+          designReview: { omit: { id: true } },
+        },
       });
       expect(result).toEqual({
-        id: "Issue9Id",
-        org: "jyasskin",
-        repo: "test-design-reviews",
-        number: 9,
-        title: "Test specification review",
-        body,
-        created: new Date("2024-09-20T19:38:15"),
-        updated: new Date("2024-09-20T19:38:15"),
+        id: issueId,
+        org: "w3ctag",
+        repo: "design-reviews",
+        number: 1110,
+        title: "windowAudio for getDisplayMedia",
+        body: designReviewCreatedPayload.issue.body,
+        created: new Date("2025-06-10T20:16:08Z"),
+        updated: new Date("2025-06-10T20:16:08Z"),
         closed: null,
-        labels: [{ label: "Label 1" }, { label: "Label 2" }],
+        labels: [{ label: "Progress: untriaged" }],
         milestoneId: null,
         pendingCommentsFrom: null,
+        designReview: {
+          privateBrainstormingIssueId: null,
+          pendingPrivateBrainstormingCommentsFrom: null,
+        },
       } satisfies typeof result);
+    });
+    describe("after design review exists", () => {
+      const issueId = designReviewCreatedPayload.issue.node_id;
+      beforeEach(async () => {
+        await prisma.issue.create({
+          data: {
+            id: issueId,
+            org: "w3ctag",
+            repo: "design-reviews",
+            number: 1110,
+            title: "windowAudio for getDisplayMedia",
+            body: designReviewCreatedPayload.issue.body,
+            created: new Date("2025-06-10T20:16:08Z"),
+            updated: new Date("2025-06-10T20:16:08Z"),
+            designReview: { create: {} },
+          },
+        });
+      });
+      test("updates with its private mirror", async () => {
+        const payload = JSON.stringify(brainstormingMirrorCreatedPayload);
+        const response = await handleWebHook(
+          new Request("https://example.com/webhook", {
+            method: "POST",
+            headers: {
+              "x-github-delivery": "unique id",
+              "x-github-event": "issues",
+              "X-Hub-Signature-256": await webhooks.sign(payload),
+            },
+            body: payload,
+          }),
+        );
+        expect(await response.text()).toEqual("");
+        expect(response).toHaveProperty("status", 200);
+        const result = await prisma.issue.findUniqueOrThrow({
+          where: { id: issueId },
+          select: { id: true, designReview: true },
+        });
+        expect(result).toEqual({
+          id: issueId,
+          designReview: {
+            id: issueId,
+            privateBrainstormingIssueId:
+              brainstormingMirrorCreatedPayload.issue.node_id,
+            pendingPrivateBrainstormingCommentsFrom: null,
+          },
+        } satisfies typeof result);
+      });
+      test("ignores malformed mirror issues", async () => {
+        const brokenPayload = structuredClone(
+          brainstormingMirrorCreatedPayload,
+        );
+        brokenPayload.issue.body = "This body doesn't declare what it mirrors.";
+        const payload = JSON.stringify(brokenPayload);
+        const response = await handleWebHook(
+          new Request("https://example.com/webhook", {
+            method: "POST",
+            headers: {
+              "x-github-delivery": "unique id",
+              "x-github-event": "issues",
+              "X-Hub-Signature-256": await webhooks.sign(payload),
+            },
+            body: payload,
+          }),
+        );
+        expect(await response.text()).toEqual("");
+        expect(response).toHaveProperty("status", 200);
+        const result = await prisma.issue.findUniqueOrThrow({
+          where: { id: issueId },
+          select: { id: true, designReview: { omit: { id: true } } },
+        });
+        expect(result).toEqual({
+          id: issueId,
+          designReview: {
+            privateBrainstormingIssueId: null,
+            pendingPrivateBrainstormingCommentsFrom: null,
+          },
+        } satisfies typeof result);
+      });
     });
   });
 });
 
 describe("issue_comment", () => {
   describe("created", () => {
+    describe("updates db cache", () => {
+      const issueId = "I_kwDOAKfwGc63GXWR";
+      beforeEach(async () => {
+        await prisma.issue.create({
+          data: {
+            id: issueId,
+            org: "w3ctag",
+            repo: "design-reviews",
+            number: 1064,
+            title: "Canvas Text Metrics for Editing, Art and Design",
+            body: "Please review my feature",
+            created: "2025-05-18T16:17:07Z",
+            updated: "2025-05-29T23:06:05Z",
+            designReview: {
+              create: {
+                privateBrainstormingIssueId:
+                  brainstormingDiscussionPayload.issue.node_id,
+              },
+            },
+          },
+        });
+      });
+      test("brainstorming discussion", async () => {
+        const payload = JSON.stringify(brainstormingDiscussionPayload);
+        const response = await handleWebHook(
+          new Request("https://example.com/webhook", {
+            method: "POST",
+            headers: {
+              "x-github-delivery": "unique id",
+              "x-github-event": "issue_comment",
+              "X-Hub-Signature-256": await webhooks.sign(payload),
+            },
+            body: payload,
+          }),
+        );
+        expect(await response.text()).toEqual("");
+        expect(response).toHaveProperty("status", 200);
+        const result = await prisma.issue.findUniqueOrThrow({
+          where: { id: issueId },
+          select: { id: true, comments: { omit: { issueId: true } } },
+        });
+        expect(result).toEqual({
+          id: issueId,
+          comments: [
+            {
+              id: brainstormingDiscussionPayload.comment.node_id,
+              authorId: brainstormingDiscussionPayload.comment.user.node_id,
+              body: brainstormingDiscussionPayload.comment.body,
+              publishedAt: new Date(
+                brainstormingDiscussionPayload.comment.created_at,
+              ),
+              updatedAt: new Date(
+                brainstormingDiscussionPayload.comment.updated_at,
+              ),
+              url: brainstormingDiscussionPayload.comment.url,
+              isMinimized: false,
+              isPrivateBrainstorming: true,
+            },
+          ],
+        } satisfies typeof result);
+      });
+    });
     describe("'pending' progress", () => {
       const issueId = "I_kwDOAKfwGc6slrgI";
       beforeEach(async () => {
@@ -391,7 +335,8 @@ describe("issue_comment", () => {
         { timeout: 20000 },
         async () => {
           const payloadCopy = structuredClone(issueResponsePayload);
-          payloadCopy.comment.user.node_id = tagMemberIdsByAttendanceName.get('jeffrey')!;
+          payloadCopy.comment.user.node_id =
+            tagMemberIdsByAttendanceName.get("jeffrey")!;
           const payload = JSON.stringify(payloadCopy);
           // No resulting request to Github.
           const response = await handleWebHook(
@@ -424,7 +369,7 @@ describe("issue_comment", () => {
 
 describe("push", () => {
   // Long timeout to handle octokit doing exponential backoff on network errors.
-  test("refetches minutes", {timeout: 20000}, async () => {
+  test("refetches minutes", { timeout: 20000 }, async () => {
     // Pre-populate the issue mentioned in the fake discussion.
     await prisma.issue.create({
       data: {
@@ -517,7 +462,7 @@ Still waiting for a reply from proponents.
       discussions: [
         {
           markdown: `Still waiting for a reply from proponents.`,
-          proposedComments: []
+          proposedComments: [],
         },
       ],
     });
