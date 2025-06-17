@@ -14,6 +14,7 @@ import { prisma } from "../src/lib/prisma";
 import { handleWebHook, webhookProcessingComplete } from "../src/pages/webhook";
 import brainstormingDiscussionPayload from "./payloads/brainstorming-discussion.json" with { type: "json" };
 import brainstormingMirrorCreatedPayload from "./payloads/brainstorming-mirror-created.json" with { type: "json" };
+import designReviewCommentEditedPayload from "./payloads/design-review-comment-edited.json" with { type: "json" };
 import designReviewCreatedPayload from "./payloads/design-review-created.json" with { type: "json" };
 import issueResponsePayload from "./payloads/issue-response.json" with { type: "json" };
 import pushPayload from "./payloads/push.json" with { type: "json" };
@@ -363,6 +364,115 @@ describe("issue_comment", () => {
           ).toHaveLength(6);
         },
       );
+    });
+  });
+
+  describe("edited", () => {
+    test("updates comment body", async () => {
+      await prisma.issue.create({
+        data: {
+          id: designReviewCommentEditedPayload.issue.node_id,
+          body: "Issue body",
+          org: "w3ctag",
+          repo: "design-reviews",
+          number: designReviewCommentEditedPayload.issue.number,
+          created: designReviewCommentEditedPayload.issue.created_at,
+          updated: designReviewCommentEditedPayload.issue.updated_at,
+          title: designReviewCommentEditedPayload.issue.title,
+          designReview: { create: {} },
+          comments: {
+            create: {
+              id: designReviewCommentEditedPayload.comment.node_id,
+              body: "Old body",
+              publishedAt: designReviewCommentEditedPayload.comment.created_at,
+              updatedAt: designReviewCommentEditedPayload.comment.created_at,
+              url: designReviewCommentEditedPayload.comment.url,
+              isMinimized: false,
+              isPrivateBrainstorming: false,
+            },
+          },
+        },
+      });
+      const payload = JSON.stringify(designReviewCommentEditedPayload);
+      // No resulting request to Github.
+      const response = await handleWebHook(
+        new Request("https://example.com/webhook", {
+          method: "POST",
+          headers: {
+            "x-github-delivery": "unique id",
+            "x-github-event": "issue_comment",
+            "X-Hub-Signature-256": await webhooks.sign(payload),
+          },
+          body: payload,
+        }),
+      );
+      expect(await response.text()).toEqual("");
+      expect(response).toHaveProperty("status", 200);
+      await webhookProcessingComplete();
+      const result = await prisma.issueComment.findUnique({
+        where: { id: designReviewCommentEditedPayload.comment.node_id },
+        select: { body: true, updatedAt: true },
+      });
+      expect(result).toEqual({
+        body: designReviewCommentEditedPayload.comment.body,
+        updatedAt: new Date(
+          designReviewCommentEditedPayload.comment.updated_at,
+        ),
+      } satisfies typeof result);
+    });
+  });
+
+  describe("deleted", () => {
+    test("deletes the cached comment", async () => {
+      await prisma.issue.create({
+        data: {
+          id: designReviewCommentEditedPayload.issue.node_id,
+          body: "Issue body",
+          org: "w3ctag",
+          repo: "design-reviews",
+          number: designReviewCommentEditedPayload.issue.number,
+          created: designReviewCommentEditedPayload.issue.created_at,
+          updated: designReviewCommentEditedPayload.issue.updated_at,
+          title: designReviewCommentEditedPayload.issue.title,
+          designReview: { create: {} },
+          comments: {
+            create: {
+              id: designReviewCommentEditedPayload.comment.node_id,
+              body: "Old body",
+              publishedAt: designReviewCommentEditedPayload.comment.created_at,
+              updatedAt: designReviewCommentEditedPayload.comment.updated_at,
+              url: designReviewCommentEditedPayload.comment.url,
+              isMinimized: false,
+              isPrivateBrainstorming: false,
+            },
+          },
+        },
+      });
+      const payload = JSON.stringify({
+        action: "deleted",
+        comment: { node_id: designReviewCommentEditedPayload.comment.node_id },
+      });
+      // No resulting request to Github.
+      const response = await handleWebHook(
+        new Request("https://example.com/webhook", {
+          method: "POST",
+          headers: {
+            "x-github-delivery": "unique id",
+            "x-github-event": "issue_comment",
+            "X-Hub-Signature-256": await webhooks.sign(payload),
+          },
+          body: payload,
+        }),
+      );
+      expect(await response.text()).toEqual("");
+      expect(response).toHaveProperty("status", 200);
+      await webhookProcessingComplete();
+      expect(
+        await prisma.issueComment.findUnique({
+          where: { id: designReviewCommentEditedPayload.comment.node_id },
+          select: { body: true },
+        }),
+      ).toEqual(null);
     });
   });
 });

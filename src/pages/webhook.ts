@@ -275,6 +275,19 @@ webhooks.on("issue_comment.created", async ({ payload }) => {
   }
 });
 
+webhooks.on("issue_comment.edited", async ({ payload }) => {
+  await prisma.issueComment.update({
+    where: { id: payload.comment.node_id },
+    data: { updatedAt: payload.comment.updated_at, body: payload.comment.body },
+  });
+});
+
+webhooks.on("issue_comment.deleted", async ({ payload }) => {
+  await prisma.issueComment.delete({
+    where: { id: payload.comment.node_id },
+  });
+});
+
 function addAll<T>(set: Set<T>, array: T[] | null | undefined) {
   if (array) {
     for (const item of array) {
