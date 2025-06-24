@@ -1,0 +1,8 @@
+query IssueBody($org: String!, $repo: String!, $number: Int!) {
+  repository(owner: $org, name: $repo) {
+    issue(number: $number) {
+      id
+      body
+    }
+  }
+}

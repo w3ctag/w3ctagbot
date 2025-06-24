@@ -3,11 +3,16 @@ import IssueList from "@components/IssueList.astro";
 import Markdown from "@components/Markdown.astro";
 import RelativeTime from "@components/RelativeTime.astro";
 import Layout from "@layouts/Layout.astro";
+import { findMainIssueNumberFromMirrorNumber } from "@lib/design-reviews";
 import { app } from "@lib/github/auth";
 import { getLogin, getLoginUrl } from "@lib/login";
 import { prisma } from "@lib/prisma";
 import { githubIdIsTagMemberOnDate } from "@lib/tag-members";
-import { REVIEWS_REPO, TAG_ORG } from "astro:env/client";
+import {
+  PRIVATE_BRAINSTORMING_REPO,
+  REVIEWS_REPO,
+  TAG_ORG,
+} from "astro:env/client";
 
 const { org, repo, number } = Astro.params;
 
@@ -20,6 +25,19 @@ if (org === undefined || repo === undefined || isNaN(parsedNumber)) {
   return new Response(undefined, { status: 404 });
 }
 
+if (org === TAG_ORG && repo === PRIVATE_BRAINSTORMING_REPO) {
+  // Find the matching top-level review, and redirect there.
+  const mainReviewNumber =
+    await findMainIssueNumberFromMirrorNumber(parsedNumber);
+  if (mainReviewNumber) {
+    return Astro.redirect(
+      `/gh/${TAG_ORG}/${REVIEWS_REPO}/${mainReviewNumber}`,
+      308
+    );
+  }
+  return new Response(undefined, { status: 404 });
+}
+
 const review = await prisma.issue.findUnique({
   where: { org_repo_number: { org, repo, number: parsedNumber } },
   include: {
@@ -29,7 +47,7 @@ const review = await prisma.issue.findUnique({
     discussions: {
       include: { meeting: true, proposedComments: true },
       orderBy: [{ meetingYear: "asc" }, { meetingName: "asc" }],
-    }
+    },
   },
 });
 

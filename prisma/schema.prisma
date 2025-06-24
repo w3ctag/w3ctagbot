@@ -51,6 +51,10 @@ model DesignReview {
   /// If there's a mirror of this issue in the private brainstorming repo, this is that issue's
   /// GraphQL node ID.
   privateBrainstormingIssueId             String? @unique
+  /// If there's a mirror of this issue in the private brainstorming repo, this is that issue's
+  /// number. This facilitates redirecting from /gh/w3ctag/design-reviews-private-brainstorming/##
+  /// to the matching review.
+  privateBrainstormingIssueNumber         Int?    @unique
   /// We get an initial set of timeline items when querying the mirrored private brainstorming
   /// issue, but there may be more pages of results. This is the `endCursor` value from the first
   /// page until we've fetched the remaining pages.

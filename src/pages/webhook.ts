@@ -1,3 +1,4 @@
+import { getMirrorSource } from "@lib/design-reviews";
 import { query } from "@lib/github";
 import { parseNewMinutes } from "@lib/github/update";
 import { githubIdIsTagMemberOnDate } from "@lib/tag-members";
@@ -19,25 +20,22 @@ import {
 import { webhooks } from "../lib/github/auth";
 import { prisma } from "../lib/prisma";
 
-const mirroredFromRE = new RegExp(
-  `Mirrored from: ${TAG_ORG}/${REVIEWS_REPO}#(?<number>\\d+)`,
-);
-
 async function recordBrainstormingIssue(
   payload: WebhookEventDefinition<"issues-opened">,
 ) {
   // Find the issue this was mirrored from.
-  const match = mirroredFromRE.exec(payload.issue.body ?? "");
-  if (!match?.groups) return;
+  const mirrorSource = getMirrorSource(payload.issue.body ?? "");
+  if (!mirrorSource) return;
   const designReviewUpdate: Prisma.DesignReviewCreateWithoutIssueInput = {
     privateBrainstormingIssueId: payload.issue.node_id,
+    privateBrainstormingIssueNumber: payload.issue.number,
   };
   await prisma.issue.update({
     where: {
       org_repo_number: {
         org: TAG_ORG,
         repo: REVIEWS_REPO,
-        number: parseInt(match.groups.number),
+        number: mirrorSource.number,
       },
     },
     data: {

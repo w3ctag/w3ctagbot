@@ -32414,6 +32414,15 @@ export type FileContentQueryVariables = Exact<{
 
 export type FileContentQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', defaultBranchRef?: { __typename?: 'Ref', name: string } | null, object?: { __typename: 'Blob', id: string, isTruncated: boolean, isBinary?: boolean | null, text?: string | null } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree' } | null } | null };
 
+export type IssueBodyQueryVariables = Exact<{
+  org: Scalars['String']['input'];
+  repo: Scalars['String']['input'];
+  number: Scalars['Int']['input'];
+}>;
+
+
+export type IssueBodyQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issue?: { __typename?: 'Issue', id: string, body: string } | null } | null };
+
 export type IssueCommentsQueryVariables = Exact<{
   id: Scalars['ID']['input'];
   cursor?: InputMaybe<Scalars['String']['input']>;
@@ -32523,6 +32532,16 @@ export const FileContentDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<FileContentQuery, FileContentQueryVariables>;
+export const IssueBodyDocument = new TypedDocumentString(`
+    query IssueBody($org: String!, $repo: String!, $number: Int!) {
+  repository(owner: $org, name: $repo) {
+    issue(number: $number) {
+      id
+      body
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<IssueBodyQuery, IssueBodyQueryVariables>;
 export const IssueCommentsDocument = new TypedDocumentString(`
     query IssueComments($id: ID!, $cursor: String) {
   node(id: $id) {

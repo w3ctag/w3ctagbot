@@ -81,6 +81,7 @@ describe("issues", () => {
         pendingCommentsFrom: null,
         designReview: {
           privateBrainstormingIssueId: null,
+          privateBrainstormingIssueNumber: null,
           pendingPrivateBrainstormingCommentsFrom: null,
         },
       } satisfies typeof result);
@@ -127,6 +128,7 @@ describe("issues", () => {
             id: issueId,
             privateBrainstormingIssueId:
               brainstormingMirrorCreatedPayload.issue.node_id,
+            privateBrainstormingIssueNumber: 166,
             pendingPrivateBrainstormingCommentsFrom: null,
           },
         } satisfies typeof result);
@@ -158,6 +160,7 @@ describe("issues", () => {
           id: issueId,
           designReview: {
             privateBrainstormingIssueId: null,
+            privateBrainstormingIssueNumber: null,
             pendingPrivateBrainstormingCommentsFrom: null,
           },
         } satisfies typeof result);

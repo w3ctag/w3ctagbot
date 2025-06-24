@@ -47,3 +47,11 @@ export function hasOwn<K extends PropertyKey, V>(
 ): key is K {
   return Object.hasOwn(obj, key);
 }
+
+export function parseIntOrUndefined(
+  input: string | null | undefined,
+): number | undefined {
+  const result = parseInt(input as string);
+  if (isNaN(result)) return undefined;
+  return result;
+}

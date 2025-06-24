@@ -208,6 +208,7 @@ async function updatePrivateBrainstorming(
       const number = parseInt(mirroredFromMatch.groups.number);
       const designReviewCreate: Prisma.DesignReviewCreateWithoutIssueInput = {
         privateBrainstormingIssueId: issue.id,
+        privateBrainstormingIssueNumber: issue.number,
         pendingPrivateBrainstormingCommentsFrom: issue.comments.pageInfo
           .hasNextPage
           ? issue.comments.pageInfo.endCursor
