@@ -3,10 +3,13 @@ import nock from "nock";
 import {
   FileContentDocument,
   RemoveLabelsDocument,
+  UpdateIssueBodyDocument,
   type FileContentQuery,
   type FileContentQueryVariables,
   type RemoveLabelsMutation,
   type RemoveLabelsMutationVariables,
+  type UpdateIssueBodyMutation,
+  type UpdateIssueBodyMutationVariables,
 } from "src/gql/graphql";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { webhooks } from "../src/lib/github/auth";
@@ -43,9 +46,31 @@ afterEach(async () => {
 
 describe("issues", () => {
   describe("opened", () => {
-    test("creates a design review in the database", async () => {
+    test("creates a design review in the database", {timeout: 20000}, async () => {
       const payload = JSON.stringify(designReviewCreatedPayload);
       const issueId = designReviewCreatedPayload.issue.node_id;
+      const scope = nock("https://api.github.com")
+        .post("/graphql", {
+          query: UpdateIssueBodyDocument.toString(),
+          variables: {
+            id: issueId,
+            body: designReviewCreatedPayload.issue.body + `
+<!-- Content below this is maintained by @w3c-tag-bot -->
+---
+
+Track conversations at http://localhost:4321/gh/w3ctag/design-reviews/1110
+`,
+          } satisfies UpdateIssueBodyMutationVariables,
+        })
+        .reply(200, {
+          data: {
+            updateIssue: {
+              issue: {
+                id: issueId,
+              },
+            },
+          } satisfies UpdateIssueBodyMutation,
+        });
       const response = await handleWebHook(
         new Request("https://example.com/webhook", {
           method: "POST",
@@ -85,6 +110,7 @@ describe("issues", () => {
           pendingPrivateBrainstormingCommentsFrom: null,
         },
       } satisfies typeof result);
+      scope.done();
     });
     describe("after design review exists", () => {
       const issueId = designReviewCreatedPayload.issue.node_id;

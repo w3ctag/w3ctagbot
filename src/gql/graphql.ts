@@ -32467,6 +32467,14 @@ export type RemoveLabelsMutationVariables = Exact<{
 
 export type RemoveLabelsMutation = { __typename?: 'Mutation', removeLabelsFromLabelable?: { __typename?: 'RemoveLabelsFromLabelablePayload', labelable?: { __typename: 'Discussion', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'Issue', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'PullRequest', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | null } | null };
 
+export type UpdateIssueBodyMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  body: Scalars['String']['input'];
+}>;
+
+
+export type UpdateIssueBodyMutation = { __typename?: 'Mutation', updateIssue?: { __typename?: 'UpdateIssuePayload', issue?: { __typename?: 'Issue', id: string } | null } | null };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -32752,3 +32760,12 @@ export const RemoveLabelsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<RemoveLabelsMutation, RemoveLabelsMutationVariables>;
+export const UpdateIssueBodyDocument = new TypedDocumentString(`
+    mutation updateIssueBody($id: ID!, $body: String!) {
+  updateIssue(input: {id: $id, body: $body}) {
+    issue {
+      id
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<UpdateIssueBodyMutation, UpdateIssueBodyMutationVariables>;

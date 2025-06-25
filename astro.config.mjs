@@ -37,6 +37,8 @@ export default defineConfig({
     mode: "standalone",
   }),
 
+  site: "http://localhost:4321",
+
   env: {
     schema: {
       // Names for TAG repositories. These are variables so that development instances can

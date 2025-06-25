@@ -48,7 +48,7 @@ jobs:
           node-version-file: "package.json"
           cache: pnpm
       - run: pnpm install
-      - run: pnpm build
+      - run: pnpm build --site "https://tag-github-bot.w3.org"
       - run: rm -rf node_modules
       - run: pnpm install --prod
       - run: pnpm prisma generate

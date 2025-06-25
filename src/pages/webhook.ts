@@ -1,5 +1,6 @@
 import { getMirrorSource } from "@lib/design-reviews";
 import { query } from "@lib/github";
+import { addLinkToThisServerToIssue } from "@lib/github/edits";
 import { parseNewMinutes } from "@lib/github/update";
 import { githubIdIsTagMemberOnDate } from "@lib/tag-members";
 import { notNull } from "@lib/util";
@@ -80,6 +81,13 @@ webhooks.on("issues.opened", async ({ payload }) => {
       },
       designReview,
     },
+  });
+  await addLinkToThisServerToIssue({
+    id: payload.issue.node_id,
+    org: repository.owner.login,
+    repo: repository.name,
+    number: payload.issue.number,
+    body: payload.issue.body ?? "",
   });
 });
 
