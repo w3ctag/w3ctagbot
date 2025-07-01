@@ -94,32 +94,40 @@ const unifiedDiscussions = review.comments
     })
   )
   .concat(
-    review.discussions.map(({ markdown, meeting }) => {
-      const dateInName = meeting.name.match(
-        /^(?<month>\d+)-(?:(?<day>\d+))?.*/
-      );
-      // TODO: Turn this into a Temporal of the right granularity.
-      let timestamp: Date;
-      if (dateInName && dateInName.groups) {
-        if (dateInName.groups.day) {
-          const { month, day } = dateInName.groups;
-          timestamp = new Date(`${meeting.year}-${month}-${day}`);
+    review.discussions
+      .filter(
+        (
+          discussion
+        ): discussion is {
+          meeting: { minutesUrl: string };
+        } & typeof discussion => discussion.meeting.minutesUrl !== null
+      )
+      .map(({ markdown, meeting }) => {
+        const dateInName = meeting.name.match(
+          /^(?<month>\d+)-(?:(?<day>\d+))?.*/
+        );
+        // TODO: Turn this into a Temporal of the right granularity.
+        let timestamp: Date;
+        if (dateInName && dateInName.groups) {
+          if (dateInName.groups.day) {
+            const { month, day } = dateInName.groups;
+            timestamp = new Date(`${meeting.year}-${month}-${day}`);
+          } else {
+            timestamp = new Date(`${meeting.year}-${dateInName.groups.month}`);
+          }
         } else {
-          timestamp = new Date(`${meeting.year}-${dateInName.groups.month}`);
+          timestamp = new Date(meeting.year);
         }
-      } else {
-        timestamp = new Date(meeting.year);
-      }
-      return {
-        type: "meeting",
-        isPrivate: false,
-        body: markdown,
-        timestamp,
-        url: meeting.minutesUrl,
-        isMinimized: false,
-        author: undefined,
-      };
-    })
+        return {
+          type: "meeting" as const,
+          isPrivate: false,
+          body: markdown,
+          timestamp,
+          url: meeting.minutesUrl,
+          isMinimized: false,
+          author: undefined,
+        };
+      })
   )
   .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 ---

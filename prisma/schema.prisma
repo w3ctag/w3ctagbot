@@ -106,22 +106,35 @@ model IssueComment {
 
 /// Either an in-person multi-day meeting or a week of telecons.
 model Meeting {
-  year       Int
+  year Int
   /// For example, "07-seattle" or "02-05".
-  name       String
-  minutesUrl String
+  name String
 
+  /// agendaUrl and agendaId are expected to be null or non-null together.
+  agendaUrl      String?
+  /// The Github node ID for the agenda document. This changes each time a commit updates the agenda.
+  agendaId       String?
+  /// The Github node ID for the agenda document whose contents are cached in the `agendaContent` field.
+  cachedAgendaId String? @unique
+  agendaContent  String?
+
+  /// minutesUrl and minutesId are expected to be null or non-null together.
+  minutesUrl      String?
   /// The Github node ID for the minutes document. This changes each time a commit updates the minutes.
-  minutesId String
-
-  /// The Github node ID for the minutes document whose contents are cached in the `contents` field.
+  minutesId       String?
+  /// The Github node ID for the minutes document whose contents are cached in the `minutesContent` field.
   cachedMinutesId String?
-  contents        String?
+  minutesContent  String?
 
   sessions    MeetingSession[]
   discussions Discussion[]
 
   @@unique([year, name])
+}
+
+model ScheduledIssue {
+  agendaBlobId String
+  meeting Meeting @relation(fields: [meetingYear, meetingName], references: [year, name], onDelete: Cascade, onUpdate: )
 }
 
 /// Represents a single discussion session within a meeting (or within a week of telecons). This is

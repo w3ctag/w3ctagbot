@@ -534,18 +534,74 @@ function createDiscussionsFromMinutes(
   );
 }
 
+/** Fetches any blobs in neededIds that aren't already cached in knownBlobContents,
+ * and caches them.
+ */
+async function learnBlobContents(
+  neededIds: (string | null)[],
+  knownBlobContents: Map<string, string>,
+) {
+  const unknownIds = neededIds.flatMap((id) =>
+    id !== null && !knownBlobContents.has(id) ? [id] : [],
+  );
+  while (unknownIds.length > 0) {
+    const chunk = unknownIds.splice(0, 20);
+    console.log(`Fetching ${chunk.length} documents from Github.`);
+    const contents = await query(BlobContentsDocument, { ids: chunk });
+    for (let i = 0; i < chunk.length; i++) {
+      const blob = contents.nodes[i];
+      if (blob?.__typename !== "Blob" || chunk[i] !== blob.id) {
+        console.error(
+          `Github returned unexpected results when getting contents for ${JSON.stringify(chunk)}[${i}]: ` +
+            `${JSON.stringify(blob)}.`,
+        );
+        return;
+      }
+      if (!blob.text) {
+        console.error(
+          `Blob ${blob.id} has no text. It may be binary (${blob.isBinary}).`,
+        );
+        continue;
+      }
+      if (blob.isTruncated) {
+        console.error(`Blob ${blob.id} is truncated.`);
+        continue;
+      }
+      knownBlobContents.set(blob.id, blob.text);
+    }
+  }
+}
+
 /**
  * @param knownBlobContents Maps blob IDs to their contents. Any unknown blobs will be fetched from
  * Github.
  */
-export async function parseNewMinutes(
+export async function parseNewAgendasAndMinutes(
   knownBlobContents: Map<string, string> = new Map(),
 ): Promise<void> {
-  const [newMinutes, issueNames] = await Promise.all([
+  const [newAgendas, newMinutes, issueNames] = await Promise.all([
     prisma.meeting.findMany({
       where: {
         OR: [
-          { cachedMinutesId: null },
+          { agendaId: { not: null }, cachedAgendaId: null },
+          {
+            NOT: {
+              cachedAgendaId: { equals: prisma.meeting.fields.agendaId },
+            },
+          },
+        ],
+      },
+      select: {
+        year: true,
+        name: true,
+        agendaId: true,
+      },
+      orderBy: [{ year: "asc" }, { name: "asc" }],
+    }),
+    prisma.meeting.findMany({
+      where: {
+        OR: [
+          { minutesId: { not: null }, cachedMinutesId: null },
           {
             NOT: {
               cachedMinutesId: { equals: prisma.meeting.fields.minutesId },
@@ -553,7 +609,11 @@ export async function parseNewMinutes(
           },
         ],
       },
-      select: { year: true, name: true, minutesId: true },
+      select: {
+        year: true,
+        name: true,
+        minutesId: true,
+      },
       orderBy: [{ year: "asc" }, { name: "asc" }],
     }),
     prisma.issue.findMany({
@@ -566,48 +626,20 @@ export async function parseNewMinutes(
       id,
     ]),
   );
+  await learnBlobContents(
+    newAgendas
+      .map((agenda) => agenda.agendaId)
+      .concat(newMinutes.map((minutes) => minutes.minutesId)),
+    knownBlobContents,
+  );
   console.log(`Loading ${newMinutes.length} minutes documents.`);
   while (newMinutes.length > 0) {
-    const chunk = newMinutes.splice(0, 20);
-    const unknownChunk = chunk.filter(
-      ({ minutesId }) => !knownBlobContents.has(minutesId),
-    );
-    if (unknownChunk.length > 0) {
-      console.log(
-        `Fetching ${unknownChunk.length} minutes documents from Github: ${unknownChunk[0].year}/${unknownChunk[0].name}...`,
+    const chunk = newMinutes
+      .splice(0, 20)
+      .filter(
+        (minutes): minutes is { minutesId: string } & typeof minutes =>
+          minutes.minutesId !== null,
       );
-      const contents = await query(BlobContentsDocument, {
-        ids: unknownChunk.map((item) => item.minutesId),
-      });
-      for (let i = 0; i < unknownChunk.length; i++) {
-        const blob = contents.nodes[i];
-        if (
-          blob?.__typename !== "Blob" ||
-          unknownChunk[i].minutesId !== blob.id
-        ) {
-          console.error(
-            `Github returned unexpected results when getting contents for ${JSON.stringify(chunk)}[${i}]: ` +
-              `${JSON.stringify(blob)}.`,
-          );
-          return;
-        }
-        const { year, name } = unknownChunk[i];
-        if (!blob.text) {
-          console.error(
-            `Blob ${blob.id} for meeting ${year}/${name} has no text. ` +
-              `It may be binary (${blob.isBinary}).`,
-          );
-          continue;
-        }
-        if (blob.isTruncated) {
-          console.error(
-            `Blob ${blob.id} for meeting ${year}/${name} is truncated.`,
-          );
-          continue;
-        }
-        knownBlobContents.set(blob.id, blob.text);
-      }
-    }
     for (const minutes of chunk) {
       const content = knownBlobContents.get(minutes.minutesId);
       if (!content) continue;
@@ -616,6 +648,26 @@ export async function parseNewMinutes(
         content,
         minutes.year,
         minutes.name,
+        issueIdsByName,
+      );
+    }
+  }
+  console.log(`Loading ${newAgendas.length} agendas.`);
+  while (newAgendas.length > 0) {
+    const chunk = newAgendas
+      .splice(0, 20)
+      .filter(
+        (agenda): agenda is { agendaId: string } & typeof agenda =>
+          agenda.agendaId !== null,
+      );
+    for (const agenda of chunk) {
+      const content = knownBlobContents.get(agenda.agendaId);
+      if (!content) continue;
+      await updateAgendaInDb(
+        agenda.agendaId,
+        content,
+        agenda.year,
+        agenda.name,
         issueIdsByName,
       );
     }
@@ -643,7 +695,7 @@ async function updateMinutesInDb(
       where: { year_name: { year, name } },
       data: {
         cachedMinutesId: blobId,
-        contents: blobText,
+        minutesContent: blobText,
         sessions: {
           create: createSessionsFromMinutes(year, name, minutes),
         },
@@ -654,7 +706,32 @@ async function updateMinutesInDb(
     }),
   ]);
 }
-
+async function updateAgendaInDb(
+  blobId: string,
+  blobText: string,
+  year: number,
+  name: string,
+  issueIdsByName: Map<`${string}/${string}#${number}`, string>,
+) {
+  const agenda = parseAgenda(blobText);
+  await prisma.$transaction([
+    // Clear out existing sessions.
+    prisma.meetingSession.deleteMany({
+      where: { meetingYear: year, meetingName: name },
+    }),
+    prisma.discussion.deleteMany({
+      where: { meetingYear: year, meetingName: name },
+    }),
+    // And create new ones from the new Agenda.
+    prisma.meeting.update({
+      where: { year_name: { year, name } },
+      data: {
+        cachedAgendaId: blobId,
+        agendaContent: blobText,
+      },
+    }),
+  ]);
+}
 export async function updateMinutes(): Promise<void> {
   console.log("Listing minutes document years.");
   const [currentMeetingYears, dbMeetings] = await Promise.all([
@@ -666,7 +743,9 @@ export async function updateMinutes(): Promise<void> {
   ]);
   const existingMeetings = new Map<string, string>();
   for (const { year, name, minutesId } of dbMeetings) {
-    existingMeetings.set(`${year}/${name}`, minutesId);
+    if (minutesId) {
+      existingMeetings.set(`${year}/${name}`, minutesId);
+    }
   }
 
   const newMeetings = await getMinutesFromGithubResponse(currentMeetingYears);
@@ -714,7 +793,7 @@ export async function updateMinutes(): Promise<void> {
   ]);
 
   // Start parsing without blocking on it.
-  void parseNewMinutes();
+  void parseNewAgendasAndMinutes();
 }
 
 let updateRunning = Promise.resolve();
@@ -733,8 +812,8 @@ export async function updateAll(): Promise<void> {
 export async function reparseMinutes(): Promise<number> {
   const [hasMinutes, issueNames] = await Promise.all([
     prisma.meeting.findMany({
-      where: { NOT: { contents: null, cachedMinutesId: null } },
-      select: { year: true, name: true, cachedMinutesId: true, contents: true },
+      where: { NOT: { minutesContent: null, cachedMinutesId: null } },
+      select: { year: true, name: true, cachedMinutesId: true, minutesContent: true },
     }),
     prisma.issue.findMany({
       select: { id: true, org: true, repo: true, number: true },
@@ -747,12 +826,12 @@ export async function reparseMinutes(): Promise<number> {
     ]),
   );
   for (const meeting of hasMinutes) {
-    if (meeting.cachedMinutesId == null || meeting.contents == null) {
+    if (meeting.cachedMinutesId == null || meeting.minutesContent == null) {
       continue;
     }
     await updateMinutesInDb(
       meeting.cachedMinutesId,
-      meeting.contents,
+      meeting.minutesContent,
       meeting.year,
       meeting.name,
       issueIdsByName,
