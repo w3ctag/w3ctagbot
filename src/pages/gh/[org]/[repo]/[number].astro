@@ -121,7 +121,12 @@ const unifiedDiscussions = review.comments
   .sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 ---
 
-<Layout title={`Design Review #${review.number}`} {user}>
+<Layout
+  title={`${
+    review.org === "w3ctag" ? "" : review.org + "/"
+  }${review.repo}#${review.number}: ${review.title}`}
+  {user}
+>
   <nav id="agenda">
     <ul>
       <IssueList issues={sameWeek} />
