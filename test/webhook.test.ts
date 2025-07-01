@@ -572,32 +572,35 @@ Still waiting for a reply from proponents.
     expect(await response.text()).toEqual("");
     expect(response).toHaveProperty("status", 200);
     await webhookProcessingComplete();
-    expect(
-      await prisma.meeting.findUnique({
-        where: { year_name: { year: 2024, name: "12-09" } },
-        include: {
-          sessions: {
-            select: {
-              type: true,
-              attendees: { select: { attendeeId: true } },
-            },
+    const result = await prisma.meeting.findUnique({
+      where: { year_name: { year: 2024, name: "12-09" } },
+      include: {
+        sessions: {
+          select: {
+            type: true,
+            attendees: { select: { attendeeId: true } },
           },
-          discussions: { select: { markdown: true, proposedComments: true } },
         },
-      }),
-    ).toEqual({
+        discussions: { select: { markdown: true, proposedComments: true } },
+      },
+    });
+    expect(result).toEqual({
       year: 2024,
       name: "12-09",
+      agendaUrl: null,
+      agendaId: null,
+      cachedAgendaId: null,
+      agendaContent: null,
       minutesId: "fakeID",
       minutesUrl:
         "https://github.com/w3ctag/meetings/blob/main/2024/telcons/12-09-minutes.md",
       cachedMinutesId: "fakeID",
-      contents: minutesMd,
+      minutesContent: minutesMd,
       sessions: [
         {
           type: "Breakout A",
           attendees: ["peter", "tristan"].map((name) => ({
-            attendeeId: tagMemberIdsByAttendanceName.get(name),
+            attendeeId: tagMemberIdsByAttendanceName.get(name) ?? "",
           })),
         },
       ],
@@ -607,7 +610,7 @@ Still waiting for a reply from proponents.
           proposedComments: [],
         },
       ],
-    });
+    } satisfies typeof result);
     scope.done();
   });
 });
