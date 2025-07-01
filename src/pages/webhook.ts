@@ -8,7 +8,7 @@ import { Temporal } from "@js-temporal/polyfill";
 import { getMirrorSource } from "@lib/design-reviews";
 import { query } from "@lib/github";
 import { addLinkToThisServerToIssue } from "@lib/github/edits";
-import { parseNewMinutes } from "@lib/github/update";
+import { parseNewAgendasAndMinutes } from "@lib/github/update";
 import { githubIdIsTagMemberOnDate } from "@lib/tag-members";
 import { notNull } from "@lib/util";
 import type { PaginateInterface } from "@octokit/plugin-paginate-rest";
@@ -21,6 +21,7 @@ import {
   REVIEWS_REPO,
   TAG_ORG,
 } from "astro:env/client";
+import assert from "node:assert";
 import { setInterval } from "node:timers";
 import { RequestError, type Octokit } from "octokit";
 import {
@@ -392,27 +393,34 @@ function addAll<T>(set: Set<T>, array: T[] | null | undefined) {
   }
 }
 
+async function extractChangedFiles(
+  payload: WebhookEventDefinition<"push">,
+): Promise<Map<string, FileContentQuery>> {
+  const touched = new Set<string>();
+  for (const commit of payload.commits) {
+    addAll(touched, commit.added);
+    addAll(touched, commit.modified);
+    addAll(touched, commit.removed);
+  }
+
+  const newContents = new Map<string, FileContentQuery>();
+  for (const path of touched) {
+    newContents.set(
+      path,
+      await query(FileContentDocument, {
+        owner: payload.repository.owner!.login,
+        repo: payload.repository.name,
+        expression: `HEAD:${path}`,
+      }),
+    );
+  }
+  return newContents;
+}
+
 webhooks.on("push", async ({ payload }) => {
   const repository = payload.repository.full_name;
   if (repository === `${TAG_ORG}/${MEETINGS_REPO}`) {
-    const touched = new Set<string>();
-    for (const commit of payload.commits) {
-      addAll(touched, commit.added);
-      addAll(touched, commit.modified);
-      addAll(touched, commit.removed);
-    }
-
-    const newContents = new Map<string, FileContentQuery>();
-    for (const path of touched) {
-      newContents.set(
-        path,
-        await query(FileContentDocument, {
-          owner: payload.repository.owner!.login,
-          repo: payload.repository.name,
-          expression: `HEAD:${path}`,
-        }),
-      );
-    }
+    const newContents = await extractChangedFiles(payload);
 
     const knownBlobContents = new Map<string, string>();
 
@@ -425,39 +433,64 @@ webhooks.on("push", async ({ payload }) => {
       if (!parts?.groups) continue;
       const { yearStr, meetingType, filename } = parts.groups;
       const year = parseInt(yearStr);
-      const filename_date = /^(?<month>\d+)-(?<day>\d+)-minutes$/.exec(
-        filename,
-      );
+      const filename_date =
+        /^(?<month>\d+)-(?<day>\d+)-(?<fileType>minutes|agenda)$/.exec(
+          filename,
+        );
       let name = meetingType;
+      let fileType = filename;
       if (name === "telcons") {
         if (!filename_date?.groups) continue;
         const { month, day } = filename_date.groups;
         name = `${month}-${day}`;
+        fileType = filename_date.groups.fileType;
       }
+      assert(fileType === "minutes" || fileType === "agenda");
       if (object?.__typename !== "Blob" || !object.text) {
         // Remove any record of this file in the database.
-        await prisma.meeting.delete({
+        await prisma.meeting.update({
           where: {
             year_name: { year, name },
           },
+          data:
+            fileType === "minutes"
+              ? {
+                  minutesUrl: null,
+                  minutesId: null,
+                  cachedMinutesId: null,
+                  minutesContent: null,
+                  sessions: { set: [] },
+                  discussions: { set: [] },
+                }
+              : {
+                  agendaUrl: null,
+                  agendaId: null,
+                  cachedAgendaId: null,
+                  agendaContent: null,
+                },
         });
       } else {
         // Schedule the content to be updated.
-        const minutesUrl =
+        const url =
           `https://github.com/${TAG_ORG}/${MEETINGS_REPO}/` +
           `blob/${content.repository?.defaultBranchRef?.name ?? "HEAD"}/${path}`;
 
+        const meetingCreate: Prisma.MeetingCreateInput =
+          fileType === "minutes"
+            ? { year, name, minutesUrl: url, minutesId: object.id }
+            : { year, name, agendaUrl: url, agendaId: object.id };
+
         await prisma.meeting.upsert({
           where: { year_name: { year, name } },
-          create: { year, name, minutesUrl, minutesId: object.id },
-          update: { minutesId: object.id },
+          create: meetingCreate,
+          update: meetingCreate,
         });
         knownBlobContents.set(object.id, object.text);
       }
     }
 
     runAsyncWebhookWork(async () => {
-      await parseNewMinutes(knownBlobContents);
+      await parseNewAgendasAndMinutes(knownBlobContents);
     });
   }
 });
