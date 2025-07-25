@@ -200,7 +200,7 @@ ${this.openReviews
   .join("\n")}
 `;
 
-    this._fileContents = `### Call Agenda
+    this._fileContents = `# Call Agenda
 
 This agenda can be viewed and updated on [Github](https://github.com/w3ctag/meetings/blob/gh-pages/${this._year}/telcons/${this._filename}).
 
@@ -209,7 +209,7 @@ If you would like to add an item to the agenda or volunteer to scribe please ope
 ${calls
   .map(
     ({ time, label }) => `
-### ${label} - ${
+## ${label} - ${
       time
         ? `[${utcDate(
             time,
@@ -225,7 +225,7 @@ ${issueText}
 * Breakout Rollup
 * [Issue Triage](https://github.com/w3ctag/design-reviews/issues?q=is%3Aissue+is%3Aopen+label%3A%22Progress%3A+untriaged%22)
 
-### Logistics
+## Logistics
 
 Chair:
 
@@ -240,12 +240,12 @@ Archived minutes: https://github.com/w3ctag/meetings/blob/gh-pages/${this._year}
 Raw minutes: ...
 
 
-### Local Call Times
+## Local Call Times
 
 ${calls
   .map(
     ({ time, label }) => `
-#### ${label}
+### ${label}
 
 ${
   time
