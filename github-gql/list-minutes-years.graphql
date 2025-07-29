@@ -1,0 +1,22 @@
+# This retrieves the current list of all year directories for minutes that the TAG has taken since
+# 2014.
+query ListMinutesYears($owner: String!, $repo: String!) {
+  repository(owner: $owner, name: $repo) {
+    defaultBranchRef {
+      name
+    }
+    object(expression: "HEAD:") {
+      __typename
+      ... on Tree {
+        entries {
+          # Year directories
+          name
+          object {
+            __typename
+            id
+          }
+        }
+      }
+    }
+  }
+}

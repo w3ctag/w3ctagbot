@@ -32451,13 +32451,20 @@ export type IssueSearchQueryVariables = Exact<{
 
 export type IssueSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultItemConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename: 'App', id: string } | { __typename: 'Discussion', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null } | { __typename: 'Issue', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null } | { __typename: 'MarketplaceListing', id: string } | { __typename: 'Organization', id: string, url: any } | { __typename: 'PullRequest', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, author?: { __typename?: 'Bot', login: string } | { __typename?: 'EnterpriseUserAccount', login: string } | { __typename?: 'Mannequin', login: string } | { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null } | { __typename: 'Repository', id: string, url: any } | { __typename: 'User', id: string, url: any } | null> | null }, rateLimit?: { __typename?: 'RateLimit', cost: number, remaining: number, resetAt: any } | null };
 
-export type ListMinutesQueryVariables = Exact<{
+export type ListMinutesInYearQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type ListMinutesInYearQuery = { __typename?: 'Query', node?: { __typename: 'AddedToMergeQueueEvent' } | { __typename: 'AddedToProjectEvent' } | { __typename: 'App' } | { __typename: 'AssignedEvent' } | { __typename: 'AutoMergeDisabledEvent' } | { __typename: 'AutoMergeEnabledEvent' } | { __typename: 'AutoRebaseEnabledEvent' } | { __typename: 'AutoSquashEnabledEvent' } | { __typename: 'AutomaticBaseChangeFailedEvent' } | { __typename: 'AutomaticBaseChangeSucceededEvent' } | { __typename: 'BaseRefChangedEvent' } | { __typename: 'BaseRefDeletedEvent' } | { __typename: 'BaseRefForcePushedEvent' } | { __typename: 'Blob' } | { __typename: 'Bot' } | { __typename: 'BranchProtectionRule' } | { __typename: 'BypassForcePushAllowance' } | { __typename: 'BypassPullRequestAllowance' } | { __typename: 'CWE' } | { __typename: 'CheckRun' } | { __typename: 'CheckSuite' } | { __typename: 'ClosedEvent' } | { __typename: 'CodeOfConduct' } | { __typename: 'CommentDeletedEvent' } | { __typename: 'Commit' } | { __typename: 'CommitComment' } | { __typename: 'CommitCommentThread' } | { __typename: 'Comparison' } | { __typename: 'ConnectedEvent' } | { __typename: 'ConvertToDraftEvent' } | { __typename: 'ConvertedNoteToIssueEvent' } | { __typename: 'ConvertedToDiscussionEvent' } | { __typename: 'CrossReferencedEvent' } | { __typename: 'DemilestonedEvent' } | { __typename: 'DependencyGraphManifest' } | { __typename: 'DeployKey' } | { __typename: 'DeployedEvent' } | { __typename: 'Deployment' } | { __typename: 'DeploymentEnvironmentChangedEvent' } | { __typename: 'DeploymentReview' } | { __typename: 'DeploymentStatus' } | { __typename: 'DisconnectedEvent' } | { __typename: 'Discussion' } | { __typename: 'DiscussionCategory' } | { __typename: 'DiscussionComment' } | { __typename: 'DiscussionPoll' } | { __typename: 'DiscussionPollOption' } | { __typename: 'DraftIssue' } | { __typename: 'Enterprise' } | { __typename: 'EnterpriseAdministratorInvitation' } | { __typename: 'EnterpriseIdentityProvider' } | { __typename: 'EnterpriseMemberInvitation' } | { __typename: 'EnterpriseRepositoryInfo' } | { __typename: 'EnterpriseServerInstallation' } | { __typename: 'EnterpriseServerUserAccount' } | { __typename: 'EnterpriseServerUserAccountEmail' } | { __typename: 'EnterpriseServerUserAccountsUpload' } | { __typename: 'EnterpriseUserAccount' } | { __typename: 'Environment' } | { __typename: 'ExternalIdentity' } | { __typename: 'Gist' } | { __typename: 'GistComment' } | { __typename: 'HeadRefDeletedEvent' } | { __typename: 'HeadRefForcePushedEvent' } | { __typename: 'HeadRefRestoredEvent' } | { __typename: 'IpAllowListEntry' } | { __typename: 'Issue' } | { __typename: 'IssueComment' } | { __typename: 'Label' } | { __typename: 'LabeledEvent' } | { __typename: 'Language' } | { __typename: 'License' } | { __typename: 'LinkedBranch' } | { __typename: 'LockedEvent' } | { __typename: 'Mannequin' } | { __typename: 'MarkedAsDuplicateEvent' } | { __typename: 'MarketplaceCategory' } | { __typename: 'MarketplaceListing' } | { __typename: 'MemberFeatureRequestNotification' } | { __typename: 'MembersCanDeleteReposClearAuditEntry' } | { __typename: 'MembersCanDeleteReposDisableAuditEntry' } | { __typename: 'MembersCanDeleteReposEnableAuditEntry' } | { __typename: 'MentionedEvent' } | { __typename: 'MergeQueue' } | { __typename: 'MergeQueueEntry' } | { __typename: 'MergedEvent' } | { __typename: 'MigrationSource' } | { __typename: 'Milestone' } | { __typename: 'MilestonedEvent' } | { __typename: 'MovedColumnsInProjectEvent' } | { __typename: 'OIDCProvider' } | { __typename: 'OauthApplicationCreateAuditEntry' } | { __typename: 'OrgAddBillingManagerAuditEntry' } | { __typename: 'OrgAddMemberAuditEntry' } | { __typename: 'OrgBlockUserAuditEntry' } | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry' } | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry' } | { __typename: 'OrgCreateAuditEntry' } | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry' } | { __typename: 'OrgDisableSamlAuditEntry' } | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry' } | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry' } | { __typename: 'OrgEnableSamlAuditEntry' } | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry' } | { __typename: 'OrgInviteMemberAuditEntry' } | { __typename: 'OrgInviteToBusinessAuditEntry' } | { __typename: 'OrgOauthAppAccessApprovedAuditEntry' } | { __typename: 'OrgOauthAppAccessBlockedAuditEntry' } | { __typename: 'OrgOauthAppAccessDeniedAuditEntry' } | { __typename: 'OrgOauthAppAccessRequestedAuditEntry' } | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry' } | { __typename: 'OrgRemoveBillingManagerAuditEntry' } | { __typename: 'OrgRemoveMemberAuditEntry' } | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry' } | { __typename: 'OrgRestoreMemberAuditEntry' } | { __typename: 'OrgUnblockUserAuditEntry' } | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry' } | { __typename: 'OrgUpdateMemberAuditEntry' } | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry' } | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry' } | { __typename: 'Organization' } | { __typename: 'OrganizationIdentityProvider' } | { __typename: 'OrganizationInvitation' } | { __typename: 'OrganizationMigration' } | { __typename: 'Package' } | { __typename: 'PackageFile' } | { __typename: 'PackageTag' } | { __typename: 'PackageVersion' } | { __typename: 'ParentIssueAddedEvent' } | { __typename: 'ParentIssueRemovedEvent' } | { __typename: 'PinnedDiscussion' } | { __typename: 'PinnedEnvironment' } | { __typename: 'PinnedEvent' } | { __typename: 'PinnedIssue' } | { __typename: 'PrivateRepositoryForkingDisableAuditEntry' } | { __typename: 'PrivateRepositoryForkingEnableAuditEntry' } | { __typename: 'Project' } | { __typename: 'ProjectCard' } | { __typename: 'ProjectColumn' } | { __typename: 'ProjectV2' } | { __typename: 'ProjectV2Field' } | { __typename: 'ProjectV2Item' } | { __typename: 'ProjectV2ItemFieldDateValue' } | { __typename: 'ProjectV2ItemFieldIterationValue' } | { __typename: 'ProjectV2ItemFieldNumberValue' } | { __typename: 'ProjectV2ItemFieldSingleSelectValue' } | { __typename: 'ProjectV2ItemFieldTextValue' } | { __typename: 'ProjectV2IterationField' } | { __typename: 'ProjectV2SingleSelectField' } | { __typename: 'ProjectV2StatusUpdate' } | { __typename: 'ProjectV2View' } | { __typename: 'ProjectV2Workflow' } | { __typename: 'PublicKey' } | { __typename: 'PullRequest' } | { __typename: 'PullRequestCommit' } | { __typename: 'PullRequestCommitCommentThread' } | { __typename: 'PullRequestReview' } | { __typename: 'PullRequestReviewComment' } | { __typename: 'PullRequestReviewThread' } | { __typename: 'PullRequestThread' } | { __typename: 'Push' } | { __typename: 'PushAllowance' } | { __typename: 'Query' } | { __typename: 'Reaction' } | { __typename: 'ReadyForReviewEvent' } | { __typename: 'Ref' } | { __typename: 'ReferencedEvent' } | { __typename: 'Release' } | { __typename: 'ReleaseAsset' } | { __typename: 'RemovedFromMergeQueueEvent' } | { __typename: 'RemovedFromProjectEvent' } | { __typename: 'RenamedTitleEvent' } | { __typename: 'ReopenedEvent' } | { __typename: 'RepoAccessAuditEntry' } | { __typename: 'RepoAddMemberAuditEntry' } | { __typename: 'RepoAddTopicAuditEntry' } | { __typename: 'RepoArchivedAuditEntry' } | { __typename: 'RepoChangeMergeSettingAuditEntry' } | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry' } | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry' } | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry' } | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry' } | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry' } | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry' } | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry' } | { __typename: 'RepoCreateAuditEntry' } | { __typename: 'RepoDestroyAuditEntry' } | { __typename: 'RepoRemoveMemberAuditEntry' } | { __typename: 'RepoRemoveTopicAuditEntry' } | { __typename: 'Repository' } | { __typename: 'RepositoryInvitation' } | { __typename: 'RepositoryMigration' } | { __typename: 'RepositoryRule' } | { __typename: 'RepositoryRuleset' } | { __typename: 'RepositoryRulesetBypassActor' } | { __typename: 'RepositoryTopic' } | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry' } | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry' } | { __typename: 'RepositoryVulnerabilityAlert' } | { __typename: 'ReviewDismissalAllowance' } | { __typename: 'ReviewDismissedEvent' } | { __typename: 'ReviewRequest' } | { __typename: 'ReviewRequestRemovedEvent' } | { __typename: 'ReviewRequestedEvent' } | { __typename: 'SavedReply' } | { __typename: 'SecurityAdvisory' } | { __typename: 'SponsorsActivity' } | { __typename: 'SponsorsListing' } | { __typename: 'SponsorsListingFeaturedItem' } | { __typename: 'SponsorsTier' } | { __typename: 'Sponsorship' } | { __typename: 'SponsorshipNewsletter' } | { __typename: 'Status' } | { __typename: 'StatusCheckRollup' } | { __typename: 'StatusContext' } | { __typename: 'SubIssueAddedEvent' } | { __typename: 'SubIssueRemovedEvent' } | { __typename: 'SubscribedEvent' } | { __typename: 'Tag' } | { __typename: 'Team' } | { __typename: 'TeamAddMemberAuditEntry' } | { __typename: 'TeamAddRepositoryAuditEntry' } | { __typename: 'TeamChangeParentTeamAuditEntry' } | { __typename: 'TeamDiscussion' } | { __typename: 'TeamDiscussionComment' } | { __typename: 'TeamRemoveMemberAuditEntry' } | { __typename: 'TeamRemoveRepositoryAuditEntry' } | { __typename: 'Topic' } | { __typename: 'TransferredEvent' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, path?: string | null, object?: { __typename: 'Blob', id: string } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree' } | null }> | null } | null }> | null } | { __typename: 'UnassignedEvent' } | { __typename: 'UnlabeledEvent' } | { __typename: 'UnlockedEvent' } | { __typename: 'UnmarkedAsDuplicateEvent' } | { __typename: 'UnpinnedEvent' } | { __typename: 'UnsubscribedEvent' } | { __typename: 'User' } | { __typename: 'UserBlockedEvent' } | { __typename: 'UserContentEdit' } | { __typename: 'UserList' } | { __typename: 'UserNamespaceRepository' } | { __typename: 'UserStatus' } | { __typename: 'VerifiableDomain' } | { __typename: 'Workflow' } | { __typename: 'WorkflowRun' } | { __typename: 'WorkflowRunFile' } | null };
+
+export type ListMinutesYearsQueryVariables = Exact<{
   owner: Scalars['String']['input'];
   repo: Scalars['String']['input'];
 }>;
 
 
-export type ListMinutesQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', defaultBranchRef?: { __typename?: 'Ref', name: string } | null, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, path?: string | null, object?: { __typename: 'Blob', id: string } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree' } | null }> | null } | null }> | null } | null }> | null } | null } | null };
+export type ListMinutesYearsQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', defaultBranchRef?: { __typename?: 'Ref', name: string } | null, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?: { __typename: 'Blob', id: string } | { __typename: 'Commit', id: string } | { __typename: 'Tag', id: string } | { __typename: 'Tree', id: string } | null }> | null } | null } | null };
 
 export type RemoveLabelsMutationVariables = Exact<{
   labelableId: Scalars['ID']['input'];
@@ -32479,7 +32486,7 @@ export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
 {
-  __apiType?: DocumentTypeDecoration<TResult, TVariables>['__apiType'];
+  __apiType?: NonNullable<DocumentTypeDecoration<TResult, TVariables>['__apiType']>;
   private value: string;
   public __meta__?: Record<string, any> | undefined;
 
@@ -32489,7 +32496,7 @@ export class TypedDocumentString<TResult, TVariables>
     this.__meta__ = __meta__;
   }
 
-  toString(): string & DocumentTypeDecoration<TResult, TVariables> {
+  override toString(): string & DocumentTypeDecoration<TResult, TVariables> {
     return this.value;
   }
 }
@@ -32703,8 +32710,35 @@ export const IssueSearchDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<IssueSearchQuery, IssueSearchQueryVariables>;
-export const ListMinutesDocument = new TypedDocumentString(`
-    query ListMinutes($owner: String!, $repo: String!) {
+export const ListMinutesInYearDocument = new TypedDocumentString(`
+    query ListMinutesInYear($id: ID!) {
+  node(id: $id) {
+    __typename
+    ... on Tree {
+      entries {
+        name
+        object {
+          __typename
+          ... on Tree {
+            entries {
+              name
+              path
+              object {
+                __typename
+                ... on Blob {
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ListMinutesInYearQuery, ListMinutesInYearQueryVariables>;
+export const ListMinutesYearsDocument = new TypedDocumentString(`
+    query ListMinutesYears($owner: String!, $repo: String!) {
   repository(owner: $owner, name: $repo) {
     defaultBranchRef {
       name
@@ -32716,33 +32750,14 @@ export const ListMinutesDocument = new TypedDocumentString(`
           name
           object {
             __typename
-            ... on Tree {
-              entries {
-                name
-                object {
-                  __typename
-                  ... on Tree {
-                    entries {
-                      name
-                      path
-                      object {
-                        __typename
-                        ... on Blob {
-                          id
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+            id
           }
         }
       }
     }
   }
 }
-    `) as unknown as TypedDocumentString<ListMinutesQuery, ListMinutesQueryVariables>;
+    `) as unknown as TypedDocumentString<ListMinutesYearsQuery, ListMinutesYearsQueryVariables>;
 export const RemoveLabelsDocument = new TypedDocumentString(`
     mutation removeLabels($labelableId: ID!, $labelIds: [ID!]!) {
   removeLabelsFromLabelable(

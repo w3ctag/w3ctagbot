@@ -1,0 +1,31 @@
+# Given the id of a Tree (directory) representing a year like
+# https://github.com/w3ctag/meetings/tree/gh-pages/2022, this retrieves the current list of all TAG
+# minutes within that year, with references to their contents.
+query ListMinutesInYear($id: ID!) {
+  node(id: $id) {
+    __typename
+    ... on Tree {
+      entries {
+        # In-person meeting name or "telcons"
+        name
+        object {
+          __typename
+          ... on Tree {
+            entries {
+              # minutes.md or mm-dd-minutes.md.
+              name
+              path
+              object {
+                __typename
+                ... on Blob {
+                  # Just the id to let us page through the contents.
+                  id
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -10,9 +10,10 @@ import { z } from "zod";
 import {
   BlobContentsDocument,
   IssueCommentsDocument,
-  ListMinutesDocument,
+  ListMinutesInYearDocument,
+  ListMinutesYearsDocument,
   RecentIssuesDocument,
-  type ListMinutesQuery,
+  type ListMinutesYearsQuery,
   type RecentIssuesQuery,
 } from "../../gql/graphql";
 import { pagedQuery, query } from "../github";
@@ -312,9 +313,11 @@ async function updateRemainingComments() {
   }
 }
 
-function getMinutesFromGithubResponse(
-  response: ListMinutesQuery,
-): { year: number; name: string; minutesId: string; minutesUrl: string }[] {
+async function getMinutesFromGithubResponse(
+  response: ListMinutesYearsQuery,
+): Promise<
+  { year: number; name: string; minutesId: string; minutesUrl: string }[]
+> {
   const repository = response.repository?.object;
   if (!repository || repository.__typename !== "Tree") {
     console.error(
@@ -323,16 +326,19 @@ function getMinutesFromGithubResponse(
     return [];
   }
   const result = [];
-  for (const year of repository.entries ?? []) {
-    const yearAsNumber = parseInt(year.name);
-    if (
-      isNaN(yearAsNumber) ||
-      year.object?.__typename !== "Tree" ||
-      !year.object.entries
-    ) {
+  for (const yearId of repository.entries ?? []) {
+    const yearAsNumber = parseInt(yearId.name);
+    if (isNaN(yearAsNumber) || yearId.object?.__typename !== "Tree") {
       continue;
     }
-    for (const meetingGroup of year.object.entries) {
+    console.log(`Listing minutes documents in ${yearId.name}.`);
+    const year = await query(ListMinutesInYearDocument, {
+      id: yearId.object.id,
+    });
+    if (year.node?.__typename!== "Tree" || year.node.entries == null) {
+      continue;
+    }
+    for (const meetingGroup of year.node.entries) {
       if (
         meetingGroup.object?.__typename !== "Tree" ||
         !meetingGroup.object.entries
@@ -554,9 +560,9 @@ async function updateMinutesInDb(
 }
 
 export async function updateMinutes(): Promise<void> {
-  console.log("Listing minutes documents.");
-  const [currentMeetings, dbMeetings] = await Promise.all([
-    query(ListMinutesDocument, {
+  console.log("Listing minutes document years.");
+  const [currentMeetingYears, dbMeetings] = await Promise.all([
+    query(ListMinutesYearsDocument, {
       owner: TAG_ORG,
       repo: MEETINGS_REPO,
     }),
@@ -567,7 +573,7 @@ export async function updateMinutes(): Promise<void> {
     existingMeetings.set(`${year}/${name}`, minutesId);
   }
 
-  const newMeetings = getMinutesFromGithubResponse(currentMeetings);
+  const newMeetings = await getMinutesFromGithubResponse(currentMeetingYears);
   const createMeetings: Prisma.MeetingCreateInput[] = [];
   const updateMeetings: {
     where: Prisma.MeetingWhereUniqueInput;
