@@ -87,6 +87,7 @@ Track conversations at http://localhost:4321/gh/w3ctag/design-reviews/1110
       const result = await prisma.issue.findUniqueOrThrow({
         where: { id: issueId },
         include: {
+          assignees: {select: {username: true}},
           labels: { select: { label: true } },
           designReview: { omit: { id: true } },
         },
@@ -100,7 +101,9 @@ Track conversations at http://localhost:4321/gh/w3ctag/design-reviews/1110
         body: designReviewCreatedPayload.issue.body,
         created: new Date("2025-06-10T20:16:08Z"),
         updated: new Date("2025-06-10T20:16:08Z"),
+        cacheUpdated: expect.any(Date) as Date,
         closed: null,
+        assignees: [],
         labels: [{ label: "Progress: untriaged" }],
         milestoneId: null,
         pendingCommentsFrom: null,

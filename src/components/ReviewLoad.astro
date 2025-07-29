@@ -1,0 +1,177 @@
+---
+import { updateIssuesById } from "@lib/github/update";
+import { prisma } from "@lib/prisma";
+import { setMapDefault } from "@lib/util";
+
+const missingAssignees = await prisma.designReview.findMany({
+  where: {
+    issue: {
+      closed: null,
+      // We don't know of an assignment, but the cache hasn't been updated since it included assignments.
+      assignees: { none: {} },
+      cacheUpdated: { lt: "2025-08-01T00:00:00Z" },
+    },
+  },
+  select: {
+    issue: {
+      select: {
+        id: true,
+      },
+    },
+  },
+});
+
+await updateIssuesById(missingAssignees.map((review) => review.issue.id));
+
+const assignedReviews = await prisma.designReview.findMany({
+  where: {
+    issue: {
+      closed: null,
+      // The issue is assigned.
+      assignees: { some: {} },
+    },
+  },
+  select: {
+    issue: {
+      select: {
+        id: true,
+        org: true,
+        repo: true,
+        number: true,
+        title: true,
+        assignees: { select: { id: true, username: true } },
+        labels: { select: { label: true } },
+      },
+    },
+  },
+});
+
+type Review = {
+  org: string;
+  repo: string;
+  number: number;
+  title: string;
+  labels: { label: string }[];
+};
+
+const reviewLoad = new Map<string, Review[]>();
+for (const review of assignedReviews) {
+  for (const assignee of review.issue.assignees) {
+    setMapDefault(reviewLoad, assignee.username, []).push(review.issue);
+  }
+}
+
+const inactiveLabels = new Set([
+  "Progress: blocked on dependency",
+  "Progress: pending editor update",
+  "Progress: pending external feedback",
+]);
+
+function partitionActiveReviews(reviews: Review[]): {
+  active: Review[];
+  pending: Review[];
+} {
+  const result: { active: Review[]; pending: Review[] } = {
+    active: [],
+    pending: [],
+  };
+  for (const review of reviews) {
+    if (review.labels.some((l) => inactiveLabels.has(l.label))) {
+      result.pending.push(review);
+    } else {
+      result.active.push(review);
+    }
+  }
+  return result;
+}
+---
+
+<table class="review-load">
+  <thead>
+    <tr>
+      <th>TAG member</th>
+      <th colspan="2">Active design reviews</th>
+      <th colspan="2">Pending design reviews</th>
+    </tr>
+    {
+      [...reviewLoad.entries()]
+        .sort(([_1, a], [_2, b]) => b.length - a.length)
+        .map(([username, reviews]) => {
+          const { active, pending } = partitionActiveReviews(reviews);
+          return (
+            <tr
+              class:list={{
+                too_many: 6 <= active.length,
+                borderline: 3 <= active.length && active.length < 6,
+                ok: active.length < 3,
+              }}
+            >
+              <td>
+                <a href={"https://github.com/" + username}>@{username}</a>
+              </td>
+              <td class="active">{active.length}</td>
+              <td>
+                <ul>
+                  {active
+                    .sort(({ number: a }, { number: b }) => a - b)
+                    .map(({ org, repo, number, title }) => (
+                      <>
+                        {/* prettier-ignore */}
+                        <li><a href={`https://github.com/${org}/${repo}/issues/${number}`} title={title}>#{number}</a></li>
+                      </>
+                    ))}
+                </ul>
+              </td>
+              <td>{pending.length}</td>
+              <td>
+                <ul>
+                  {pending
+                    .sort(({ number: a }, { number: b }) => a - b)
+                    .map(({ org, repo, number, title }) => (
+                      <>
+                        {/* prettier-ignore */}
+                        <li><a href={`https://github.com/${org}/${repo}/issues/${number}`} title={title}>#{number}</a></li>
+                      </>
+                    ))}
+                </ul>
+              </td>
+            </tr>
+          );
+        })
+    }
+  </thead>
+</table>
+
+<style is:global>
+  .review-load {
+    td {
+      padding-inline: 0.5ex;
+    }
+    .active {
+      font-weight: bold;
+    }
+    .too_many .active {
+      color: red;
+    }
+    .borderline .active {
+      color: darkorange;
+    }
+    .ok .active {
+      color: green;
+    }
+    ul {
+      display: inline;
+      padding: 0;
+      li {
+        display: inline;
+
+        &::after {
+          content: ",";
+        }
+        &:last-child::after {
+          content: none;
+        }
+      }
+    }
+  }
+</style>

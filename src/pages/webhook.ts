@@ -73,6 +73,17 @@ webhooks.on("issues.opened", async ({ payload }) => {
       created: payload.issue.created_at,
       updated: payload.issue.updated_at,
       closed: payload.issue.closed_at,
+      assignees: {
+        connectOrCreate: payload.issue.assignees
+          .filter(
+            (assignee): assignee is typeof assignee & { node_id: string } =>
+              assignee?.node_id != null,
+          )
+          .map(({ node_id, login }) => ({
+            where: { id: node_id },
+            create: { id: node_id, username: login },
+          })),
+      },
       labels: {
         create: payload.issue.labels?.map((label) => ({
           labelId: label.node_id,
@@ -112,6 +123,42 @@ webhooks.on("issues.edited", async ({ payload }) => {
       updated: payload.issue.updated_at,
       title: payload.issue.title,
       body: payload.issue.body ?? "",
+    },
+  });
+});
+
+webhooks.on("issues.assigned", async ({ payload }) => {
+  if (!payload.assignee?.node_id) return;
+  await prisma.issue.update({
+    where: {
+      id: payload.issue.node_id,
+    },
+    data: {
+      updated: payload.issue.updated_at,
+      assignees: {
+        connectOrCreate: {
+          where: { id: payload.assignee.node_id },
+          create: {
+            id: payload.assignee.node_id,
+            username: payload.assignee.login,
+          },
+        },
+      },
+    },
+  });
+});
+
+webhooks.on("issues.unassigned", async ({ payload }) => {
+  if (!payload.assignee?.node_id) return;
+  await prisma.issue.update({
+    where: {
+      id: payload.issue.node_id,
+    },
+    data: {
+      updated: payload.issue.updated_at,
+      assignees: {
+        disconnect: { id: payload.assignee.node_id },
+      },
     },
   });
 });
