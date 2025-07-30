@@ -9,6 +9,9 @@ const missingAssignees = await prisma.designReview.findMany({
       closed: null,
       // We don't know of an assignment, but the cache hasn't been updated since it included assignments.
       assignees: { none: {} },
+      // This date is meant to be slightly after the PR adding it is deployed.
+      // Once it's been deployed, and this query has run,
+      // we can remove the missingAssignees check again.
       cacheUpdated: { lt: "2025-08-01T00:00:00Z" },
     },
   },
