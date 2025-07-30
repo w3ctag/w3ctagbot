@@ -253,7 +253,7 @@ async function addIssueComment(
       body: payload.comment.body,
       publishedAt: payload.comment.created_at,
       updatedAt: payload.comment.updated_at,
-      url: payload.comment.url,
+      url: payload.comment.html_url,
       isMinimized: false,
       isPrivateBrainstorming:
         payload.repository.name === PRIVATE_BRAINSTORMING_REPO,
