@@ -1,0 +1,68 @@
+query IssueMetadata($ids: [ID!]!) {
+  nodes(ids: $ids) {
+    __typename
+    ... on Node {
+      id
+    }
+    ... on UniformResourceLocatable {
+      url
+    }
+    ... on RepositoryNode {
+      repository {
+        owner {
+          login
+        }
+        name
+      }
+    }
+    ... on Comment {
+      updatedAt
+      body
+    }
+    ... on Closable {
+      closedAt
+    }
+    ... on Issue {
+      title
+      number
+      milestone {
+        ...Milestone
+      }
+    }
+    ... on PullRequest {
+      title
+      number
+      author {
+        ... on Node {
+          id
+        }
+        login
+      }
+      milestone {
+        ...Milestone
+      }
+    }
+    ... on Assignable {
+      assignees(first: 50) {
+        nodes {
+          id
+          login
+        }
+      }
+    }
+    ... on Labelable {
+      labels(first: 50) {
+        nodes {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+fragment Milestone on Milestone {
+  id
+  title
+  dueOn
+}

@@ -23,6 +23,12 @@ query RecentIssues(
         createdAt
         updatedAt
         closedAt
+        assignees(first: 100) {
+          nodes {
+            id
+            login
+          }
+        }
         labels(first: 100) {
           totalCount
           nodes {

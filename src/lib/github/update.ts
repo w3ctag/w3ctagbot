@@ -10,6 +10,7 @@ import { z } from "zod";
 import {
   BlobContentsDocument,
   IssueCommentsDocument,
+  IssueMetadataDocument,
   ListMinutesInYearDocument,
   ListMinutesYearsDocument,
   RecentIssuesDocument,
@@ -75,7 +76,7 @@ export async function updateIssues(org: string, repo: string): Promise<void> {
     }),
   ]);
   console.log(
-    `Querying design reviews after ${latestKnownReview?.updated.toISOString()}`,
+    `Querying ${org}/${repo} after ${latestKnownReview?.updated.toISOString()}`,
   );
   const result = await pagedQuery(RecentIssuesDocument, {
     since: latestKnownReview?.updated,
@@ -101,6 +102,14 @@ export async function updateIssues(org: string, repo: string): Promise<void> {
         updated: issue.updatedAt as string,
         closed: issue.closedAt as string | undefined,
         body: issue.body,
+        assignees: {
+          connectOrCreate: issue.assignees.nodes
+            ?.filter(notNull)
+            .map(({ id, login }) => ({
+              where: { id },
+              create: { id, username: login },
+            })),
+        },
         milestone: issue.milestone
           ? {
               connectOrCreate: {
@@ -138,6 +147,10 @@ export async function updateIssues(org: string, repo: string): Promise<void> {
         },
         update: {
           ...update,
+          assignees: {
+            set: [],
+            connectOrCreate: update.assignees?.connectOrCreate,
+          },
           labels: {
             deleteMany: {
               labelId: {
@@ -313,6 +326,66 @@ async function updateRemainingComments() {
   }
 }
 
+export async function updateIssuesById(ids: string[]): Promise<void> {
+  while (ids.length > 0) {
+    const chunk = ids.splice(0, 100);
+    const issueUpdates = await query(IssueMetadataDocument, { ids: chunk });
+    await Promise.all(
+      issueUpdates.nodes
+        .filter(
+          (node) =>
+            node?.__typename === "Issue" || node?.__typename === "PullRequest",
+        )
+        .map((issue) =>
+          prisma.issue.update({
+            where: { id: issue.id },
+            data: {
+              org: issue.repository.owner.login,
+              repo: issue.repository.name,
+              number: issue.number,
+              title: issue.title,
+              body: issue.body,
+              assignees: {
+                set: [],
+                connectOrCreate: issue.assignees.nodes
+                  ?.filter(notNull)
+                  .map(({ id, login }) => ({
+                    where: { id },
+                    create: { id, username: login },
+                  })),
+              },
+              labels: {
+                set: issue.labels?.nodes
+                  ?.filter(notNull)
+                  .map(({ id, name }) => ({
+                    issueId_labelId: { issueId: issue.id, labelId: id },
+                    label: name,
+                  })),
+              },
+              milestone: issue.milestone
+                ? {
+                    connectOrCreate: {
+                      where: { id: issue.milestone.id },
+                      create: {
+                        id: issue.milestone.id,
+                        title: issue.milestone.title,
+                        dueOn: z
+                          .string()
+                          .optional()
+                          .parse(issue.milestone.dueOn),
+                      },
+                    },
+                  }
+                : { disconnect: true },
+              updated: z.string().parse(issue.updatedAt),
+              closed: z.string().nullable().parse(issue.closedAt),
+            },
+          }),
+        ),
+    );
+  }
+}
+
 async function getMinutesFromGithubResponse(
   response: ListMinutesYearsQuery,
 ): Promise<
@@ -408,8 +481,13 @@ function createSessionsFromMinutes(
   }));
 }
 
-function getReviewNameFromUrl(url: string): `${string}/${string}#${string}` | null {
-  const match = /\/(?<org>[^/]+)\/(?<repo>[^/]+)\/(?:issues|pull)\/(?<number>\d+)(?:#.*)?$/.exec(url);
+function getReviewNameFromUrl(
+  url: string,
+): `${string}/${string}#${string}` | null {
+  const match =
+    /\/(?<org>[^/]+)\/(?<repo>[^/]+)\/(?:issues|pull)\/(?<number>\d+)(?:#.*)?$/.exec(
+      url,
+    );
   if (!match || !match.groups) {
     console.warn(`Ignoring discussion about URL ${url}`);
     return null;
@@ -419,7 +497,7 @@ function getReviewNameFromUrl(url: string): `${string}/${string}#${string}` | nu
 
 function createDiscussionsFromMinutes(
   minutes: Minutes,
-  issueIdsByName: Map<`${string}/${string}#${string}`, string>
+  issueIdsByName: Map<`${string}/${string}#${string}`, string>,
 ): Prisma.DiscussionCreateWithoutMeetingInput[] {
   return Object.entries(minutes.discussion).flatMap(
     ([designReviewUrl, discussions]) => {
@@ -449,7 +527,9 @@ function createDiscussionsFromMinutes(
  * @param knownBlobContents Maps blob IDs to their contents. Any unknown blobs will be fetched from
  * Github.
  */
-export async function parseNewMinutes(knownBlobContents: Map<string, string> = new Map()): Promise<void> {
+export async function parseNewMinutes(
+  knownBlobContents: Map<string, string> = new Map(),
+): Promise<void> {
   const [newMinutes, issueNames] = await Promise.all([
     prisma.meeting.findMany({
       where: {
@@ -465,10 +545,15 @@ export async function parseNewMinutes(knownBlobContents: Map<string, string> = n
       select: { year: true, name: true, minutesId: true },
       orderBy: [{ year: "asc" }, { name: "asc" }],
     }),
-    prisma.issue.findMany({ select: { id: true, org: true, repo: true, number: true } }),
+    prisma.issue.findMany({
+      select: { id: true, org: true, repo: true, number: true },
+    }),
   ]);
   const issueIdsByName = new Map<`${string}/${string}#${number}`, string>(
-    issueNames.map(({ id, org, repo, number }) => [`${org}/${repo}#${number}`, id]),
+    issueNames.map(({ id, org, repo, number }) => [
+      `${org}/${repo}#${number}`,
+      id,
+    ]),
   );
   console.log(`Loading ${newMinutes.length} minutes documents.`);
   while (newMinutes.length > 0) {
@@ -481,8 +566,8 @@ export async function parseNewMinutes(knownBlobContents: Map<string, string> = n
         `Fetching ${unknownChunk.length} minutes documents from Github: ${unknownChunk[0].year}/${unknownChunk[0].name}...`,
       );
       const contents = await query(BlobContentsDocument, {
-          ids: unknownChunk.map((item) => item.minutesId),
-        });
+        ids: unknownChunk.map((item) => item.minutesId),
+      });
       for (let i = 0; i < unknownChunk.length; i++) {
         const blob = contents.nodes[i];
         if (
@@ -640,10 +725,15 @@ export async function reparseMinutes(): Promise<number> {
       where: { NOT: { contents: null, cachedMinutesId: null } },
       select: { year: true, name: true, cachedMinutesId: true, contents: true },
     }),
-    prisma.issue.findMany({ select: { id: true, org: true, repo: true, number: true } }),
+    prisma.issue.findMany({
+      select: { id: true, org: true, repo: true, number: true },
+    }),
   ]);
   const issueIdsByName = new Map<`${string}/${string}#${number}`, string>(
-    issueNames.map(({ id, org, repo, number }) => [`${org}/${repo}#${number}`, id]),
+    issueNames.map(({ id, org, repo, number }) => [
+      `${org}/${repo}#${number}`,
+      id,
+    ]),
   );
   for (const meeting of hasMinutes) {
     if (meeting.cachedMinutesId == null || meeting.contents == null) {

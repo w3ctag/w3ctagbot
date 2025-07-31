@@ -1,5 +1,6 @@
 ---
 import IssueList from "@components/IssueList.astro";
+import ReviewLoad from "@components/ReviewLoad.astro";
 import { Temporal } from "@js-temporal/polyfill";
 import type { Issue } from "@prisma/client";
 import Layout from "../layouts/Layout.astro";
@@ -36,8 +37,10 @@ for (const review of openReviews) {
 }
 ---
 
-<Layout title="Open design reviews" {user}>
+<Layout title="TAG Github Status" {user}>
   <main>
+    <h2>Review load</h2>
+    <ReviewLoad />
     <h2>Open reviews</h2>
     {
       serverEmpty ? (

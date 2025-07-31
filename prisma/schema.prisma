@@ -18,15 +18,19 @@ model Issue {
   /// The issue or PR number: https://github.com/{org}/{repo}/issues/{number}
   number Int
 
-  title       String
+  title        String
   /// The initial comment on the issue, in Markdown format.
-  body        String
-  labels      Label[]
-  milestoneId String?
-  milestone   Milestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
-  created     DateTime
-  updated     DateTime
-  closed      DateTime?
+  body         String
+  assignees    GithubUser[] @relation("IssueAssignment")
+  labels       Label[]
+  milestoneId  String?
+  milestone    Milestone?   @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  created      DateTime
+  /// When the Github issue was last updated.
+  updated      DateTime
+  /// When the local cache of this issue was last updated.
+  cacheUpdated DateTime     @updatedAt @default("0000-01-01T00:00:00Z")
+  closed       DateTime?
 
   /// We get an initial set of timeline items when querying the issue, but there may be more pages
   /// of results. This is the `endCursor` value from the first page until we've fetched the
@@ -192,6 +196,8 @@ model GithubUser {
   sessions Session[]
 
   issueComments IssueComment[]
+
+  assignedTo Issue[] @relation("IssueAssignment")
 }
 
 /// One user can have multiple active sessions in different browsers.

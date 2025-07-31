@@ -32433,6 +32433,15 @@ export type IssueCommentsQuery = { __typename?: 'Query', node?: { __typename: 'A
 
 export type CommentDetailsFragment = { __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null };
 
+export type IssueMetadataQueryVariables = Exact<{
+  ids: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
+}>;
+
+
+export type IssueMetadataQuery = { __typename?: 'Query', nodes: Array<{ __typename: 'AddedToMergeQueueEvent', id: string } | { __typename: 'AddedToProjectEvent', id: string } | { __typename: 'App', id: string } | { __typename: 'AssignedEvent', id: string } | { __typename: 'AutoMergeDisabledEvent', id: string } | { __typename: 'AutoMergeEnabledEvent', id: string } | { __typename: 'AutoRebaseEnabledEvent', id: string } | { __typename: 'AutoSquashEnabledEvent', id: string } | { __typename: 'AutomaticBaseChangeFailedEvent', id: string } | { __typename: 'AutomaticBaseChangeSucceededEvent', id: string } | { __typename: 'BaseRefChangedEvent', id: string } | { __typename: 'BaseRefDeletedEvent', id: string } | { __typename: 'BaseRefForcePushedEvent', id: string } | { __typename: 'Blob', id: string } | { __typename: 'Bot', id: string, url: any } | { __typename: 'BranchProtectionRule', id: string } | { __typename: 'BypassForcePushAllowance', id: string } | { __typename: 'BypassPullRequestAllowance', id: string } | { __typename: 'CWE', id: string } | { __typename: 'CheckRun', id: string, url: any } | { __typename: 'CheckSuite', id: string } | { __typename: 'ClosedEvent', id: string, url: any } | { __typename: 'CodeOfConduct', id: string } | { __typename: 'CommentDeletedEvent', id: string } | { __typename: 'Commit', id: string, url: any } | { __typename: 'CommitComment', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'CommitCommentThread', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'Comparison', id: string } | { __typename: 'ConnectedEvent', id: string } | { __typename: 'ConvertToDraftEvent', id: string, url: any } | { __typename: 'ConvertedNoteToIssueEvent', id: string } | { __typename: 'ConvertedToDiscussionEvent', id: string } | { __typename: 'CrossReferencedEvent', id: string, url: any } | { __typename: 'DemilestonedEvent', id: string } | { __typename: 'DependencyGraphManifest', id: string } | { __typename: 'DeployKey', id: string } | { __typename: 'DeployedEvent', id: string } | { __typename: 'Deployment', id: string } | { __typename: 'DeploymentEnvironmentChangedEvent', id: string } | { __typename: 'DeploymentReview', id: string } | { __typename: 'DeploymentStatus', id: string } | { __typename: 'DisconnectedEvent', id: string } | { __typename: 'Discussion', id: string, updatedAt: any, body: string, closedAt?: any | null, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'DiscussionCategory', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'DiscussionComment', id: string, updatedAt: any, body: string } | { __typename: 'DiscussionPoll', id: string } | { __typename: 'DiscussionPollOption', id: string } | { __typename: 'DraftIssue', id: string } | { __typename: 'Enterprise', id: string } | { __typename: 'EnterpriseAdministratorInvitation', id: string } | { __typename: 'EnterpriseIdentityProvider', id: string } | { __typename: 'EnterpriseMemberInvitation', id: string } | { __typename: 'EnterpriseRepositoryInfo', id: string } | { __typename: 'EnterpriseServerInstallation', id: string } | { __typename: 'EnterpriseServerUserAccount', id: string } | { __typename: 'EnterpriseServerUserAccountEmail', id: string } | { __typename: 'EnterpriseServerUserAccountsUpload', id: string } | { __typename: 'EnterpriseUserAccount', id: string } | { __typename: 'Environment', id: string } | { __typename: 'ExternalIdentity', id: string } | { __typename: 'Gist', id: string, url: any } | { __typename: 'GistComment', id: string, updatedAt: any, body: string } | { __typename: 'HeadRefDeletedEvent', id: string } | { __typename: 'HeadRefForcePushedEvent', id: string } | { __typename: 'HeadRefRestoredEvent', id: string } | { __typename: 'IpAllowListEntry', id: string } | { __typename: 'Issue', id: string, url: any, updatedAt: any, body: string, closedAt?: any | null, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', id: string, login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'IssueComment', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'Label', id: string } | { __typename: 'LabeledEvent', id: string } | { __typename: 'Language', id: string } | { __typename: 'License', id: string } | { __typename: 'LinkedBranch', id: string } | { __typename: 'LockedEvent', id: string } | { __typename: 'Mannequin', id: string, url: any } | { __typename: 'MarkedAsDuplicateEvent', id: string } | { __typename: 'MarketplaceCategory', id: string } | { __typename: 'MarketplaceListing', id: string } | { __typename: 'MemberFeatureRequestNotification', id: string } | { __typename: 'MembersCanDeleteReposClearAuditEntry', id: string } | { __typename: 'MembersCanDeleteReposDisableAuditEntry', id: string } | { __typename: 'MembersCanDeleteReposEnableAuditEntry', id: string } | { __typename: 'MentionedEvent', id: string } | { __typename: 'MergeQueue', id: string } | { __typename: 'MergeQueueEntry', id: string } | { __typename: 'MergedEvent', id: string, url: any } | { __typename: 'MigrationSource', id: string } | { __typename: 'Milestone', id: string, url: any, closedAt?: any | null } | { __typename: 'MilestonedEvent', id: string } | { __typename: 'MovedColumnsInProjectEvent', id: string } | { __typename: 'OIDCProvider', id: string } | { __typename: 'OauthApplicationCreateAuditEntry', id: string } | { __typename: 'OrgAddBillingManagerAuditEntry', id: string } | { __typename: 'OrgAddMemberAuditEntry', id: string } | { __typename: 'OrgBlockUserAuditEntry', id: string } | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry', id: string } | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry', id: string } | { __typename: 'OrgCreateAuditEntry', id: string } | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry', id: string } | { __typename: 'OrgDisableSamlAuditEntry', id: string } | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry', id: string } | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry', id: string } | { __typename: 'OrgEnableSamlAuditEntry', id: string } | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry', id: string } | { __typename: 'OrgInviteMemberAuditEntry', id: string } | { __typename: 'OrgInviteToBusinessAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessApprovedAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessBlockedAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessDeniedAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessRequestedAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry', id: string } | { __typename: 'OrgRemoveBillingManagerAuditEntry', id: string } | { __typename: 'OrgRemoveMemberAuditEntry', id: string } | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry', id: string } | { __typename: 'OrgRestoreMemberAuditEntry', id: string } | { __typename: 'OrgUnblockUserAuditEntry', id: string } | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry', id: string } | { __typename: 'OrgUpdateMemberAuditEntry', id: string } | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry', id: string } | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry', id: string } | { __typename: 'Organization', id: string, url: any } | { __typename: 'OrganizationIdentityProvider', id: string } | { __typename: 'OrganizationInvitation', id: string } | { __typename: 'OrganizationMigration', id: string } | { __typename: 'Package', id: string } | { __typename: 'PackageFile', id: string } | { __typename: 'PackageTag', id: string } | { __typename: 'PackageVersion', id: string } | { __typename: 'ParentIssueAddedEvent', id: string } | { __typename: 'ParentIssueRemovedEvent', id: string } | { __typename: 'PinnedDiscussion', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'PinnedEnvironment', id: string } | { __typename: 'PinnedEvent', id: string } | { __typename: 'PinnedIssue', id: string } | { __typename: 'PrivateRepositoryForkingDisableAuditEntry', id: string } | { __typename: 'PrivateRepositoryForkingEnableAuditEntry', id: string } | { __typename: 'Project', id: string, closedAt?: any | null } | { __typename: 'ProjectCard', id: string } | { __typename: 'ProjectColumn', id: string } | { __typename: 'ProjectV2', id: string, closedAt?: any | null } | { __typename: 'ProjectV2Field', id: string } | { __typename: 'ProjectV2Item', id: string } | { __typename: 'ProjectV2ItemFieldDateValue', id: string } | { __typename: 'ProjectV2ItemFieldIterationValue', id: string } | { __typename: 'ProjectV2ItemFieldNumberValue', id: string } | { __typename: 'ProjectV2ItemFieldSingleSelectValue', id: string } | { __typename: 'ProjectV2ItemFieldTextValue', id: string } | { __typename: 'ProjectV2IterationField', id: string } | { __typename: 'ProjectV2SingleSelectField', id: string } | { __typename: 'ProjectV2StatusUpdate', id: string } | { __typename: 'ProjectV2View', id: string } | { __typename: 'ProjectV2Workflow', id: string } | { __typename: 'PublicKey', id: string } | { __typename: 'PullRequest', id: string, url: any, updatedAt: any, body: string, closedAt?: any | null, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', id: string, login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'PullRequestCommit', id: string, url: any } | { __typename: 'PullRequestCommitCommentThread', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'PullRequestReview', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'PullRequestReviewComment', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'PullRequestReviewThread', id: string } | { __typename: 'PullRequestThread', id: string } | { __typename: 'Push', id: string } | { __typename: 'PushAllowance', id: string } | { __typename: 'Query', id: string } | { __typename: 'Reaction', id: string } | { __typename: 'ReadyForReviewEvent', id: string, url: any } | { __typename: 'Ref', id: string } | { __typename: 'ReferencedEvent', id: string } | { __typename: 'Release', id: string, url: any } | { __typename: 'ReleaseAsset', id: string } | { __typename: 'RemovedFromMergeQueueEvent', id: string } | { __typename: 'RemovedFromProjectEvent', id: string } | { __typename: 'RenamedTitleEvent', id: string } | { __typename: 'ReopenedEvent', id: string } | { __typename: 'RepoAccessAuditEntry', id: string } | { __typename: 'RepoAddMemberAuditEntry', id: string } | { __typename: 'RepoAddTopicAuditEntry', id: string } | { __typename: 'RepoArchivedAuditEntry', id: string } | { __typename: 'RepoChangeMergeSettingAuditEntry', id: string } | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry', id: string } | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry', id: string } | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry', id: string } | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry', id: string } | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry', id: string } | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry', id: string } | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry', id: string } | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry', id: string } | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry', id: string } | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry', id: string } | { __typename: 'RepoCreateAuditEntry', id: string } | { __typename: 'RepoDestroyAuditEntry', id: string } | { __typename: 'RepoRemoveMemberAuditEntry', id: string } | { __typename: 'RepoRemoveTopicAuditEntry', id: string } | { __typename: 'Repository', id: string, url: any } | { __typename: 'RepositoryInvitation', id: string } | { __typename: 'RepositoryMigration', id: string } | { __typename: 'RepositoryRule', id: string } | { __typename: 'RepositoryRuleset', id: string } | { __typename: 'RepositoryRulesetBypassActor', id: string } | { __typename: 'RepositoryTopic', id: string, url: any } | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry', id: string } | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry', id: string } | { __typename: 'RepositoryVulnerabilityAlert', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'ReviewDismissalAllowance', id: string } | { __typename: 'ReviewDismissedEvent', id: string, url: any } | { __typename: 'ReviewRequest', id: string } | { __typename: 'ReviewRequestRemovedEvent', id: string } | { __typename: 'ReviewRequestedEvent', id: string } | { __typename: 'SavedReply', id: string } | { __typename: 'SecurityAdvisory', id: string } | { __typename: 'SponsorsActivity', id: string } | { __typename: 'SponsorsListing', id: string } | { __typename: 'SponsorsListingFeaturedItem', id: string } | { __typename: 'SponsorsTier', id: string } | { __typename: 'Sponsorship', id: string } | { __typename: 'SponsorshipNewsletter', id: string } | { __typename: 'Status', id: string } | { __typename: 'StatusCheckRollup', id: string } | { __typename: 'StatusContext', id: string } | { __typename: 'SubIssueAddedEvent', id: string } | { __typename: 'SubIssueRemovedEvent', id: string } | { __typename: 'SubscribedEvent', id: string } | { __typename: 'Tag', id: string } | { __typename: 'Team', id: string } | { __typename: 'TeamAddMemberAuditEntry', id: string } | { __typename: 'TeamAddRepositoryAuditEntry', id: string } | { __typename: 'TeamChangeParentTeamAuditEntry', id: string } | { __typename: 'TeamDiscussion', id: string, url: any, updatedAt: any, body: string } | { __typename: 'TeamDiscussionComment', id: string, url: any, updatedAt: any, body: string } | { __typename: 'TeamRemoveMemberAuditEntry', id: string } | { __typename: 'TeamRemoveRepositoryAuditEntry', id: string } | { __typename: 'Topic', id: string } | { __typename: 'TransferredEvent', id: string } | { __typename: 'Tree', id: string } | { __typename: 'UnassignedEvent', id: string } | { __typename: 'UnlabeledEvent', id: string } | { __typename: 'UnlockedEvent', id: string } | { __typename: 'UnmarkedAsDuplicateEvent', id: string } | { __typename: 'UnpinnedEvent', id: string } | { __typename: 'UnsubscribedEvent', id: string } | { __typename: 'User', id: string, url: any } | { __typename: 'UserBlockedEvent', id: string } | { __typename: 'UserContentEdit', id: string } | { __typename: 'UserList', id: string } | { __typename: 'UserNamespaceRepository', id: string } | { __typename: 'UserStatus', id: string } | { __typename: 'VerifiableDomain', id: string } | { __typename: 'Workflow', id: string, url: any } | { __typename: 'WorkflowRun', id: string, url: any } | { __typename: 'WorkflowRunFile', id: string, url: any } | null> };
+
+export type MilestoneFragment = { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null };
+
 export type RecentIssuesQueryVariables = Exact<{
   owner: Scalars['String']['input'];
   repo: Scalars['String']['input'];
@@ -32441,7 +32450,7 @@ export type RecentIssuesQueryVariables = Exact<{
 }>;
 
 
-export type RecentIssuesQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, body: string, createdAt: any, updatedAt: any, closedAt?: any | null, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, comments: { __typename?: 'IssueCommentConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null } | null> | null } } | null> | null } } | null };
+export type RecentIssuesQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, body: string, createdAt: any, updatedAt: any, closedAt?: any | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', id: string, login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, comments: { __typename?: 'IssueCommentConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null } | null> | null } } | null> | null } } | null };
 
 export type IssueSearchQueryVariables = Exact<{
   query_: Scalars['String']['input'];
@@ -32516,6 +32525,13 @@ export const CommentDetailsFragmentDoc = new TypedDocumentString(`
   isMinimized
 }
     `, {"fragmentName":"CommentDetails"}) as unknown as TypedDocumentString<CommentDetailsFragment, unknown>;
+export const MilestoneFragmentDoc = new TypedDocumentString(`
+    fragment Milestone on Milestone {
+  id
+  title
+  dueOn
+}
+    `, {"fragmentName":"Milestone"}) as unknown as TypedDocumentString<MilestoneFragment, unknown>;
 export const BlobContentsDocument = new TypedDocumentString(`
     query BlobContents($ids: [ID!]!) {
   nodes(ids: $ids) {
@@ -32593,6 +32609,74 @@ export const IssueCommentsDocument = new TypedDocumentString(`
   updatedAt
   isMinimized
 }`) as unknown as TypedDocumentString<IssueCommentsQuery, IssueCommentsQueryVariables>;
+export const IssueMetadataDocument = new TypedDocumentString(`
+    query IssueMetadata($ids: [ID!]!) {
+  nodes(ids: $ids) {
+    __typename
+    ... on Node {
+      id
+    }
+    ... on UniformResourceLocatable {
+      url
+    }
+    ... on RepositoryNode {
+      repository {
+        owner {
+          login
+        }
+        name
+      }
+    }
+    ... on Comment {
+      updatedAt
+      body
+    }
+    ... on Closable {
+      closedAt
+    }
+    ... on Issue {
+      title
+      number
+      milestone {
+        ...Milestone
+      }
+    }
+    ... on PullRequest {
+      title
+      number
+      author {
+        ... on Node {
+          id
+        }
+        login
+      }
+      milestone {
+        ...Milestone
+      }
+    }
+    ... on Assignable {
+      assignees(first: 50) {
+        nodes {
+          id
+          login
+        }
+      }
+    }
+    ... on Labelable {
+      labels(first: 50) {
+        nodes {
+          id
+          name
+        }
+      }
+    }
+  }
+}
+    fragment Milestone on Milestone {
+  id
+  title
+  dueOn
+}`) as unknown as TypedDocumentString<IssueMetadataQuery, IssueMetadataQueryVariables>;
 export const RecentIssuesDocument = new TypedDocumentString(`
     query RecentIssues($owner: String!, $repo: String!, $since: DateTime, $cursor: String) {
   repository(owner: $owner, name: $repo) {
@@ -32614,6 +32698,12 @@ export const RecentIssuesDocument = new TypedDocumentString(`
         createdAt
         updatedAt
         closedAt
+        assignees(first: 100) {
+          nodes {
+            id
+            login
+          }
+        }
         labels(first: 100) {
           totalCount
           nodes {
