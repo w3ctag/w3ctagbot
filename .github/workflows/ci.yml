@@ -73,7 +73,7 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_PROXY: ${{ secrets.SSH_PROXY }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: built-server
       - name: Extract the built server
