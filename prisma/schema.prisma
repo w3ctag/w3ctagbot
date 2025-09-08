@@ -29,7 +29,7 @@ model Issue {
   /// When the Github issue was last updated.
   updated      DateTime
   /// When the local cache of this issue was last updated.
-  cacheUpdated DateTime     @default("0000-01-01T00:00:00Z") @updatedAt
+  cacheUpdated DateTime     @updatedAt
   closed       DateTime?
 
   /// We get an initial set of timeline items when querying the issue, but there may be more pages
