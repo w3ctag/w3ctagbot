@@ -17,6 +17,8 @@ updates:
         update-types: [patch, minor]
       octokit:
         patterns: ["@octokit/*"]
+      graphql-codegen:
+        patterns: ["@graphql-codegen/*"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
