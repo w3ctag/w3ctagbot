@@ -11,10 +11,16 @@ import { setMapDefault } from "../lib/util";
 
 const user = await getLogin(Astro.cookies);
 
+await prisma.issue.updateMany( {
+  data: {cacheUpdated: new Date("0000-01-01 00:00:00Z")}
+})
 const openReviews = await prisma.issue.findMany({
   where: { closed: null, org: "w3ctag", repo: "design-reviews" },
-  include: { milestone: { select: { dueOn: true } } },
+  //select: { cacheUpdated: true, },
+  take: 2,
 });
+
+console.dir(openReviews);
 
 let serverEmpty = false;
 
