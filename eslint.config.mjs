@@ -1,10 +1,11 @@
 import eslint from "@eslint/js";
-import { configs } from 'eslint-plugin-lit';
+import { configs } from "eslint-plugin-lit";
+import { defineConfig } from "eslint/config";
 import tseslint from "typescript-eslint";
 
-export default tseslint.config(
+export default defineConfig(
   eslint.configs.recommended,
-  configs['flat/recommended'],
+  configs["flat/recommended"],
   ...tseslint.configs.strictTypeChecked,
   {
     rules: {
