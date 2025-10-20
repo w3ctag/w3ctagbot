@@ -1,0 +1,22 @@
+---
+import type { Issue } from "@prisma/client";
+
+export type IssueLinkFields = Pick<Issue, "org" | "repo" | "number" | "title">;
+
+interface Props {
+  issue: IssueLinkFields;
+  justNumbers?: boolean;
+}
+
+const { issue, justNumbers = false } = Astro.props;
+---
+
+<a
+  href={`${import.meta.env.BASE_URL}gh/${issue.org}/${issue.repo}/${issue.number}`}
+  title={justNumbers ? issue.title : null}
+  >{
+    justNumbers
+      ? ""
+      : `${issue.org === "w3ctag" ? "" : issue.org + "/"}${issue.repo}`
+  }#{issue.number}{justNumbers ? "" : `: ${issue.title}`}</a
+>

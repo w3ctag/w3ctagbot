@@ -2,6 +2,7 @@
 import { updateIssuesById } from "@lib/github/update";
 import { prisma } from "@lib/prisma";
 import { setMapDefault } from "@lib/util";
+import IssueList from "./IssueList.astro";
 
 const missingAssignees = await prisma.designReview.findMany({
   where: {
@@ -115,27 +116,13 @@ function partitionActiveReviews(reviews: Review[]): {
               <td class="active">{active.length}</td>
               <td>
                 <ul>
-                  {active
-                    .sort(({ number: a }, { number: b }) => a - b)
-                    .map(({ org, repo, number, title }) => (
-                      <>
-                        {/* prettier-ignore */}
-                        <li><a href={`https://github.com/${org}/${repo}/issues/${number}`} title={title}>#{number}</a></li>
-                      </>
-                    ))}
+                  <IssueList issues={active} justNumbers />
                 </ul>
               </td>
               <td>{pending.length}</td>
               <td>
                 <ul>
-                  {pending
-                    .sort(({ number: a }, { number: b }) => a - b)
-                    .map(({ org, repo, number, title }) => (
-                      <>
-                        {/* prettier-ignore */}
-                        <li><a href={`https://github.com/${org}/${repo}/issues/${number}`} title={title}>#{number}</a></li>
-                      </>
-                    ))}
+                  <IssueList issues={pending} justNumbers />
                 </ul>
               </td>
             </tr>
@@ -169,7 +156,7 @@ function partitionActiveReviews(reviews: Review[]): {
         display: inline;
 
         &::after {
-          content: ",";
+          content: ", ";
         }
         &:last-child::after {
           content: none;

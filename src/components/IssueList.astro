@@ -1,24 +1,19 @@
 ---
-import type { Issue } from "@prisma/client";
+import IssueLink, { type IssueLinkFields } from "./IssueLink.astro";
 
 interface Props {
-  issues: Issue[];
+  issues: IssueLinkFields[];
+  justNumbers?: boolean;
 }
 
-const { issues } = Astro.props;
+const { issues, justNumbers = false } = Astro.props;
 ---
 
 {
   issues
     .toSorted((a, b) => a.number - b.number)
-    .map((issue) => (
-      <li>
-        <a
-          href={`${import.meta.env.BASE_URL}gh/${issue.org}/${issue.repo}/${issue.number}`}
-        >
-          {issue.org === "w3ctag" ? "" : issue.org + "/"}
-          {issue.repo}#{issue.number}: {issue.title}
-        </a>
-      </li>
-    ))
+    .map((issue) =>
+      /* prettier-ignore */
+      <li><IssueLink {issue} {justNumbers} /></li>
+    )
 }
