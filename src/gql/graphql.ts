@@ -1,7 +1,7 @@
 /* eslint-disable */
 import type { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
+export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
@@ -32403,7 +32403,257 @@ export type BlobContentsQueryVariables = Exact<{
 }>;
 
 
-export type BlobContentsQuery = { __typename?: 'Query', nodes: Array<{ __typename: 'AddedToMergeQueueEvent' } | { __typename: 'AddedToProjectEvent' } | { __typename: 'App' } | { __typename: 'AssignedEvent' } | { __typename: 'AutoMergeDisabledEvent' } | { __typename: 'AutoMergeEnabledEvent' } | { __typename: 'AutoRebaseEnabledEvent' } | { __typename: 'AutoSquashEnabledEvent' } | { __typename: 'AutomaticBaseChangeFailedEvent' } | { __typename: 'AutomaticBaseChangeSucceededEvent' } | { __typename: 'BaseRefChangedEvent' } | { __typename: 'BaseRefDeletedEvent' } | { __typename: 'BaseRefForcePushedEvent' } | { __typename: 'Blob', id: string, isTruncated: boolean, isBinary?: boolean | null, text?: string | null } | { __typename: 'Bot' } | { __typename: 'BranchProtectionRule' } | { __typename: 'BypassForcePushAllowance' } | { __typename: 'BypassPullRequestAllowance' } | { __typename: 'CWE' } | { __typename: 'CheckRun' } | { __typename: 'CheckSuite' } | { __typename: 'ClosedEvent' } | { __typename: 'CodeOfConduct' } | { __typename: 'CommentDeletedEvent' } | { __typename: 'Commit' } | { __typename: 'CommitComment' } | { __typename: 'CommitCommentThread' } | { __typename: 'Comparison' } | { __typename: 'ConnectedEvent' } | { __typename: 'ConvertToDraftEvent' } | { __typename: 'ConvertedNoteToIssueEvent' } | { __typename: 'ConvertedToDiscussionEvent' } | { __typename: 'CrossReferencedEvent' } | { __typename: 'DemilestonedEvent' } | { __typename: 'DependencyGraphManifest' } | { __typename: 'DeployKey' } | { __typename: 'DeployedEvent' } | { __typename: 'Deployment' } | { __typename: 'DeploymentEnvironmentChangedEvent' } | { __typename: 'DeploymentReview' } | { __typename: 'DeploymentStatus' } | { __typename: 'DisconnectedEvent' } | { __typename: 'Discussion' } | { __typename: 'DiscussionCategory' } | { __typename: 'DiscussionComment' } | { __typename: 'DiscussionPoll' } | { __typename: 'DiscussionPollOption' } | { __typename: 'DraftIssue' } | { __typename: 'Enterprise' } | { __typename: 'EnterpriseAdministratorInvitation' } | { __typename: 'EnterpriseIdentityProvider' } | { __typename: 'EnterpriseMemberInvitation' } | { __typename: 'EnterpriseRepositoryInfo' } | { __typename: 'EnterpriseServerInstallation' } | { __typename: 'EnterpriseServerUserAccount' } | { __typename: 'EnterpriseServerUserAccountEmail' } | { __typename: 'EnterpriseServerUserAccountsUpload' } | { __typename: 'EnterpriseUserAccount' } | { __typename: 'Environment' } | { __typename: 'ExternalIdentity' } | { __typename: 'Gist' } | { __typename: 'GistComment' } | { __typename: 'HeadRefDeletedEvent' } | { __typename: 'HeadRefForcePushedEvent' } | { __typename: 'HeadRefRestoredEvent' } | { __typename: 'IpAllowListEntry' } | { __typename: 'Issue' } | { __typename: 'IssueComment' } | { __typename: 'Label' } | { __typename: 'LabeledEvent' } | { __typename: 'Language' } | { __typename: 'License' } | { __typename: 'LinkedBranch' } | { __typename: 'LockedEvent' } | { __typename: 'Mannequin' } | { __typename: 'MarkedAsDuplicateEvent' } | { __typename: 'MarketplaceCategory' } | { __typename: 'MarketplaceListing' } | { __typename: 'MemberFeatureRequestNotification' } | { __typename: 'MembersCanDeleteReposClearAuditEntry' } | { __typename: 'MembersCanDeleteReposDisableAuditEntry' } | { __typename: 'MembersCanDeleteReposEnableAuditEntry' } | { __typename: 'MentionedEvent' } | { __typename: 'MergeQueue' } | { __typename: 'MergeQueueEntry' } | { __typename: 'MergedEvent' } | { __typename: 'MigrationSource' } | { __typename: 'Milestone' } | { __typename: 'MilestonedEvent' } | { __typename: 'MovedColumnsInProjectEvent' } | { __typename: 'OIDCProvider' } | { __typename: 'OauthApplicationCreateAuditEntry' } | { __typename: 'OrgAddBillingManagerAuditEntry' } | { __typename: 'OrgAddMemberAuditEntry' } | { __typename: 'OrgBlockUserAuditEntry' } | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry' } | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry' } | { __typename: 'OrgCreateAuditEntry' } | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry' } | { __typename: 'OrgDisableSamlAuditEntry' } | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry' } | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry' } | { __typename: 'OrgEnableSamlAuditEntry' } | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry' } | { __typename: 'OrgInviteMemberAuditEntry' } | { __typename: 'OrgInviteToBusinessAuditEntry' } | { __typename: 'OrgOauthAppAccessApprovedAuditEntry' } | { __typename: 'OrgOauthAppAccessBlockedAuditEntry' } | { __typename: 'OrgOauthAppAccessDeniedAuditEntry' } | { __typename: 'OrgOauthAppAccessRequestedAuditEntry' } | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry' } | { __typename: 'OrgRemoveBillingManagerAuditEntry' } | { __typename: 'OrgRemoveMemberAuditEntry' } | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry' } | { __typename: 'OrgRestoreMemberAuditEntry' } | { __typename: 'OrgUnblockUserAuditEntry' } | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry' } | { __typename: 'OrgUpdateMemberAuditEntry' } | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry' } | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry' } | { __typename: 'Organization' } | { __typename: 'OrganizationIdentityProvider' } | { __typename: 'OrganizationInvitation' } | { __typename: 'OrganizationMigration' } | { __typename: 'Package' } | { __typename: 'PackageFile' } | { __typename: 'PackageTag' } | { __typename: 'PackageVersion' } | { __typename: 'ParentIssueAddedEvent' } | { __typename: 'ParentIssueRemovedEvent' } | { __typename: 'PinnedDiscussion' } | { __typename: 'PinnedEnvironment' } | { __typename: 'PinnedEvent' } | { __typename: 'PinnedIssue' } | { __typename: 'PrivateRepositoryForkingDisableAuditEntry' } | { __typename: 'PrivateRepositoryForkingEnableAuditEntry' } | { __typename: 'Project' } | { __typename: 'ProjectCard' } | { __typename: 'ProjectColumn' } | { __typename: 'ProjectV2' } | { __typename: 'ProjectV2Field' } | { __typename: 'ProjectV2Item' } | { __typename: 'ProjectV2ItemFieldDateValue' } | { __typename: 'ProjectV2ItemFieldIterationValue' } | { __typename: 'ProjectV2ItemFieldNumberValue' } | { __typename: 'ProjectV2ItemFieldSingleSelectValue' } | { __typename: 'ProjectV2ItemFieldTextValue' } | { __typename: 'ProjectV2IterationField' } | { __typename: 'ProjectV2SingleSelectField' } | { __typename: 'ProjectV2StatusUpdate' } | { __typename: 'ProjectV2View' } | { __typename: 'ProjectV2Workflow' } | { __typename: 'PublicKey' } | { __typename: 'PullRequest' } | { __typename: 'PullRequestCommit' } | { __typename: 'PullRequestCommitCommentThread' } | { __typename: 'PullRequestReview' } | { __typename: 'PullRequestReviewComment' } | { __typename: 'PullRequestReviewThread' } | { __typename: 'PullRequestThread' } | { __typename: 'Push' } | { __typename: 'PushAllowance' } | { __typename: 'Query' } | { __typename: 'Reaction' } | { __typename: 'ReadyForReviewEvent' } | { __typename: 'Ref' } | { __typename: 'ReferencedEvent' } | { __typename: 'Release' } | { __typename: 'ReleaseAsset' } | { __typename: 'RemovedFromMergeQueueEvent' } | { __typename: 'RemovedFromProjectEvent' } | { __typename: 'RenamedTitleEvent' } | { __typename: 'ReopenedEvent' } | { __typename: 'RepoAccessAuditEntry' } | { __typename: 'RepoAddMemberAuditEntry' } | { __typename: 'RepoAddTopicAuditEntry' } | { __typename: 'RepoArchivedAuditEntry' } | { __typename: 'RepoChangeMergeSettingAuditEntry' } | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry' } | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry' } | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry' } | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry' } | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry' } | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry' } | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry' } | { __typename: 'RepoCreateAuditEntry' } | { __typename: 'RepoDestroyAuditEntry' } | { __typename: 'RepoRemoveMemberAuditEntry' } | { __typename: 'RepoRemoveTopicAuditEntry' } | { __typename: 'Repository' } | { __typename: 'RepositoryInvitation' } | { __typename: 'RepositoryMigration' } | { __typename: 'RepositoryRule' } | { __typename: 'RepositoryRuleset' } | { __typename: 'RepositoryRulesetBypassActor' } | { __typename: 'RepositoryTopic' } | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry' } | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry' } | { __typename: 'RepositoryVulnerabilityAlert' } | { __typename: 'ReviewDismissalAllowance' } | { __typename: 'ReviewDismissedEvent' } | { __typename: 'ReviewRequest' } | { __typename: 'ReviewRequestRemovedEvent' } | { __typename: 'ReviewRequestedEvent' } | { __typename: 'SavedReply' } | { __typename: 'SecurityAdvisory' } | { __typename: 'SponsorsActivity' } | { __typename: 'SponsorsListing' } | { __typename: 'SponsorsListingFeaturedItem' } | { __typename: 'SponsorsTier' } | { __typename: 'Sponsorship' } | { __typename: 'SponsorshipNewsletter' } | { __typename: 'Status' } | { __typename: 'StatusCheckRollup' } | { __typename: 'StatusContext' } | { __typename: 'SubIssueAddedEvent' } | { __typename: 'SubIssueRemovedEvent' } | { __typename: 'SubscribedEvent' } | { __typename: 'Tag' } | { __typename: 'Team' } | { __typename: 'TeamAddMemberAuditEntry' } | { __typename: 'TeamAddRepositoryAuditEntry' } | { __typename: 'TeamChangeParentTeamAuditEntry' } | { __typename: 'TeamDiscussion' } | { __typename: 'TeamDiscussionComment' } | { __typename: 'TeamRemoveMemberAuditEntry' } | { __typename: 'TeamRemoveRepositoryAuditEntry' } | { __typename: 'Topic' } | { __typename: 'TransferredEvent' } | { __typename: 'Tree' } | { __typename: 'UnassignedEvent' } | { __typename: 'UnlabeledEvent' } | { __typename: 'UnlockedEvent' } | { __typename: 'UnmarkedAsDuplicateEvent' } | { __typename: 'UnpinnedEvent' } | { __typename: 'UnsubscribedEvent' } | { __typename: 'User' } | { __typename: 'UserBlockedEvent' } | { __typename: 'UserContentEdit' } | { __typename: 'UserList' } | { __typename: 'UserNamespaceRepository' } | { __typename: 'UserStatus' } | { __typename: 'VerifiableDomain' } | { __typename: 'Workflow' } | { __typename: 'WorkflowRun' } | { __typename: 'WorkflowRunFile' } | null> };
+export type BlobContentsQuery = { __typename?: 'Query', nodes: Array<
+    | { __typename: 'AddedToMergeQueueEvent' }
+    | { __typename: 'AddedToProjectEvent' }
+    | { __typename: 'App' }
+    | { __typename: 'AssignedEvent' }
+    | { __typename: 'AutoMergeDisabledEvent' }
+    | { __typename: 'AutoMergeEnabledEvent' }
+    | { __typename: 'AutoRebaseEnabledEvent' }
+    | { __typename: 'AutoSquashEnabledEvent' }
+    | { __typename: 'AutomaticBaseChangeFailedEvent' }
+    | { __typename: 'AutomaticBaseChangeSucceededEvent' }
+    | { __typename: 'BaseRefChangedEvent' }
+    | { __typename: 'BaseRefDeletedEvent' }
+    | { __typename: 'BaseRefForcePushedEvent' }
+    | { __typename: 'Blob', id: string, isTruncated: boolean, isBinary?: boolean | null, text?: string | null }
+    | { __typename: 'Bot' }
+    | { __typename: 'BranchProtectionRule' }
+    | { __typename: 'BypassForcePushAllowance' }
+    | { __typename: 'BypassPullRequestAllowance' }
+    | { __typename: 'CWE' }
+    | { __typename: 'CheckRun' }
+    | { __typename: 'CheckSuite' }
+    | { __typename: 'ClosedEvent' }
+    | { __typename: 'CodeOfConduct' }
+    | { __typename: 'CommentDeletedEvent' }
+    | { __typename: 'Commit' }
+    | { __typename: 'CommitComment' }
+    | { __typename: 'CommitCommentThread' }
+    | { __typename: 'Comparison' }
+    | { __typename: 'ConnectedEvent' }
+    | { __typename: 'ConvertToDraftEvent' }
+    | { __typename: 'ConvertedNoteToIssueEvent' }
+    | { __typename: 'ConvertedToDiscussionEvent' }
+    | { __typename: 'CrossReferencedEvent' }
+    | { __typename: 'DemilestonedEvent' }
+    | { __typename: 'DependencyGraphManifest' }
+    | { __typename: 'DeployKey' }
+    | { __typename: 'DeployedEvent' }
+    | { __typename: 'Deployment' }
+    | { __typename: 'DeploymentEnvironmentChangedEvent' }
+    | { __typename: 'DeploymentReview' }
+    | { __typename: 'DeploymentStatus' }
+    | { __typename: 'DisconnectedEvent' }
+    | { __typename: 'Discussion' }
+    | { __typename: 'DiscussionCategory' }
+    | { __typename: 'DiscussionComment' }
+    | { __typename: 'DiscussionPoll' }
+    | { __typename: 'DiscussionPollOption' }
+    | { __typename: 'DraftIssue' }
+    | { __typename: 'Enterprise' }
+    | { __typename: 'EnterpriseAdministratorInvitation' }
+    | { __typename: 'EnterpriseIdentityProvider' }
+    | { __typename: 'EnterpriseMemberInvitation' }
+    | { __typename: 'EnterpriseRepositoryInfo' }
+    | { __typename: 'EnterpriseServerInstallation' }
+    | { __typename: 'EnterpriseServerUserAccount' }
+    | { __typename: 'EnterpriseServerUserAccountEmail' }
+    | { __typename: 'EnterpriseServerUserAccountsUpload' }
+    | { __typename: 'EnterpriseUserAccount' }
+    | { __typename: 'Environment' }
+    | { __typename: 'ExternalIdentity' }
+    | { __typename: 'Gist' }
+    | { __typename: 'GistComment' }
+    | { __typename: 'HeadRefDeletedEvent' }
+    | { __typename: 'HeadRefForcePushedEvent' }
+    | { __typename: 'HeadRefRestoredEvent' }
+    | { __typename: 'IpAllowListEntry' }
+    | { __typename: 'Issue' }
+    | { __typename: 'IssueComment' }
+    | { __typename: 'Label' }
+    | { __typename: 'LabeledEvent' }
+    | { __typename: 'Language' }
+    | { __typename: 'License' }
+    | { __typename: 'LinkedBranch' }
+    | { __typename: 'LockedEvent' }
+    | { __typename: 'Mannequin' }
+    | { __typename: 'MarkedAsDuplicateEvent' }
+    | { __typename: 'MarketplaceCategory' }
+    | { __typename: 'MarketplaceListing' }
+    | { __typename: 'MemberFeatureRequestNotification' }
+    | { __typename: 'MembersCanDeleteReposClearAuditEntry' }
+    | { __typename: 'MembersCanDeleteReposDisableAuditEntry' }
+    | { __typename: 'MembersCanDeleteReposEnableAuditEntry' }
+    | { __typename: 'MentionedEvent' }
+    | { __typename: 'MergeQueue' }
+    | { __typename: 'MergeQueueEntry' }
+    | { __typename: 'MergedEvent' }
+    | { __typename: 'MigrationSource' }
+    | { __typename: 'Milestone' }
+    | { __typename: 'MilestonedEvent' }
+    | { __typename: 'MovedColumnsInProjectEvent' }
+    | { __typename: 'OIDCProvider' }
+    | { __typename: 'OauthApplicationCreateAuditEntry' }
+    | { __typename: 'OrgAddBillingManagerAuditEntry' }
+    | { __typename: 'OrgAddMemberAuditEntry' }
+    | { __typename: 'OrgBlockUserAuditEntry' }
+    | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'OrgCreateAuditEntry' }
+    | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry' }
+    | { __typename: 'OrgDisableSamlAuditEntry' }
+    | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry' }
+    | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry' }
+    | { __typename: 'OrgEnableSamlAuditEntry' }
+    | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry' }
+    | { __typename: 'OrgInviteMemberAuditEntry' }
+    | { __typename: 'OrgInviteToBusinessAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessApprovedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessBlockedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessDeniedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessRequestedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry' }
+    | { __typename: 'OrgRemoveBillingManagerAuditEntry' }
+    | { __typename: 'OrgRemoveMemberAuditEntry' }
+    | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry' }
+    | { __typename: 'OrgRestoreMemberAuditEntry' }
+    | { __typename: 'OrgUnblockUserAuditEntry' }
+    | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry' }
+    | { __typename: 'OrgUpdateMemberAuditEntry' }
+    | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry' }
+    | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry' }
+    | { __typename: 'Organization' }
+    | { __typename: 'OrganizationIdentityProvider' }
+    | { __typename: 'OrganizationInvitation' }
+    | { __typename: 'OrganizationMigration' }
+    | { __typename: 'Package' }
+    | { __typename: 'PackageFile' }
+    | { __typename: 'PackageTag' }
+    | { __typename: 'PackageVersion' }
+    | { __typename: 'ParentIssueAddedEvent' }
+    | { __typename: 'ParentIssueRemovedEvent' }
+    | { __typename: 'PinnedDiscussion' }
+    | { __typename: 'PinnedEnvironment' }
+    | { __typename: 'PinnedEvent' }
+    | { __typename: 'PinnedIssue' }
+    | { __typename: 'PrivateRepositoryForkingDisableAuditEntry' }
+    | { __typename: 'PrivateRepositoryForkingEnableAuditEntry' }
+    | { __typename: 'Project' }
+    | { __typename: 'ProjectCard' }
+    | { __typename: 'ProjectColumn' }
+    | { __typename: 'ProjectV2' }
+    | { __typename: 'ProjectV2Field' }
+    | { __typename: 'ProjectV2Item' }
+    | { __typename: 'ProjectV2ItemFieldDateValue' }
+    | { __typename: 'ProjectV2ItemFieldIterationValue' }
+    | { __typename: 'ProjectV2ItemFieldNumberValue' }
+    | { __typename: 'ProjectV2ItemFieldSingleSelectValue' }
+    | { __typename: 'ProjectV2ItemFieldTextValue' }
+    | { __typename: 'ProjectV2IterationField' }
+    | { __typename: 'ProjectV2SingleSelectField' }
+    | { __typename: 'ProjectV2StatusUpdate' }
+    | { __typename: 'ProjectV2View' }
+    | { __typename: 'ProjectV2Workflow' }
+    | { __typename: 'PublicKey' }
+    | { __typename: 'PullRequest' }
+    | { __typename: 'PullRequestCommit' }
+    | { __typename: 'PullRequestCommitCommentThread' }
+    | { __typename: 'PullRequestReview' }
+    | { __typename: 'PullRequestReviewComment' }
+    | { __typename: 'PullRequestReviewThread' }
+    | { __typename: 'PullRequestThread' }
+    | { __typename: 'Push' }
+    | { __typename: 'PushAllowance' }
+    | { __typename: 'Query' }
+    | { __typename: 'Reaction' }
+    | { __typename: 'ReadyForReviewEvent' }
+    | { __typename: 'Ref' }
+    | { __typename: 'ReferencedEvent' }
+    | { __typename: 'Release' }
+    | { __typename: 'ReleaseAsset' }
+    | { __typename: 'RemovedFromMergeQueueEvent' }
+    | { __typename: 'RemovedFromProjectEvent' }
+    | { __typename: 'RenamedTitleEvent' }
+    | { __typename: 'ReopenedEvent' }
+    | { __typename: 'RepoAccessAuditEntry' }
+    | { __typename: 'RepoAddMemberAuditEntry' }
+    | { __typename: 'RepoAddTopicAuditEntry' }
+    | { __typename: 'RepoArchivedAuditEntry' }
+    | { __typename: 'RepoChangeMergeSettingAuditEntry' }
+    | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry' }
+    | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry' }
+    | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoCreateAuditEntry' }
+    | { __typename: 'RepoDestroyAuditEntry' }
+    | { __typename: 'RepoRemoveMemberAuditEntry' }
+    | { __typename: 'RepoRemoveTopicAuditEntry' }
+    | { __typename: 'Repository' }
+    | { __typename: 'RepositoryInvitation' }
+    | { __typename: 'RepositoryMigration' }
+    | { __typename: 'RepositoryRule' }
+    | { __typename: 'RepositoryRuleset' }
+    | { __typename: 'RepositoryRulesetBypassActor' }
+    | { __typename: 'RepositoryTopic' }
+    | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry' }
+    | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry' }
+    | { __typename: 'RepositoryVulnerabilityAlert' }
+    | { __typename: 'ReviewDismissalAllowance' }
+    | { __typename: 'ReviewDismissedEvent' }
+    | { __typename: 'ReviewRequest' }
+    | { __typename: 'ReviewRequestRemovedEvent' }
+    | { __typename: 'ReviewRequestedEvent' }
+    | { __typename: 'SavedReply' }
+    | { __typename: 'SecurityAdvisory' }
+    | { __typename: 'SponsorsActivity' }
+    | { __typename: 'SponsorsListing' }
+    | { __typename: 'SponsorsListingFeaturedItem' }
+    | { __typename: 'SponsorsTier' }
+    | { __typename: 'Sponsorship' }
+    | { __typename: 'SponsorshipNewsletter' }
+    | { __typename: 'Status' }
+    | { __typename: 'StatusCheckRollup' }
+    | { __typename: 'StatusContext' }
+    | { __typename: 'SubIssueAddedEvent' }
+    | { __typename: 'SubIssueRemovedEvent' }
+    | { __typename: 'SubscribedEvent' }
+    | { __typename: 'Tag' }
+    | { __typename: 'Team' }
+    | { __typename: 'TeamAddMemberAuditEntry' }
+    | { __typename: 'TeamAddRepositoryAuditEntry' }
+    | { __typename: 'TeamChangeParentTeamAuditEntry' }
+    | { __typename: 'TeamDiscussion' }
+    | { __typename: 'TeamDiscussionComment' }
+    | { __typename: 'TeamRemoveMemberAuditEntry' }
+    | { __typename: 'TeamRemoveRepositoryAuditEntry' }
+    | { __typename: 'Topic' }
+    | { __typename: 'TransferredEvent' }
+    | { __typename: 'Tree' }
+    | { __typename: 'UnassignedEvent' }
+    | { __typename: 'UnlabeledEvent' }
+    | { __typename: 'UnlockedEvent' }
+    | { __typename: 'UnmarkedAsDuplicateEvent' }
+    | { __typename: 'UnpinnedEvent' }
+    | { __typename: 'UnsubscribedEvent' }
+    | { __typename: 'User' }
+    | { __typename: 'UserBlockedEvent' }
+    | { __typename: 'UserContentEdit' }
+    | { __typename: 'UserList' }
+    | { __typename: 'UserNamespaceRepository' }
+    | { __typename: 'UserStatus' }
+    | { __typename: 'VerifiableDomain' }
+    | { __typename: 'Workflow' }
+    | { __typename: 'WorkflowRun' }
+    | { __typename: 'WorkflowRunFile' }
+   | null> };
 
 export type FileContentQueryVariables = Exact<{
   owner: Scalars['String']['input'];
@@ -32412,7 +32662,12 @@ export type FileContentQueryVariables = Exact<{
 }>;
 
 
-export type FileContentQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', defaultBranchRef?: { __typename?: 'Ref', name: string } | null, object?: { __typename: 'Blob', id: string, isTruncated: boolean, isBinary?: boolean | null, text?: string | null } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree' } | null } | null };
+export type FileContentQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', defaultBranchRef?: { __typename?: 'Ref', name: string } | null, object?:
+      | { __typename: 'Blob', id: string, isTruncated: boolean, isBinary?: boolean | null, text?: string | null }
+      | { __typename: 'Commit' }
+      | { __typename: 'Tag' }
+      | { __typename: 'Tree' }
+     | null } | null };
 
 export type IssueBodyQueryVariables = Exact<{
   org: Scalars['String']['input'];
@@ -32429,16 +32684,570 @@ export type IssueCommentsQueryVariables = Exact<{
 }>;
 
 
-export type IssueCommentsQuery = { __typename?: 'Query', node?: { __typename: 'AddedToMergeQueueEvent' } | { __typename: 'AddedToProjectEvent' } | { __typename: 'App' } | { __typename: 'AssignedEvent' } | { __typename: 'AutoMergeDisabledEvent' } | { __typename: 'AutoMergeEnabledEvent' } | { __typename: 'AutoRebaseEnabledEvent' } | { __typename: 'AutoSquashEnabledEvent' } | { __typename: 'AutomaticBaseChangeFailedEvent' } | { __typename: 'AutomaticBaseChangeSucceededEvent' } | { __typename: 'BaseRefChangedEvent' } | { __typename: 'BaseRefDeletedEvent' } | { __typename: 'BaseRefForcePushedEvent' } | { __typename: 'Blob' } | { __typename: 'Bot' } | { __typename: 'BranchProtectionRule' } | { __typename: 'BypassForcePushAllowance' } | { __typename: 'BypassPullRequestAllowance' } | { __typename: 'CWE' } | { __typename: 'CheckRun' } | { __typename: 'CheckSuite' } | { __typename: 'ClosedEvent' } | { __typename: 'CodeOfConduct' } | { __typename: 'CommentDeletedEvent' } | { __typename: 'Commit' } | { __typename: 'CommitComment' } | { __typename: 'CommitCommentThread' } | { __typename: 'Comparison' } | { __typename: 'ConnectedEvent' } | { __typename: 'ConvertToDraftEvent' } | { __typename: 'ConvertedNoteToIssueEvent' } | { __typename: 'ConvertedToDiscussionEvent' } | { __typename: 'CrossReferencedEvent' } | { __typename: 'DemilestonedEvent' } | { __typename: 'DependencyGraphManifest' } | { __typename: 'DeployKey' } | { __typename: 'DeployedEvent' } | { __typename: 'Deployment' } | { __typename: 'DeploymentEnvironmentChangedEvent' } | { __typename: 'DeploymentReview' } | { __typename: 'DeploymentStatus' } | { __typename: 'DisconnectedEvent' } | { __typename: 'Discussion' } | { __typename: 'DiscussionCategory' } | { __typename: 'DiscussionComment' } | { __typename: 'DiscussionPoll' } | { __typename: 'DiscussionPollOption' } | { __typename: 'DraftIssue' } | { __typename: 'Enterprise' } | { __typename: 'EnterpriseAdministratorInvitation' } | { __typename: 'EnterpriseIdentityProvider' } | { __typename: 'EnterpriseMemberInvitation' } | { __typename: 'EnterpriseRepositoryInfo' } | { __typename: 'EnterpriseServerInstallation' } | { __typename: 'EnterpriseServerUserAccount' } | { __typename: 'EnterpriseServerUserAccountEmail' } | { __typename: 'EnterpriseServerUserAccountsUpload' } | { __typename: 'EnterpriseUserAccount' } | { __typename: 'Environment' } | { __typename: 'ExternalIdentity' } | { __typename: 'Gist' } | { __typename: 'GistComment' } | { __typename: 'HeadRefDeletedEvent' } | { __typename: 'HeadRefForcePushedEvent' } | { __typename: 'HeadRefRestoredEvent' } | { __typename: 'IpAllowListEntry' } | { __typename: 'Issue', id: string, comments: { __typename?: 'IssueCommentConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null } | null> | null } } | { __typename: 'IssueComment' } | { __typename: 'Label' } | { __typename: 'LabeledEvent' } | { __typename: 'Language' } | { __typename: 'License' } | { __typename: 'LinkedBranch' } | { __typename: 'LockedEvent' } | { __typename: 'Mannequin' } | { __typename: 'MarkedAsDuplicateEvent' } | { __typename: 'MarketplaceCategory' } | { __typename: 'MarketplaceListing' } | { __typename: 'MemberFeatureRequestNotification' } | { __typename: 'MembersCanDeleteReposClearAuditEntry' } | { __typename: 'MembersCanDeleteReposDisableAuditEntry' } | { __typename: 'MembersCanDeleteReposEnableAuditEntry' } | { __typename: 'MentionedEvent' } | { __typename: 'MergeQueue' } | { __typename: 'MergeQueueEntry' } | { __typename: 'MergedEvent' } | { __typename: 'MigrationSource' } | { __typename: 'Milestone' } | { __typename: 'MilestonedEvent' } | { __typename: 'MovedColumnsInProjectEvent' } | { __typename: 'OIDCProvider' } | { __typename: 'OauthApplicationCreateAuditEntry' } | { __typename: 'OrgAddBillingManagerAuditEntry' } | { __typename: 'OrgAddMemberAuditEntry' } | { __typename: 'OrgBlockUserAuditEntry' } | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry' } | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry' } | { __typename: 'OrgCreateAuditEntry' } | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry' } | { __typename: 'OrgDisableSamlAuditEntry' } | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry' } | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry' } | { __typename: 'OrgEnableSamlAuditEntry' } | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry' } | { __typename: 'OrgInviteMemberAuditEntry' } | { __typename: 'OrgInviteToBusinessAuditEntry' } | { __typename: 'OrgOauthAppAccessApprovedAuditEntry' } | { __typename: 'OrgOauthAppAccessBlockedAuditEntry' } | { __typename: 'OrgOauthAppAccessDeniedAuditEntry' } | { __typename: 'OrgOauthAppAccessRequestedAuditEntry' } | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry' } | { __typename: 'OrgRemoveBillingManagerAuditEntry' } | { __typename: 'OrgRemoveMemberAuditEntry' } | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry' } | { __typename: 'OrgRestoreMemberAuditEntry' } | { __typename: 'OrgUnblockUserAuditEntry' } | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry' } | { __typename: 'OrgUpdateMemberAuditEntry' } | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry' } | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry' } | { __typename: 'Organization' } | { __typename: 'OrganizationIdentityProvider' } | { __typename: 'OrganizationInvitation' } | { __typename: 'OrganizationMigration' } | { __typename: 'Package' } | { __typename: 'PackageFile' } | { __typename: 'PackageTag' } | { __typename: 'PackageVersion' } | { __typename: 'ParentIssueAddedEvent' } | { __typename: 'ParentIssueRemovedEvent' } | { __typename: 'PinnedDiscussion' } | { __typename: 'PinnedEnvironment' } | { __typename: 'PinnedEvent' } | { __typename: 'PinnedIssue' } | { __typename: 'PrivateRepositoryForkingDisableAuditEntry' } | { __typename: 'PrivateRepositoryForkingEnableAuditEntry' } | { __typename: 'Project' } | { __typename: 'ProjectCard' } | { __typename: 'ProjectColumn' } | { __typename: 'ProjectV2' } | { __typename: 'ProjectV2Field' } | { __typename: 'ProjectV2Item' } | { __typename: 'ProjectV2ItemFieldDateValue' } | { __typename: 'ProjectV2ItemFieldIterationValue' } | { __typename: 'ProjectV2ItemFieldNumberValue' } | { __typename: 'ProjectV2ItemFieldSingleSelectValue' } | { __typename: 'ProjectV2ItemFieldTextValue' } | { __typename: 'ProjectV2IterationField' } | { __typename: 'ProjectV2SingleSelectField' } | { __typename: 'ProjectV2StatusUpdate' } | { __typename: 'ProjectV2View' } | { __typename: 'ProjectV2Workflow' } | { __typename: 'PublicKey' } | { __typename: 'PullRequest' } | { __typename: 'PullRequestCommit' } | { __typename: 'PullRequestCommitCommentThread' } | { __typename: 'PullRequestReview' } | { __typename: 'PullRequestReviewComment' } | { __typename: 'PullRequestReviewThread' } | { __typename: 'PullRequestThread' } | { __typename: 'Push' } | { __typename: 'PushAllowance' } | { __typename: 'Query' } | { __typename: 'Reaction' } | { __typename: 'ReadyForReviewEvent' } | { __typename: 'Ref' } | { __typename: 'ReferencedEvent' } | { __typename: 'Release' } | { __typename: 'ReleaseAsset' } | { __typename: 'RemovedFromMergeQueueEvent' } | { __typename: 'RemovedFromProjectEvent' } | { __typename: 'RenamedTitleEvent' } | { __typename: 'ReopenedEvent' } | { __typename: 'RepoAccessAuditEntry' } | { __typename: 'RepoAddMemberAuditEntry' } | { __typename: 'RepoAddTopicAuditEntry' } | { __typename: 'RepoArchivedAuditEntry' } | { __typename: 'RepoChangeMergeSettingAuditEntry' } | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry' } | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry' } | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry' } | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry' } | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry' } | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry' } | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry' } | { __typename: 'RepoCreateAuditEntry' } | { __typename: 'RepoDestroyAuditEntry' } | { __typename: 'RepoRemoveMemberAuditEntry' } | { __typename: 'RepoRemoveTopicAuditEntry' } | { __typename: 'Repository' } | { __typename: 'RepositoryInvitation' } | { __typename: 'RepositoryMigration' } | { __typename: 'RepositoryRule' } | { __typename: 'RepositoryRuleset' } | { __typename: 'RepositoryRulesetBypassActor' } | { __typename: 'RepositoryTopic' } | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry' } | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry' } | { __typename: 'RepositoryVulnerabilityAlert' } | { __typename: 'ReviewDismissalAllowance' } | { __typename: 'ReviewDismissedEvent' } | { __typename: 'ReviewRequest' } | { __typename: 'ReviewRequestRemovedEvent' } | { __typename: 'ReviewRequestedEvent' } | { __typename: 'SavedReply' } | { __typename: 'SecurityAdvisory' } | { __typename: 'SponsorsActivity' } | { __typename: 'SponsorsListing' } | { __typename: 'SponsorsListingFeaturedItem' } | { __typename: 'SponsorsTier' } | { __typename: 'Sponsorship' } | { __typename: 'SponsorshipNewsletter' } | { __typename: 'Status' } | { __typename: 'StatusCheckRollup' } | { __typename: 'StatusContext' } | { __typename: 'SubIssueAddedEvent' } | { __typename: 'SubIssueRemovedEvent' } | { __typename: 'SubscribedEvent' } | { __typename: 'Tag' } | { __typename: 'Team' } | { __typename: 'TeamAddMemberAuditEntry' } | { __typename: 'TeamAddRepositoryAuditEntry' } | { __typename: 'TeamChangeParentTeamAuditEntry' } | { __typename: 'TeamDiscussion' } | { __typename: 'TeamDiscussionComment' } | { __typename: 'TeamRemoveMemberAuditEntry' } | { __typename: 'TeamRemoveRepositoryAuditEntry' } | { __typename: 'Topic' } | { __typename: 'TransferredEvent' } | { __typename: 'Tree' } | { __typename: 'UnassignedEvent' } | { __typename: 'UnlabeledEvent' } | { __typename: 'UnlockedEvent' } | { __typename: 'UnmarkedAsDuplicateEvent' } | { __typename: 'UnpinnedEvent' } | { __typename: 'UnsubscribedEvent' } | { __typename: 'User' } | { __typename: 'UserBlockedEvent' } | { __typename: 'UserContentEdit' } | { __typename: 'UserList' } | { __typename: 'UserNamespaceRepository' } | { __typename: 'UserStatus' } | { __typename: 'VerifiableDomain' } | { __typename: 'Workflow' } | { __typename: 'WorkflowRun' } | { __typename: 'WorkflowRunFile' } | null };
+export type IssueCommentsQuery = { __typename?: 'Query', node?:
+    | { __typename: 'AddedToMergeQueueEvent' }
+    | { __typename: 'AddedToProjectEvent' }
+    | { __typename: 'App' }
+    | { __typename: 'AssignedEvent' }
+    | { __typename: 'AutoMergeDisabledEvent' }
+    | { __typename: 'AutoMergeEnabledEvent' }
+    | { __typename: 'AutoRebaseEnabledEvent' }
+    | { __typename: 'AutoSquashEnabledEvent' }
+    | { __typename: 'AutomaticBaseChangeFailedEvent' }
+    | { __typename: 'AutomaticBaseChangeSucceededEvent' }
+    | { __typename: 'BaseRefChangedEvent' }
+    | { __typename: 'BaseRefDeletedEvent' }
+    | { __typename: 'BaseRefForcePushedEvent' }
+    | { __typename: 'Blob' }
+    | { __typename: 'Bot' }
+    | { __typename: 'BranchProtectionRule' }
+    | { __typename: 'BypassForcePushAllowance' }
+    | { __typename: 'BypassPullRequestAllowance' }
+    | { __typename: 'CWE' }
+    | { __typename: 'CheckRun' }
+    | { __typename: 'CheckSuite' }
+    | { __typename: 'ClosedEvent' }
+    | { __typename: 'CodeOfConduct' }
+    | { __typename: 'CommentDeletedEvent' }
+    | { __typename: 'Commit' }
+    | { __typename: 'CommitComment' }
+    | { __typename: 'CommitCommentThread' }
+    | { __typename: 'Comparison' }
+    | { __typename: 'ConnectedEvent' }
+    | { __typename: 'ConvertToDraftEvent' }
+    | { __typename: 'ConvertedNoteToIssueEvent' }
+    | { __typename: 'ConvertedToDiscussionEvent' }
+    | { __typename: 'CrossReferencedEvent' }
+    | { __typename: 'DemilestonedEvent' }
+    | { __typename: 'DependencyGraphManifest' }
+    | { __typename: 'DeployKey' }
+    | { __typename: 'DeployedEvent' }
+    | { __typename: 'Deployment' }
+    | { __typename: 'DeploymentEnvironmentChangedEvent' }
+    | { __typename: 'DeploymentReview' }
+    | { __typename: 'DeploymentStatus' }
+    | { __typename: 'DisconnectedEvent' }
+    | { __typename: 'Discussion' }
+    | { __typename: 'DiscussionCategory' }
+    | { __typename: 'DiscussionComment' }
+    | { __typename: 'DiscussionPoll' }
+    | { __typename: 'DiscussionPollOption' }
+    | { __typename: 'DraftIssue' }
+    | { __typename: 'Enterprise' }
+    | { __typename: 'EnterpriseAdministratorInvitation' }
+    | { __typename: 'EnterpriseIdentityProvider' }
+    | { __typename: 'EnterpriseMemberInvitation' }
+    | { __typename: 'EnterpriseRepositoryInfo' }
+    | { __typename: 'EnterpriseServerInstallation' }
+    | { __typename: 'EnterpriseServerUserAccount' }
+    | { __typename: 'EnterpriseServerUserAccountEmail' }
+    | { __typename: 'EnterpriseServerUserAccountsUpload' }
+    | { __typename: 'EnterpriseUserAccount' }
+    | { __typename: 'Environment' }
+    | { __typename: 'ExternalIdentity' }
+    | { __typename: 'Gist' }
+    | { __typename: 'GistComment' }
+    | { __typename: 'HeadRefDeletedEvent' }
+    | { __typename: 'HeadRefForcePushedEvent' }
+    | { __typename: 'HeadRefRestoredEvent' }
+    | { __typename: 'IpAllowListEntry' }
+    | { __typename: 'Issue', id: string, comments: { __typename?: 'IssueCommentConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?:
+            | { __typename?: 'Bot', id: string, login: string }
+            | { __typename?: 'EnterpriseUserAccount', id: string, login: string }
+            | { __typename?: 'Mannequin', id: string, login: string }
+            | { __typename?: 'Organization', id: string, login: string }
+            | { __typename?: 'User', id: string, login: string }
+           | null } | null> | null } }
+    | { __typename: 'IssueComment' }
+    | { __typename: 'Label' }
+    | { __typename: 'LabeledEvent' }
+    | { __typename: 'Language' }
+    | { __typename: 'License' }
+    | { __typename: 'LinkedBranch' }
+    | { __typename: 'LockedEvent' }
+    | { __typename: 'Mannequin' }
+    | { __typename: 'MarkedAsDuplicateEvent' }
+    | { __typename: 'MarketplaceCategory' }
+    | { __typename: 'MarketplaceListing' }
+    | { __typename: 'MemberFeatureRequestNotification' }
+    | { __typename: 'MembersCanDeleteReposClearAuditEntry' }
+    | { __typename: 'MembersCanDeleteReposDisableAuditEntry' }
+    | { __typename: 'MembersCanDeleteReposEnableAuditEntry' }
+    | { __typename: 'MentionedEvent' }
+    | { __typename: 'MergeQueue' }
+    | { __typename: 'MergeQueueEntry' }
+    | { __typename: 'MergedEvent' }
+    | { __typename: 'MigrationSource' }
+    | { __typename: 'Milestone' }
+    | { __typename: 'MilestonedEvent' }
+    | { __typename: 'MovedColumnsInProjectEvent' }
+    | { __typename: 'OIDCProvider' }
+    | { __typename: 'OauthApplicationCreateAuditEntry' }
+    | { __typename: 'OrgAddBillingManagerAuditEntry' }
+    | { __typename: 'OrgAddMemberAuditEntry' }
+    | { __typename: 'OrgBlockUserAuditEntry' }
+    | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'OrgCreateAuditEntry' }
+    | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry' }
+    | { __typename: 'OrgDisableSamlAuditEntry' }
+    | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry' }
+    | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry' }
+    | { __typename: 'OrgEnableSamlAuditEntry' }
+    | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry' }
+    | { __typename: 'OrgInviteMemberAuditEntry' }
+    | { __typename: 'OrgInviteToBusinessAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessApprovedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessBlockedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessDeniedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessRequestedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry' }
+    | { __typename: 'OrgRemoveBillingManagerAuditEntry' }
+    | { __typename: 'OrgRemoveMemberAuditEntry' }
+    | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry' }
+    | { __typename: 'OrgRestoreMemberAuditEntry' }
+    | { __typename: 'OrgUnblockUserAuditEntry' }
+    | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry' }
+    | { __typename: 'OrgUpdateMemberAuditEntry' }
+    | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry' }
+    | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry' }
+    | { __typename: 'Organization' }
+    | { __typename: 'OrganizationIdentityProvider' }
+    | { __typename: 'OrganizationInvitation' }
+    | { __typename: 'OrganizationMigration' }
+    | { __typename: 'Package' }
+    | { __typename: 'PackageFile' }
+    | { __typename: 'PackageTag' }
+    | { __typename: 'PackageVersion' }
+    | { __typename: 'ParentIssueAddedEvent' }
+    | { __typename: 'ParentIssueRemovedEvent' }
+    | { __typename: 'PinnedDiscussion' }
+    | { __typename: 'PinnedEnvironment' }
+    | { __typename: 'PinnedEvent' }
+    | { __typename: 'PinnedIssue' }
+    | { __typename: 'PrivateRepositoryForkingDisableAuditEntry' }
+    | { __typename: 'PrivateRepositoryForkingEnableAuditEntry' }
+    | { __typename: 'Project' }
+    | { __typename: 'ProjectCard' }
+    | { __typename: 'ProjectColumn' }
+    | { __typename: 'ProjectV2' }
+    | { __typename: 'ProjectV2Field' }
+    | { __typename: 'ProjectV2Item' }
+    | { __typename: 'ProjectV2ItemFieldDateValue' }
+    | { __typename: 'ProjectV2ItemFieldIterationValue' }
+    | { __typename: 'ProjectV2ItemFieldNumberValue' }
+    | { __typename: 'ProjectV2ItemFieldSingleSelectValue' }
+    | { __typename: 'ProjectV2ItemFieldTextValue' }
+    | { __typename: 'ProjectV2IterationField' }
+    | { __typename: 'ProjectV2SingleSelectField' }
+    | { __typename: 'ProjectV2StatusUpdate' }
+    | { __typename: 'ProjectV2View' }
+    | { __typename: 'ProjectV2Workflow' }
+    | { __typename: 'PublicKey' }
+    | { __typename: 'PullRequest' }
+    | { __typename: 'PullRequestCommit' }
+    | { __typename: 'PullRequestCommitCommentThread' }
+    | { __typename: 'PullRequestReview' }
+    | { __typename: 'PullRequestReviewComment' }
+    | { __typename: 'PullRequestReviewThread' }
+    | { __typename: 'PullRequestThread' }
+    | { __typename: 'Push' }
+    | { __typename: 'PushAllowance' }
+    | { __typename: 'Query' }
+    | { __typename: 'Reaction' }
+    | { __typename: 'ReadyForReviewEvent' }
+    | { __typename: 'Ref' }
+    | { __typename: 'ReferencedEvent' }
+    | { __typename: 'Release' }
+    | { __typename: 'ReleaseAsset' }
+    | { __typename: 'RemovedFromMergeQueueEvent' }
+    | { __typename: 'RemovedFromProjectEvent' }
+    | { __typename: 'RenamedTitleEvent' }
+    | { __typename: 'ReopenedEvent' }
+    | { __typename: 'RepoAccessAuditEntry' }
+    | { __typename: 'RepoAddMemberAuditEntry' }
+    | { __typename: 'RepoAddTopicAuditEntry' }
+    | { __typename: 'RepoArchivedAuditEntry' }
+    | { __typename: 'RepoChangeMergeSettingAuditEntry' }
+    | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry' }
+    | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry' }
+    | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoCreateAuditEntry' }
+    | { __typename: 'RepoDestroyAuditEntry' }
+    | { __typename: 'RepoRemoveMemberAuditEntry' }
+    | { __typename: 'RepoRemoveTopicAuditEntry' }
+    | { __typename: 'Repository' }
+    | { __typename: 'RepositoryInvitation' }
+    | { __typename: 'RepositoryMigration' }
+    | { __typename: 'RepositoryRule' }
+    | { __typename: 'RepositoryRuleset' }
+    | { __typename: 'RepositoryRulesetBypassActor' }
+    | { __typename: 'RepositoryTopic' }
+    | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry' }
+    | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry' }
+    | { __typename: 'RepositoryVulnerabilityAlert' }
+    | { __typename: 'ReviewDismissalAllowance' }
+    | { __typename: 'ReviewDismissedEvent' }
+    | { __typename: 'ReviewRequest' }
+    | { __typename: 'ReviewRequestRemovedEvent' }
+    | { __typename: 'ReviewRequestedEvent' }
+    | { __typename: 'SavedReply' }
+    | { __typename: 'SecurityAdvisory' }
+    | { __typename: 'SponsorsActivity' }
+    | { __typename: 'SponsorsListing' }
+    | { __typename: 'SponsorsListingFeaturedItem' }
+    | { __typename: 'SponsorsTier' }
+    | { __typename: 'Sponsorship' }
+    | { __typename: 'SponsorshipNewsletter' }
+    | { __typename: 'Status' }
+    | { __typename: 'StatusCheckRollup' }
+    | { __typename: 'StatusContext' }
+    | { __typename: 'SubIssueAddedEvent' }
+    | { __typename: 'SubIssueRemovedEvent' }
+    | { __typename: 'SubscribedEvent' }
+    | { __typename: 'Tag' }
+    | { __typename: 'Team' }
+    | { __typename: 'TeamAddMemberAuditEntry' }
+    | { __typename: 'TeamAddRepositoryAuditEntry' }
+    | { __typename: 'TeamChangeParentTeamAuditEntry' }
+    | { __typename: 'TeamDiscussion' }
+    | { __typename: 'TeamDiscussionComment' }
+    | { __typename: 'TeamRemoveMemberAuditEntry' }
+    | { __typename: 'TeamRemoveRepositoryAuditEntry' }
+    | { __typename: 'Topic' }
+    | { __typename: 'TransferredEvent' }
+    | { __typename: 'Tree' }
+    | { __typename: 'UnassignedEvent' }
+    | { __typename: 'UnlabeledEvent' }
+    | { __typename: 'UnlockedEvent' }
+    | { __typename: 'UnmarkedAsDuplicateEvent' }
+    | { __typename: 'UnpinnedEvent' }
+    | { __typename: 'UnsubscribedEvent' }
+    | { __typename: 'User' }
+    | { __typename: 'UserBlockedEvent' }
+    | { __typename: 'UserContentEdit' }
+    | { __typename: 'UserList' }
+    | { __typename: 'UserNamespaceRepository' }
+    | { __typename: 'UserStatus' }
+    | { __typename: 'VerifiableDomain' }
+    | { __typename: 'Workflow' }
+    | { __typename: 'WorkflowRun' }
+    | { __typename: 'WorkflowRunFile' }
+   | null };
 
-export type CommentDetailsFragment = { __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null };
+export type CommentDetailsFragment = { __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?:
+    | { __typename?: 'Bot', id: string, login: string }
+    | { __typename?: 'EnterpriseUserAccount', id: string, login: string }
+    | { __typename?: 'Mannequin', id: string, login: string }
+    | { __typename?: 'Organization', id: string, login: string }
+    | { __typename?: 'User', id: string, login: string }
+   | null };
 
 export type IssueMetadataQueryVariables = Exact<{
   ids: Array<Scalars['ID']['input']> | Scalars['ID']['input'];
 }>;
 
 
-export type IssueMetadataQuery = { __typename?: 'Query', nodes: Array<{ __typename: 'AddedToMergeQueueEvent', id: string } | { __typename: 'AddedToProjectEvent', id: string } | { __typename: 'App', id: string } | { __typename: 'AssignedEvent', id: string } | { __typename: 'AutoMergeDisabledEvent', id: string } | { __typename: 'AutoMergeEnabledEvent', id: string } | { __typename: 'AutoRebaseEnabledEvent', id: string } | { __typename: 'AutoSquashEnabledEvent', id: string } | { __typename: 'AutomaticBaseChangeFailedEvent', id: string } | { __typename: 'AutomaticBaseChangeSucceededEvent', id: string } | { __typename: 'BaseRefChangedEvent', id: string } | { __typename: 'BaseRefDeletedEvent', id: string } | { __typename: 'BaseRefForcePushedEvent', id: string } | { __typename: 'Blob', id: string } | { __typename: 'Bot', id: string, url: any } | { __typename: 'BranchProtectionRule', id: string } | { __typename: 'BypassForcePushAllowance', id: string } | { __typename: 'BypassPullRequestAllowance', id: string } | { __typename: 'CWE', id: string } | { __typename: 'CheckRun', id: string, url: any } | { __typename: 'CheckSuite', id: string } | { __typename: 'ClosedEvent', id: string, url: any } | { __typename: 'CodeOfConduct', id: string } | { __typename: 'CommentDeletedEvent', id: string } | { __typename: 'Commit', id: string, url: any } | { __typename: 'CommitComment', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'CommitCommentThread', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'Comparison', id: string } | { __typename: 'ConnectedEvent', id: string } | { __typename: 'ConvertToDraftEvent', id: string, url: any } | { __typename: 'ConvertedNoteToIssueEvent', id: string } | { __typename: 'ConvertedToDiscussionEvent', id: string } | { __typename: 'CrossReferencedEvent', id: string, url: any } | { __typename: 'DemilestonedEvent', id: string } | { __typename: 'DependencyGraphManifest', id: string } | { __typename: 'DeployKey', id: string } | { __typename: 'DeployedEvent', id: string } | { __typename: 'Deployment', id: string } | { __typename: 'DeploymentEnvironmentChangedEvent', id: string } | { __typename: 'DeploymentReview', id: string } | { __typename: 'DeploymentStatus', id: string } | { __typename: 'DisconnectedEvent', id: string } | { __typename: 'Discussion', id: string, updatedAt: any, body: string, closedAt?: any | null, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'DiscussionCategory', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'DiscussionComment', id: string, updatedAt: any, body: string } | { __typename: 'DiscussionPoll', id: string } | { __typename: 'DiscussionPollOption', id: string } | { __typename: 'DraftIssue', id: string } | { __typename: 'Enterprise', id: string } | { __typename: 'EnterpriseAdministratorInvitation', id: string } | { __typename: 'EnterpriseIdentityProvider', id: string } | { __typename: 'EnterpriseMemberInvitation', id: string } | { __typename: 'EnterpriseRepositoryInfo', id: string } | { __typename: 'EnterpriseServerInstallation', id: string } | { __typename: 'EnterpriseServerUserAccount', id: string } | { __typename: 'EnterpriseServerUserAccountEmail', id: string } | { __typename: 'EnterpriseServerUserAccountsUpload', id: string } | { __typename: 'EnterpriseUserAccount', id: string } | { __typename: 'Environment', id: string } | { __typename: 'ExternalIdentity', id: string } | { __typename: 'Gist', id: string, url: any } | { __typename: 'GistComment', id: string, updatedAt: any, body: string } | { __typename: 'HeadRefDeletedEvent', id: string } | { __typename: 'HeadRefForcePushedEvent', id: string } | { __typename: 'HeadRefRestoredEvent', id: string } | { __typename: 'IpAllowListEntry', id: string } | { __typename: 'Issue', id: string, url: any, updatedAt: any, body: string, closedAt?: any | null, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', id: string, login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'IssueComment', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'Label', id: string } | { __typename: 'LabeledEvent', id: string } | { __typename: 'Language', id: string } | { __typename: 'License', id: string } | { __typename: 'LinkedBranch', id: string } | { __typename: 'LockedEvent', id: string } | { __typename: 'Mannequin', id: string, url: any } | { __typename: 'MarkedAsDuplicateEvent', id: string } | { __typename: 'MarketplaceCategory', id: string } | { __typename: 'MarketplaceListing', id: string } | { __typename: 'MemberFeatureRequestNotification', id: string } | { __typename: 'MembersCanDeleteReposClearAuditEntry', id: string } | { __typename: 'MembersCanDeleteReposDisableAuditEntry', id: string } | { __typename: 'MembersCanDeleteReposEnableAuditEntry', id: string } | { __typename: 'MentionedEvent', id: string } | { __typename: 'MergeQueue', id: string } | { __typename: 'MergeQueueEntry', id: string } | { __typename: 'MergedEvent', id: string, url: any } | { __typename: 'MigrationSource', id: string } | { __typename: 'Milestone', id: string, url: any, closedAt?: any | null } | { __typename: 'MilestonedEvent', id: string } | { __typename: 'MovedColumnsInProjectEvent', id: string } | { __typename: 'OIDCProvider', id: string } | { __typename: 'OauthApplicationCreateAuditEntry', id: string } | { __typename: 'OrgAddBillingManagerAuditEntry', id: string } | { __typename: 'OrgAddMemberAuditEntry', id: string } | { __typename: 'OrgBlockUserAuditEntry', id: string } | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry', id: string } | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry', id: string } | { __typename: 'OrgCreateAuditEntry', id: string } | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry', id: string } | { __typename: 'OrgDisableSamlAuditEntry', id: string } | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry', id: string } | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry', id: string } | { __typename: 'OrgEnableSamlAuditEntry', id: string } | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry', id: string } | { __typename: 'OrgInviteMemberAuditEntry', id: string } | { __typename: 'OrgInviteToBusinessAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessApprovedAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessBlockedAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessDeniedAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessRequestedAuditEntry', id: string } | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry', id: string } | { __typename: 'OrgRemoveBillingManagerAuditEntry', id: string } | { __typename: 'OrgRemoveMemberAuditEntry', id: string } | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry', id: string } | { __typename: 'OrgRestoreMemberAuditEntry', id: string } | { __typename: 'OrgUnblockUserAuditEntry', id: string } | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry', id: string } | { __typename: 'OrgUpdateMemberAuditEntry', id: string } | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry', id: string } | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry', id: string } | { __typename: 'Organization', id: string, url: any } | { __typename: 'OrganizationIdentityProvider', id: string } | { __typename: 'OrganizationInvitation', id: string } | { __typename: 'OrganizationMigration', id: string } | { __typename: 'Package', id: string } | { __typename: 'PackageFile', id: string } | { __typename: 'PackageTag', id: string } | { __typename: 'PackageVersion', id: string } | { __typename: 'ParentIssueAddedEvent', id: string } | { __typename: 'ParentIssueRemovedEvent', id: string } | { __typename: 'PinnedDiscussion', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'PinnedEnvironment', id: string } | { __typename: 'PinnedEvent', id: string } | { __typename: 'PinnedIssue', id: string } | { __typename: 'PrivateRepositoryForkingDisableAuditEntry', id: string } | { __typename: 'PrivateRepositoryForkingEnableAuditEntry', id: string } | { __typename: 'Project', id: string, closedAt?: any | null } | { __typename: 'ProjectCard', id: string } | { __typename: 'ProjectColumn', id: string } | { __typename: 'ProjectV2', id: string, closedAt?: any | null } | { __typename: 'ProjectV2Field', id: string } | { __typename: 'ProjectV2Item', id: string } | { __typename: 'ProjectV2ItemFieldDateValue', id: string } | { __typename: 'ProjectV2ItemFieldIterationValue', id: string } | { __typename: 'ProjectV2ItemFieldNumberValue', id: string } | { __typename: 'ProjectV2ItemFieldSingleSelectValue', id: string } | { __typename: 'ProjectV2ItemFieldTextValue', id: string } | { __typename: 'ProjectV2IterationField', id: string } | { __typename: 'ProjectV2SingleSelectField', id: string } | { __typename: 'ProjectV2StatusUpdate', id: string } | { __typename: 'ProjectV2View', id: string } | { __typename: 'ProjectV2Workflow', id: string } | { __typename: 'PublicKey', id: string } | { __typename: 'PullRequest', id: string, url: any, updatedAt: any, body: string, closedAt?: any | null, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', id: string, login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'PullRequestCommit', id: string, url: any } | { __typename: 'PullRequestCommitCommentThread', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'PullRequestReview', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'PullRequestReviewComment', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'PullRequestReviewThread', id: string } | { __typename: 'PullRequestThread', id: string } | { __typename: 'Push', id: string } | { __typename: 'PushAllowance', id: string } | { __typename: 'Query', id: string } | { __typename: 'Reaction', id: string } | { __typename: 'ReadyForReviewEvent', id: string, url: any } | { __typename: 'Ref', id: string } | { __typename: 'ReferencedEvent', id: string } | { __typename: 'Release', id: string, url: any } | { __typename: 'ReleaseAsset', id: string } | { __typename: 'RemovedFromMergeQueueEvent', id: string } | { __typename: 'RemovedFromProjectEvent', id: string } | { __typename: 'RenamedTitleEvent', id: string } | { __typename: 'ReopenedEvent', id: string } | { __typename: 'RepoAccessAuditEntry', id: string } | { __typename: 'RepoAddMemberAuditEntry', id: string } | { __typename: 'RepoAddTopicAuditEntry', id: string } | { __typename: 'RepoArchivedAuditEntry', id: string } | { __typename: 'RepoChangeMergeSettingAuditEntry', id: string } | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry', id: string } | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry', id: string } | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry', id: string } | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry', id: string } | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry', id: string } | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry', id: string } | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry', id: string } | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry', id: string } | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry', id: string } | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry', id: string } | { __typename: 'RepoCreateAuditEntry', id: string } | { __typename: 'RepoDestroyAuditEntry', id: string } | { __typename: 'RepoRemoveMemberAuditEntry', id: string } | { __typename: 'RepoRemoveTopicAuditEntry', id: string } | { __typename: 'Repository', id: string, url: any } | { __typename: 'RepositoryInvitation', id: string } | { __typename: 'RepositoryMigration', id: string } | { __typename: 'RepositoryRule', id: string } | { __typename: 'RepositoryRuleset', id: string } | { __typename: 'RepositoryRulesetBypassActor', id: string } | { __typename: 'RepositoryTopic', id: string, url: any } | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry', id: string } | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry', id: string } | { __typename: 'RepositoryVulnerabilityAlert', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } } } | { __typename: 'ReviewDismissalAllowance', id: string } | { __typename: 'ReviewDismissedEvent', id: string, url: any } | { __typename: 'ReviewRequest', id: string } | { __typename: 'ReviewRequestRemovedEvent', id: string } | { __typename: 'ReviewRequestedEvent', id: string } | { __typename: 'SavedReply', id: string } | { __typename: 'SecurityAdvisory', id: string } | { __typename: 'SponsorsActivity', id: string } | { __typename: 'SponsorsListing', id: string } | { __typename: 'SponsorsListingFeaturedItem', id: string } | { __typename: 'SponsorsTier', id: string } | { __typename: 'Sponsorship', id: string } | { __typename: 'SponsorshipNewsletter', id: string } | { __typename: 'Status', id: string } | { __typename: 'StatusCheckRollup', id: string } | { __typename: 'StatusContext', id: string } | { __typename: 'SubIssueAddedEvent', id: string } | { __typename: 'SubIssueRemovedEvent', id: string } | { __typename: 'SubscribedEvent', id: string } | { __typename: 'Tag', id: string } | { __typename: 'Team', id: string } | { __typename: 'TeamAddMemberAuditEntry', id: string } | { __typename: 'TeamAddRepositoryAuditEntry', id: string } | { __typename: 'TeamChangeParentTeamAuditEntry', id: string } | { __typename: 'TeamDiscussion', id: string, url: any, updatedAt: any, body: string } | { __typename: 'TeamDiscussionComment', id: string, url: any, updatedAt: any, body: string } | { __typename: 'TeamRemoveMemberAuditEntry', id: string } | { __typename: 'TeamRemoveRepositoryAuditEntry', id: string } | { __typename: 'Topic', id: string } | { __typename: 'TransferredEvent', id: string } | { __typename: 'Tree', id: string } | { __typename: 'UnassignedEvent', id: string } | { __typename: 'UnlabeledEvent', id: string } | { __typename: 'UnlockedEvent', id: string } | { __typename: 'UnmarkedAsDuplicateEvent', id: string } | { __typename: 'UnpinnedEvent', id: string } | { __typename: 'UnsubscribedEvent', id: string } | { __typename: 'User', id: string, url: any } | { __typename: 'UserBlockedEvent', id: string } | { __typename: 'UserContentEdit', id: string } | { __typename: 'UserList', id: string } | { __typename: 'UserNamespaceRepository', id: string } | { __typename: 'UserStatus', id: string } | { __typename: 'VerifiableDomain', id: string } | { __typename: 'Workflow', id: string, url: any } | { __typename: 'WorkflowRun', id: string, url: any } | { __typename: 'WorkflowRunFile', id: string, url: any } | null> };
+export type IssueMetadataQuery = { __typename?: 'Query', nodes: Array<
+    | { __typename: 'AddedToMergeQueueEvent', id: string }
+    | { __typename: 'AddedToProjectEvent', id: string }
+    | { __typename: 'App', id: string }
+    | { __typename: 'AssignedEvent', id: string }
+    | { __typename: 'AutoMergeDisabledEvent', id: string }
+    | { __typename: 'AutoMergeEnabledEvent', id: string }
+    | { __typename: 'AutoRebaseEnabledEvent', id: string }
+    | { __typename: 'AutoSquashEnabledEvent', id: string }
+    | { __typename: 'AutomaticBaseChangeFailedEvent', id: string }
+    | { __typename: 'AutomaticBaseChangeSucceededEvent', id: string }
+    | { __typename: 'BaseRefChangedEvent', id: string }
+    | { __typename: 'BaseRefDeletedEvent', id: string }
+    | { __typename: 'BaseRefForcePushedEvent', id: string }
+    | { __typename: 'Blob', id: string }
+    | { __typename: 'Bot', id: string, url: any }
+    | { __typename: 'BranchProtectionRule', id: string }
+    | { __typename: 'BypassForcePushAllowance', id: string }
+    | { __typename: 'BypassPullRequestAllowance', id: string }
+    | { __typename: 'CWE', id: string }
+    | { __typename: 'CheckRun', id: string, url: any }
+    | { __typename: 'CheckSuite', id: string }
+    | { __typename: 'ClosedEvent', id: string, url: any }
+    | { __typename: 'CodeOfConduct', id: string }
+    | { __typename: 'CommentDeletedEvent', id: string }
+    | { __typename: 'Commit', id: string, url: any }
+    | { __typename: 'CommitComment', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         } }
+    | { __typename: 'CommitCommentThread', id: string, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         } }
+    | { __typename: 'Comparison', id: string }
+    | { __typename: 'ConnectedEvent', id: string }
+    | { __typename: 'ConvertToDraftEvent', id: string, url: any }
+    | { __typename: 'ConvertedNoteToIssueEvent', id: string }
+    | { __typename: 'ConvertedToDiscussionEvent', id: string }
+    | { __typename: 'CrossReferencedEvent', id: string, url: any }
+    | { __typename: 'DemilestonedEvent', id: string }
+    | { __typename: 'DependencyGraphManifest', id: string }
+    | { __typename: 'DeployKey', id: string }
+    | { __typename: 'DeployedEvent', id: string }
+    | { __typename: 'Deployment', id: string }
+    | { __typename: 'DeploymentEnvironmentChangedEvent', id: string }
+    | { __typename: 'DeploymentReview', id: string }
+    | { __typename: 'DeploymentStatus', id: string }
+    | { __typename: 'DisconnectedEvent', id: string }
+    | { __typename: 'Discussion', id: string, updatedAt: any, body: string, closedAt?: any | null, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null }
+    | { __typename: 'DiscussionCategory', id: string, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         } }
+    | { __typename: 'DiscussionComment', id: string, updatedAt: any, body: string }
+    | { __typename: 'DiscussionPoll', id: string }
+    | { __typename: 'DiscussionPollOption', id: string }
+    | { __typename: 'DraftIssue', id: string }
+    | { __typename: 'Enterprise', id: string }
+    | { __typename: 'EnterpriseAdministratorInvitation', id: string }
+    | { __typename: 'EnterpriseIdentityProvider', id: string }
+    | { __typename: 'EnterpriseMemberInvitation', id: string }
+    | { __typename: 'EnterpriseRepositoryInfo', id: string }
+    | { __typename: 'EnterpriseServerInstallation', id: string }
+    | { __typename: 'EnterpriseServerUserAccount', id: string }
+    | { __typename: 'EnterpriseServerUserAccountEmail', id: string }
+    | { __typename: 'EnterpriseServerUserAccountsUpload', id: string }
+    | { __typename: 'EnterpriseUserAccount', id: string }
+    | { __typename: 'Environment', id: string }
+    | { __typename: 'ExternalIdentity', id: string }
+    | { __typename: 'Gist', id: string, url: any }
+    | { __typename: 'GistComment', id: string, updatedAt: any, body: string }
+    | { __typename: 'HeadRefDeletedEvent', id: string }
+    | { __typename: 'HeadRefForcePushedEvent', id: string }
+    | { __typename: 'HeadRefRestoredEvent', id: string }
+    | { __typename: 'IpAllowListEntry', id: string }
+    | { __typename: 'Issue', id: string, url: any, updatedAt: any, body: string, closedAt?: any | null, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         }, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', id: string, login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null }
+    | { __typename: 'IssueComment', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         } }
+    | { __typename: 'Label', id: string }
+    | { __typename: 'LabeledEvent', id: string }
+    | { __typename: 'Language', id: string }
+    | { __typename: 'License', id: string }
+    | { __typename: 'LinkedBranch', id: string }
+    | { __typename: 'LockedEvent', id: string }
+    | { __typename: 'Mannequin', id: string, url: any }
+    | { __typename: 'MarkedAsDuplicateEvent', id: string }
+    | { __typename: 'MarketplaceCategory', id: string }
+    | { __typename: 'MarketplaceListing', id: string }
+    | { __typename: 'MemberFeatureRequestNotification', id: string }
+    | { __typename: 'MembersCanDeleteReposClearAuditEntry', id: string }
+    | { __typename: 'MembersCanDeleteReposDisableAuditEntry', id: string }
+    | { __typename: 'MembersCanDeleteReposEnableAuditEntry', id: string }
+    | { __typename: 'MentionedEvent', id: string }
+    | { __typename: 'MergeQueue', id: string }
+    | { __typename: 'MergeQueueEntry', id: string }
+    | { __typename: 'MergedEvent', id: string, url: any }
+    | { __typename: 'MigrationSource', id: string }
+    | { __typename: 'Milestone', id: string, url: any, closedAt?: any | null }
+    | { __typename: 'MilestonedEvent', id: string }
+    | { __typename: 'MovedColumnsInProjectEvent', id: string }
+    | { __typename: 'OIDCProvider', id: string }
+    | { __typename: 'OauthApplicationCreateAuditEntry', id: string }
+    | { __typename: 'OrgAddBillingManagerAuditEntry', id: string }
+    | { __typename: 'OrgAddMemberAuditEntry', id: string }
+    | { __typename: 'OrgBlockUserAuditEntry', id: string }
+    | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry', id: string }
+    | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry', id: string }
+    | { __typename: 'OrgCreateAuditEntry', id: string }
+    | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry', id: string }
+    | { __typename: 'OrgDisableSamlAuditEntry', id: string }
+    | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry', id: string }
+    | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry', id: string }
+    | { __typename: 'OrgEnableSamlAuditEntry', id: string }
+    | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry', id: string }
+    | { __typename: 'OrgInviteMemberAuditEntry', id: string }
+    | { __typename: 'OrgInviteToBusinessAuditEntry', id: string }
+    | { __typename: 'OrgOauthAppAccessApprovedAuditEntry', id: string }
+    | { __typename: 'OrgOauthAppAccessBlockedAuditEntry', id: string }
+    | { __typename: 'OrgOauthAppAccessDeniedAuditEntry', id: string }
+    | { __typename: 'OrgOauthAppAccessRequestedAuditEntry', id: string }
+    | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry', id: string }
+    | { __typename: 'OrgRemoveBillingManagerAuditEntry', id: string }
+    | { __typename: 'OrgRemoveMemberAuditEntry', id: string }
+    | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry', id: string }
+    | { __typename: 'OrgRestoreMemberAuditEntry', id: string }
+    | { __typename: 'OrgUnblockUserAuditEntry', id: string }
+    | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry', id: string }
+    | { __typename: 'OrgUpdateMemberAuditEntry', id: string }
+    | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry', id: string }
+    | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry', id: string }
+    | { __typename: 'Organization', id: string, url: any }
+    | { __typename: 'OrganizationIdentityProvider', id: string }
+    | { __typename: 'OrganizationInvitation', id: string }
+    | { __typename: 'OrganizationMigration', id: string }
+    | { __typename: 'Package', id: string }
+    | { __typename: 'PackageFile', id: string }
+    | { __typename: 'PackageTag', id: string }
+    | { __typename: 'PackageVersion', id: string }
+    | { __typename: 'ParentIssueAddedEvent', id: string }
+    | { __typename: 'ParentIssueRemovedEvent', id: string }
+    | { __typename: 'PinnedDiscussion', id: string, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         } }
+    | { __typename: 'PinnedEnvironment', id: string }
+    | { __typename: 'PinnedEvent', id: string }
+    | { __typename: 'PinnedIssue', id: string }
+    | { __typename: 'PrivateRepositoryForkingDisableAuditEntry', id: string }
+    | { __typename: 'PrivateRepositoryForkingEnableAuditEntry', id: string }
+    | { __typename: 'Project', id: string, closedAt?: any | null }
+    | { __typename: 'ProjectCard', id: string }
+    | { __typename: 'ProjectColumn', id: string }
+    | { __typename: 'ProjectV2', id: string, closedAt?: any | null }
+    | { __typename: 'ProjectV2Field', id: string }
+    | { __typename: 'ProjectV2Item', id: string }
+    | { __typename: 'ProjectV2ItemFieldDateValue', id: string }
+    | { __typename: 'ProjectV2ItemFieldIterationValue', id: string }
+    | { __typename: 'ProjectV2ItemFieldNumberValue', id: string }
+    | { __typename: 'ProjectV2ItemFieldSingleSelectValue', id: string }
+    | { __typename: 'ProjectV2ItemFieldTextValue', id: string }
+    | { __typename: 'ProjectV2IterationField', id: string }
+    | { __typename: 'ProjectV2SingleSelectField', id: string }
+    | { __typename: 'ProjectV2StatusUpdate', id: string }
+    | { __typename: 'ProjectV2View', id: string }
+    | { __typename: 'ProjectV2Workflow', id: string }
+    | { __typename: 'PublicKey', id: string }
+    | { __typename: 'PullRequest', id: string, url: any, updatedAt: any, body: string, closedAt?: any | null, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         }, author?:
+        | { __typename?: 'Bot', id: string, login: string }
+        | { __typename?: 'EnterpriseUserAccount', id: string, login: string }
+        | { __typename?: 'Mannequin', id: string, login: string }
+        | { __typename?: 'Organization', id: string, login: string }
+        | { __typename?: 'User', id: string, login: string }
+       | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', id: string, login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null }
+    | { __typename: 'PullRequestCommit', id: string, url: any }
+    | { __typename: 'PullRequestCommitCommentThread', id: string, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         } }
+    | { __typename: 'PullRequestReview', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         } }
+    | { __typename: 'PullRequestReviewComment', id: string, updatedAt: any, body: string, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         } }
+    | { __typename: 'PullRequestReviewThread', id: string }
+    | { __typename: 'PullRequestThread', id: string }
+    | { __typename: 'Push', id: string }
+    | { __typename: 'PushAllowance', id: string }
+    | { __typename: 'Query', id: string }
+    | { __typename: 'Reaction', id: string }
+    | { __typename: 'ReadyForReviewEvent', id: string, url: any }
+    | { __typename: 'Ref', id: string }
+    | { __typename: 'ReferencedEvent', id: string }
+    | { __typename: 'Release', id: string, url: any }
+    | { __typename: 'ReleaseAsset', id: string }
+    | { __typename: 'RemovedFromMergeQueueEvent', id: string }
+    | { __typename: 'RemovedFromProjectEvent', id: string }
+    | { __typename: 'RenamedTitleEvent', id: string }
+    | { __typename: 'ReopenedEvent', id: string }
+    | { __typename: 'RepoAccessAuditEntry', id: string }
+    | { __typename: 'RepoAddMemberAuditEntry', id: string }
+    | { __typename: 'RepoAddTopicAuditEntry', id: string }
+    | { __typename: 'RepoArchivedAuditEntry', id: string }
+    | { __typename: 'RepoChangeMergeSettingAuditEntry', id: string }
+    | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry', id: string }
+    | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry', id: string }
+    | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry', id: string }
+    | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry', id: string }
+    | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry', id: string }
+    | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry', id: string }
+    | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry', id: string }
+    | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry', id: string }
+    | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry', id: string }
+    | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry', id: string }
+    | { __typename: 'RepoCreateAuditEntry', id: string }
+    | { __typename: 'RepoDestroyAuditEntry', id: string }
+    | { __typename: 'RepoRemoveMemberAuditEntry', id: string }
+    | { __typename: 'RepoRemoveTopicAuditEntry', id: string }
+    | { __typename: 'Repository', id: string, url: any }
+    | { __typename: 'RepositoryInvitation', id: string }
+    | { __typename: 'RepositoryMigration', id: string }
+    | { __typename: 'RepositoryRule', id: string }
+    | { __typename: 'RepositoryRuleset', id: string }
+    | { __typename: 'RepositoryRulesetBypassActor', id: string }
+    | { __typename: 'RepositoryTopic', id: string, url: any }
+    | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry', id: string }
+    | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry', id: string }
+    | { __typename: 'RepositoryVulnerabilityAlert', id: string, repository: { __typename?: 'Repository', name: string, owner:
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         } }
+    | { __typename: 'ReviewDismissalAllowance', id: string }
+    | { __typename: 'ReviewDismissedEvent', id: string, url: any }
+    | { __typename: 'ReviewRequest', id: string }
+    | { __typename: 'ReviewRequestRemovedEvent', id: string }
+    | { __typename: 'ReviewRequestedEvent', id: string }
+    | { __typename: 'SavedReply', id: string }
+    | { __typename: 'SecurityAdvisory', id: string }
+    | { __typename: 'SponsorsActivity', id: string }
+    | { __typename: 'SponsorsListing', id: string }
+    | { __typename: 'SponsorsListingFeaturedItem', id: string }
+    | { __typename: 'SponsorsTier', id: string }
+    | { __typename: 'Sponsorship', id: string }
+    | { __typename: 'SponsorshipNewsletter', id: string }
+    | { __typename: 'Status', id: string }
+    | { __typename: 'StatusCheckRollup', id: string }
+    | { __typename: 'StatusContext', id: string }
+    | { __typename: 'SubIssueAddedEvent', id: string }
+    | { __typename: 'SubIssueRemovedEvent', id: string }
+    | { __typename: 'SubscribedEvent', id: string }
+    | { __typename: 'Tag', id: string }
+    | { __typename: 'Team', id: string }
+    | { __typename: 'TeamAddMemberAuditEntry', id: string }
+    | { __typename: 'TeamAddRepositoryAuditEntry', id: string }
+    | { __typename: 'TeamChangeParentTeamAuditEntry', id: string }
+    | { __typename: 'TeamDiscussion', id: string, url: any, updatedAt: any, body: string }
+    | { __typename: 'TeamDiscussionComment', id: string, url: any, updatedAt: any, body: string }
+    | { __typename: 'TeamRemoveMemberAuditEntry', id: string }
+    | { __typename: 'TeamRemoveRepositoryAuditEntry', id: string }
+    | { __typename: 'Topic', id: string }
+    | { __typename: 'TransferredEvent', id: string }
+    | { __typename: 'Tree', id: string }
+    | { __typename: 'UnassignedEvent', id: string }
+    | { __typename: 'UnlabeledEvent', id: string }
+    | { __typename: 'UnlockedEvent', id: string }
+    | { __typename: 'UnmarkedAsDuplicateEvent', id: string }
+    | { __typename: 'UnpinnedEvent', id: string }
+    | { __typename: 'UnsubscribedEvent', id: string }
+    | { __typename: 'User', id: string, url: any }
+    | { __typename: 'UserBlockedEvent', id: string }
+    | { __typename: 'UserContentEdit', id: string }
+    | { __typename: 'UserList', id: string }
+    | { __typename: 'UserNamespaceRepository', id: string }
+    | { __typename: 'UserStatus', id: string }
+    | { __typename: 'VerifiableDomain', id: string }
+    | { __typename: 'Workflow', id: string, url: any }
+    | { __typename: 'WorkflowRun', id: string, url: any }
+    | { __typename: 'WorkflowRunFile', id: string, url: any }
+   | null> };
 
 export type MilestoneFragment = { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null };
 
@@ -32450,7 +33259,13 @@ export type RecentIssuesQueryVariables = Exact<{
 }>;
 
 
-export type RecentIssuesQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, body: string, createdAt: any, updatedAt: any, closedAt?: any | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', id: string, login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, comments: { __typename?: 'IssueCommentConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?: { __typename?: 'Bot', id: string, login: string } | { __typename?: 'EnterpriseUserAccount', id: string, login: string } | { __typename?: 'Mannequin', id: string, login: string } | { __typename?: 'Organization', id: string, login: string } | { __typename?: 'User', id: string, login: string } | null } | null> | null } } | null> | null } } | null };
+export type RecentIssuesQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', issues: { __typename?: 'IssueConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'Issue', id: string, number: number, title: string, body: string, createdAt: any, updatedAt: any, closedAt?: any | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', id: string, login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', totalCount: number, nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null, milestone?: { __typename?: 'Milestone', id: string, title: string, dueOn?: any | null } | null, comments: { __typename?: 'IssueCommentConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename?: 'IssueComment', id: string, url: any, body: string, publishedAt?: any | null, updatedAt: any, isMinimized: boolean, author?:
+              | { __typename?: 'Bot', id: string, login: string }
+              | { __typename?: 'EnterpriseUserAccount', id: string, login: string }
+              | { __typename?: 'Mannequin', id: string, login: string }
+              | { __typename?: 'Organization', id: string, login: string }
+              | { __typename?: 'User', id: string, login: string }
+             | null } | null> | null } } | null> | null } } | null };
 
 export type IssueSearchQueryVariables = Exact<{
   query_: Scalars['String']['input'];
@@ -32458,14 +33273,298 @@ export type IssueSearchQueryVariables = Exact<{
 }>;
 
 
-export type IssueSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultItemConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<{ __typename: 'App', id: string } | { __typename: 'Discussion', id: string, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null } | { __typename: 'Issue', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null } | { __typename: 'MarketplaceListing', id: string } | { __typename: 'Organization', id: string, url: any } | { __typename: 'PullRequest', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner: { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } }, author?: { __typename?: 'Bot', login: string } | { __typename?: 'EnterpriseUserAccount', login: string } | { __typename?: 'Mannequin', login: string } | { __typename?: 'Organization', login: string } | { __typename?: 'User', login: string } | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null } | { __typename: 'Repository', id: string, url: any } | { __typename: 'User', id: string, url: any } | null> | null }, rateLimit?: { __typename?: 'RateLimit', cost: number, remaining: number, resetAt: any } | null };
+export type IssueSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultItemConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<
+      | { __typename: 'App', id: string }
+      | { __typename: 'Discussion', id: string, repository: { __typename?: 'Repository', name: string, owner:
+            | { __typename?: 'Organization', login: string }
+            | { __typename?: 'User', login: string }
+           }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null }
+      | { __typename: 'Issue', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner:
+            | { __typename?: 'Organization', login: string }
+            | { __typename?: 'User', login: string }
+           }, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null }
+      | { __typename: 'MarketplaceListing', id: string }
+      | { __typename: 'Organization', id: string, url: any }
+      | { __typename: 'PullRequest', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner:
+            | { __typename?: 'Organization', login: string }
+            | { __typename?: 'User', login: string }
+           }, author?:
+          | { __typename?: 'Bot', login: string }
+          | { __typename?: 'EnterpriseUserAccount', login: string }
+          | { __typename?: 'Mannequin', login: string }
+          | { __typename?: 'Organization', login: string }
+          | { __typename?: 'User', login: string }
+         | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null }
+      | { __typename: 'Repository', id: string, url: any }
+      | { __typename: 'User', id: string, url: any }
+     | null> | null }, rateLimit?: { __typename?: 'RateLimit', cost: number, remaining: number, resetAt: any } | null };
 
 export type ListMinutesInYearQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type ListMinutesInYearQuery = { __typename?: 'Query', node?: { __typename: 'AddedToMergeQueueEvent' } | { __typename: 'AddedToProjectEvent' } | { __typename: 'App' } | { __typename: 'AssignedEvent' } | { __typename: 'AutoMergeDisabledEvent' } | { __typename: 'AutoMergeEnabledEvent' } | { __typename: 'AutoRebaseEnabledEvent' } | { __typename: 'AutoSquashEnabledEvent' } | { __typename: 'AutomaticBaseChangeFailedEvent' } | { __typename: 'AutomaticBaseChangeSucceededEvent' } | { __typename: 'BaseRefChangedEvent' } | { __typename: 'BaseRefDeletedEvent' } | { __typename: 'BaseRefForcePushedEvent' } | { __typename: 'Blob' } | { __typename: 'Bot' } | { __typename: 'BranchProtectionRule' } | { __typename: 'BypassForcePushAllowance' } | { __typename: 'BypassPullRequestAllowance' } | { __typename: 'CWE' } | { __typename: 'CheckRun' } | { __typename: 'CheckSuite' } | { __typename: 'ClosedEvent' } | { __typename: 'CodeOfConduct' } | { __typename: 'CommentDeletedEvent' } | { __typename: 'Commit' } | { __typename: 'CommitComment' } | { __typename: 'CommitCommentThread' } | { __typename: 'Comparison' } | { __typename: 'ConnectedEvent' } | { __typename: 'ConvertToDraftEvent' } | { __typename: 'ConvertedNoteToIssueEvent' } | { __typename: 'ConvertedToDiscussionEvent' } | { __typename: 'CrossReferencedEvent' } | { __typename: 'DemilestonedEvent' } | { __typename: 'DependencyGraphManifest' } | { __typename: 'DeployKey' } | { __typename: 'DeployedEvent' } | { __typename: 'Deployment' } | { __typename: 'DeploymentEnvironmentChangedEvent' } | { __typename: 'DeploymentReview' } | { __typename: 'DeploymentStatus' } | { __typename: 'DisconnectedEvent' } | { __typename: 'Discussion' } | { __typename: 'DiscussionCategory' } | { __typename: 'DiscussionComment' } | { __typename: 'DiscussionPoll' } | { __typename: 'DiscussionPollOption' } | { __typename: 'DraftIssue' } | { __typename: 'Enterprise' } | { __typename: 'EnterpriseAdministratorInvitation' } | { __typename: 'EnterpriseIdentityProvider' } | { __typename: 'EnterpriseMemberInvitation' } | { __typename: 'EnterpriseRepositoryInfo' } | { __typename: 'EnterpriseServerInstallation' } | { __typename: 'EnterpriseServerUserAccount' } | { __typename: 'EnterpriseServerUserAccountEmail' } | { __typename: 'EnterpriseServerUserAccountsUpload' } | { __typename: 'EnterpriseUserAccount' } | { __typename: 'Environment' } | { __typename: 'ExternalIdentity' } | { __typename: 'Gist' } | { __typename: 'GistComment' } | { __typename: 'HeadRefDeletedEvent' } | { __typename: 'HeadRefForcePushedEvent' } | { __typename: 'HeadRefRestoredEvent' } | { __typename: 'IpAllowListEntry' } | { __typename: 'Issue' } | { __typename: 'IssueComment' } | { __typename: 'Label' } | { __typename: 'LabeledEvent' } | { __typename: 'Language' } | { __typename: 'License' } | { __typename: 'LinkedBranch' } | { __typename: 'LockedEvent' } | { __typename: 'Mannequin' } | { __typename: 'MarkedAsDuplicateEvent' } | { __typename: 'MarketplaceCategory' } | { __typename: 'MarketplaceListing' } | { __typename: 'MemberFeatureRequestNotification' } | { __typename: 'MembersCanDeleteReposClearAuditEntry' } | { __typename: 'MembersCanDeleteReposDisableAuditEntry' } | { __typename: 'MembersCanDeleteReposEnableAuditEntry' } | { __typename: 'MentionedEvent' } | { __typename: 'MergeQueue' } | { __typename: 'MergeQueueEntry' } | { __typename: 'MergedEvent' } | { __typename: 'MigrationSource' } | { __typename: 'Milestone' } | { __typename: 'MilestonedEvent' } | { __typename: 'MovedColumnsInProjectEvent' } | { __typename: 'OIDCProvider' } | { __typename: 'OauthApplicationCreateAuditEntry' } | { __typename: 'OrgAddBillingManagerAuditEntry' } | { __typename: 'OrgAddMemberAuditEntry' } | { __typename: 'OrgBlockUserAuditEntry' } | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry' } | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry' } | { __typename: 'OrgCreateAuditEntry' } | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry' } | { __typename: 'OrgDisableSamlAuditEntry' } | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry' } | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry' } | { __typename: 'OrgEnableSamlAuditEntry' } | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry' } | { __typename: 'OrgInviteMemberAuditEntry' } | { __typename: 'OrgInviteToBusinessAuditEntry' } | { __typename: 'OrgOauthAppAccessApprovedAuditEntry' } | { __typename: 'OrgOauthAppAccessBlockedAuditEntry' } | { __typename: 'OrgOauthAppAccessDeniedAuditEntry' } | { __typename: 'OrgOauthAppAccessRequestedAuditEntry' } | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry' } | { __typename: 'OrgRemoveBillingManagerAuditEntry' } | { __typename: 'OrgRemoveMemberAuditEntry' } | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry' } | { __typename: 'OrgRestoreMemberAuditEntry' } | { __typename: 'OrgUnblockUserAuditEntry' } | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry' } | { __typename: 'OrgUpdateMemberAuditEntry' } | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry' } | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry' } | { __typename: 'Organization' } | { __typename: 'OrganizationIdentityProvider' } | { __typename: 'OrganizationInvitation' } | { __typename: 'OrganizationMigration' } | { __typename: 'Package' } | { __typename: 'PackageFile' } | { __typename: 'PackageTag' } | { __typename: 'PackageVersion' } | { __typename: 'ParentIssueAddedEvent' } | { __typename: 'ParentIssueRemovedEvent' } | { __typename: 'PinnedDiscussion' } | { __typename: 'PinnedEnvironment' } | { __typename: 'PinnedEvent' } | { __typename: 'PinnedIssue' } | { __typename: 'PrivateRepositoryForkingDisableAuditEntry' } | { __typename: 'PrivateRepositoryForkingEnableAuditEntry' } | { __typename: 'Project' } | { __typename: 'ProjectCard' } | { __typename: 'ProjectColumn' } | { __typename: 'ProjectV2' } | { __typename: 'ProjectV2Field' } | { __typename: 'ProjectV2Item' } | { __typename: 'ProjectV2ItemFieldDateValue' } | { __typename: 'ProjectV2ItemFieldIterationValue' } | { __typename: 'ProjectV2ItemFieldNumberValue' } | { __typename: 'ProjectV2ItemFieldSingleSelectValue' } | { __typename: 'ProjectV2ItemFieldTextValue' } | { __typename: 'ProjectV2IterationField' } | { __typename: 'ProjectV2SingleSelectField' } | { __typename: 'ProjectV2StatusUpdate' } | { __typename: 'ProjectV2View' } | { __typename: 'ProjectV2Workflow' } | { __typename: 'PublicKey' } | { __typename: 'PullRequest' } | { __typename: 'PullRequestCommit' } | { __typename: 'PullRequestCommitCommentThread' } | { __typename: 'PullRequestReview' } | { __typename: 'PullRequestReviewComment' } | { __typename: 'PullRequestReviewThread' } | { __typename: 'PullRequestThread' } | { __typename: 'Push' } | { __typename: 'PushAllowance' } | { __typename: 'Query' } | { __typename: 'Reaction' } | { __typename: 'ReadyForReviewEvent' } | { __typename: 'Ref' } | { __typename: 'ReferencedEvent' } | { __typename: 'Release' } | { __typename: 'ReleaseAsset' } | { __typename: 'RemovedFromMergeQueueEvent' } | { __typename: 'RemovedFromProjectEvent' } | { __typename: 'RenamedTitleEvent' } | { __typename: 'ReopenedEvent' } | { __typename: 'RepoAccessAuditEntry' } | { __typename: 'RepoAddMemberAuditEntry' } | { __typename: 'RepoAddTopicAuditEntry' } | { __typename: 'RepoArchivedAuditEntry' } | { __typename: 'RepoChangeMergeSettingAuditEntry' } | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry' } | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry' } | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry' } | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry' } | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry' } | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry' } | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry' } | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry' } | { __typename: 'RepoCreateAuditEntry' } | { __typename: 'RepoDestroyAuditEntry' } | { __typename: 'RepoRemoveMemberAuditEntry' } | { __typename: 'RepoRemoveTopicAuditEntry' } | { __typename: 'Repository' } | { __typename: 'RepositoryInvitation' } | { __typename: 'RepositoryMigration' } | { __typename: 'RepositoryRule' } | { __typename: 'RepositoryRuleset' } | { __typename: 'RepositoryRulesetBypassActor' } | { __typename: 'RepositoryTopic' } | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry' } | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry' } | { __typename: 'RepositoryVulnerabilityAlert' } | { __typename: 'ReviewDismissalAllowance' } | { __typename: 'ReviewDismissedEvent' } | { __typename: 'ReviewRequest' } | { __typename: 'ReviewRequestRemovedEvent' } | { __typename: 'ReviewRequestedEvent' } | { __typename: 'SavedReply' } | { __typename: 'SecurityAdvisory' } | { __typename: 'SponsorsActivity' } | { __typename: 'SponsorsListing' } | { __typename: 'SponsorsListingFeaturedItem' } | { __typename: 'SponsorsTier' } | { __typename: 'Sponsorship' } | { __typename: 'SponsorshipNewsletter' } | { __typename: 'Status' } | { __typename: 'StatusCheckRollup' } | { __typename: 'StatusContext' } | { __typename: 'SubIssueAddedEvent' } | { __typename: 'SubIssueRemovedEvent' } | { __typename: 'SubscribedEvent' } | { __typename: 'Tag' } | { __typename: 'Team' } | { __typename: 'TeamAddMemberAuditEntry' } | { __typename: 'TeamAddRepositoryAuditEntry' } | { __typename: 'TeamChangeParentTeamAuditEntry' } | { __typename: 'TeamDiscussion' } | { __typename: 'TeamDiscussionComment' } | { __typename: 'TeamRemoveMemberAuditEntry' } | { __typename: 'TeamRemoveRepositoryAuditEntry' } | { __typename: 'Topic' } | { __typename: 'TransferredEvent' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, path?: string | null, object?: { __typename: 'Blob', id: string } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree' } | null }> | null } | null }> | null } | { __typename: 'UnassignedEvent' } | { __typename: 'UnlabeledEvent' } | { __typename: 'UnlockedEvent' } | { __typename: 'UnmarkedAsDuplicateEvent' } | { __typename: 'UnpinnedEvent' } | { __typename: 'UnsubscribedEvent' } | { __typename: 'User' } | { __typename: 'UserBlockedEvent' } | { __typename: 'UserContentEdit' } | { __typename: 'UserList' } | { __typename: 'UserNamespaceRepository' } | { __typename: 'UserStatus' } | { __typename: 'VerifiableDomain' } | { __typename: 'Workflow' } | { __typename: 'WorkflowRun' } | { __typename: 'WorkflowRunFile' } | null };
+export type ListMinutesInYearQuery = { __typename?: 'Query', node?:
+    | { __typename: 'AddedToMergeQueueEvent' }
+    | { __typename: 'AddedToProjectEvent' }
+    | { __typename: 'App' }
+    | { __typename: 'AssignedEvent' }
+    | { __typename: 'AutoMergeDisabledEvent' }
+    | { __typename: 'AutoMergeEnabledEvent' }
+    | { __typename: 'AutoRebaseEnabledEvent' }
+    | { __typename: 'AutoSquashEnabledEvent' }
+    | { __typename: 'AutomaticBaseChangeFailedEvent' }
+    | { __typename: 'AutomaticBaseChangeSucceededEvent' }
+    | { __typename: 'BaseRefChangedEvent' }
+    | { __typename: 'BaseRefDeletedEvent' }
+    | { __typename: 'BaseRefForcePushedEvent' }
+    | { __typename: 'Blob' }
+    | { __typename: 'Bot' }
+    | { __typename: 'BranchProtectionRule' }
+    | { __typename: 'BypassForcePushAllowance' }
+    | { __typename: 'BypassPullRequestAllowance' }
+    | { __typename: 'CWE' }
+    | { __typename: 'CheckRun' }
+    | { __typename: 'CheckSuite' }
+    | { __typename: 'ClosedEvent' }
+    | { __typename: 'CodeOfConduct' }
+    | { __typename: 'CommentDeletedEvent' }
+    | { __typename: 'Commit' }
+    | { __typename: 'CommitComment' }
+    | { __typename: 'CommitCommentThread' }
+    | { __typename: 'Comparison' }
+    | { __typename: 'ConnectedEvent' }
+    | { __typename: 'ConvertToDraftEvent' }
+    | { __typename: 'ConvertedNoteToIssueEvent' }
+    | { __typename: 'ConvertedToDiscussionEvent' }
+    | { __typename: 'CrossReferencedEvent' }
+    | { __typename: 'DemilestonedEvent' }
+    | { __typename: 'DependencyGraphManifest' }
+    | { __typename: 'DeployKey' }
+    | { __typename: 'DeployedEvent' }
+    | { __typename: 'Deployment' }
+    | { __typename: 'DeploymentEnvironmentChangedEvent' }
+    | { __typename: 'DeploymentReview' }
+    | { __typename: 'DeploymentStatus' }
+    | { __typename: 'DisconnectedEvent' }
+    | { __typename: 'Discussion' }
+    | { __typename: 'DiscussionCategory' }
+    | { __typename: 'DiscussionComment' }
+    | { __typename: 'DiscussionPoll' }
+    | { __typename: 'DiscussionPollOption' }
+    | { __typename: 'DraftIssue' }
+    | { __typename: 'Enterprise' }
+    | { __typename: 'EnterpriseAdministratorInvitation' }
+    | { __typename: 'EnterpriseIdentityProvider' }
+    | { __typename: 'EnterpriseMemberInvitation' }
+    | { __typename: 'EnterpriseRepositoryInfo' }
+    | { __typename: 'EnterpriseServerInstallation' }
+    | { __typename: 'EnterpriseServerUserAccount' }
+    | { __typename: 'EnterpriseServerUserAccountEmail' }
+    | { __typename: 'EnterpriseServerUserAccountsUpload' }
+    | { __typename: 'EnterpriseUserAccount' }
+    | { __typename: 'Environment' }
+    | { __typename: 'ExternalIdentity' }
+    | { __typename: 'Gist' }
+    | { __typename: 'GistComment' }
+    | { __typename: 'HeadRefDeletedEvent' }
+    | { __typename: 'HeadRefForcePushedEvent' }
+    | { __typename: 'HeadRefRestoredEvent' }
+    | { __typename: 'IpAllowListEntry' }
+    | { __typename: 'Issue' }
+    | { __typename: 'IssueComment' }
+    | { __typename: 'Label' }
+    | { __typename: 'LabeledEvent' }
+    | { __typename: 'Language' }
+    | { __typename: 'License' }
+    | { __typename: 'LinkedBranch' }
+    | { __typename: 'LockedEvent' }
+    | { __typename: 'Mannequin' }
+    | { __typename: 'MarkedAsDuplicateEvent' }
+    | { __typename: 'MarketplaceCategory' }
+    | { __typename: 'MarketplaceListing' }
+    | { __typename: 'MemberFeatureRequestNotification' }
+    | { __typename: 'MembersCanDeleteReposClearAuditEntry' }
+    | { __typename: 'MembersCanDeleteReposDisableAuditEntry' }
+    | { __typename: 'MembersCanDeleteReposEnableAuditEntry' }
+    | { __typename: 'MentionedEvent' }
+    | { __typename: 'MergeQueue' }
+    | { __typename: 'MergeQueueEntry' }
+    | { __typename: 'MergedEvent' }
+    | { __typename: 'MigrationSource' }
+    | { __typename: 'Milestone' }
+    | { __typename: 'MilestonedEvent' }
+    | { __typename: 'MovedColumnsInProjectEvent' }
+    | { __typename: 'OIDCProvider' }
+    | { __typename: 'OauthApplicationCreateAuditEntry' }
+    | { __typename: 'OrgAddBillingManagerAuditEntry' }
+    | { __typename: 'OrgAddMemberAuditEntry' }
+    | { __typename: 'OrgBlockUserAuditEntry' }
+    | { __typename: 'OrgConfigDisableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'OrgConfigEnableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'OrgCreateAuditEntry' }
+    | { __typename: 'OrgDisableOauthAppRestrictionsAuditEntry' }
+    | { __typename: 'OrgDisableSamlAuditEntry' }
+    | { __typename: 'OrgDisableTwoFactorRequirementAuditEntry' }
+    | { __typename: 'OrgEnableOauthAppRestrictionsAuditEntry' }
+    | { __typename: 'OrgEnableSamlAuditEntry' }
+    | { __typename: 'OrgEnableTwoFactorRequirementAuditEntry' }
+    | { __typename: 'OrgInviteMemberAuditEntry' }
+    | { __typename: 'OrgInviteToBusinessAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessApprovedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessBlockedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessDeniedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessRequestedAuditEntry' }
+    | { __typename: 'OrgOauthAppAccessUnblockedAuditEntry' }
+    | { __typename: 'OrgRemoveBillingManagerAuditEntry' }
+    | { __typename: 'OrgRemoveMemberAuditEntry' }
+    | { __typename: 'OrgRemoveOutsideCollaboratorAuditEntry' }
+    | { __typename: 'OrgRestoreMemberAuditEntry' }
+    | { __typename: 'OrgUnblockUserAuditEntry' }
+    | { __typename: 'OrgUpdateDefaultRepositoryPermissionAuditEntry' }
+    | { __typename: 'OrgUpdateMemberAuditEntry' }
+    | { __typename: 'OrgUpdateMemberRepositoryCreationPermissionAuditEntry' }
+    | { __typename: 'OrgUpdateMemberRepositoryInvitationPermissionAuditEntry' }
+    | { __typename: 'Organization' }
+    | { __typename: 'OrganizationIdentityProvider' }
+    | { __typename: 'OrganizationInvitation' }
+    | { __typename: 'OrganizationMigration' }
+    | { __typename: 'Package' }
+    | { __typename: 'PackageFile' }
+    | { __typename: 'PackageTag' }
+    | { __typename: 'PackageVersion' }
+    | { __typename: 'ParentIssueAddedEvent' }
+    | { __typename: 'ParentIssueRemovedEvent' }
+    | { __typename: 'PinnedDiscussion' }
+    | { __typename: 'PinnedEnvironment' }
+    | { __typename: 'PinnedEvent' }
+    | { __typename: 'PinnedIssue' }
+    | { __typename: 'PrivateRepositoryForkingDisableAuditEntry' }
+    | { __typename: 'PrivateRepositoryForkingEnableAuditEntry' }
+    | { __typename: 'Project' }
+    | { __typename: 'ProjectCard' }
+    | { __typename: 'ProjectColumn' }
+    | { __typename: 'ProjectV2' }
+    | { __typename: 'ProjectV2Field' }
+    | { __typename: 'ProjectV2Item' }
+    | { __typename: 'ProjectV2ItemFieldDateValue' }
+    | { __typename: 'ProjectV2ItemFieldIterationValue' }
+    | { __typename: 'ProjectV2ItemFieldNumberValue' }
+    | { __typename: 'ProjectV2ItemFieldSingleSelectValue' }
+    | { __typename: 'ProjectV2ItemFieldTextValue' }
+    | { __typename: 'ProjectV2IterationField' }
+    | { __typename: 'ProjectV2SingleSelectField' }
+    | { __typename: 'ProjectV2StatusUpdate' }
+    | { __typename: 'ProjectV2View' }
+    | { __typename: 'ProjectV2Workflow' }
+    | { __typename: 'PublicKey' }
+    | { __typename: 'PullRequest' }
+    | { __typename: 'PullRequestCommit' }
+    | { __typename: 'PullRequestCommitCommentThread' }
+    | { __typename: 'PullRequestReview' }
+    | { __typename: 'PullRequestReviewComment' }
+    | { __typename: 'PullRequestReviewThread' }
+    | { __typename: 'PullRequestThread' }
+    | { __typename: 'Push' }
+    | { __typename: 'PushAllowance' }
+    | { __typename: 'Query' }
+    | { __typename: 'Reaction' }
+    | { __typename: 'ReadyForReviewEvent' }
+    | { __typename: 'Ref' }
+    | { __typename: 'ReferencedEvent' }
+    | { __typename: 'Release' }
+    | { __typename: 'ReleaseAsset' }
+    | { __typename: 'RemovedFromMergeQueueEvent' }
+    | { __typename: 'RemovedFromProjectEvent' }
+    | { __typename: 'RenamedTitleEvent' }
+    | { __typename: 'ReopenedEvent' }
+    | { __typename: 'RepoAccessAuditEntry' }
+    | { __typename: 'RepoAddMemberAuditEntry' }
+    | { __typename: 'RepoAddTopicAuditEntry' }
+    | { __typename: 'RepoArchivedAuditEntry' }
+    | { __typename: 'RepoChangeMergeSettingAuditEntry' }
+    | { __typename: 'RepoConfigDisableAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoConfigDisableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigDisableContributorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigDisableSockpuppetDisallowedAuditEntry' }
+    | { __typename: 'RepoConfigEnableAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoConfigEnableCollaboratorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigEnableContributorsOnlyAuditEntry' }
+    | { __typename: 'RepoConfigEnableSockpuppetDisallowedAuditEntry' }
+    | { __typename: 'RepoConfigLockAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoConfigUnlockAnonymousGitAccessAuditEntry' }
+    | { __typename: 'RepoCreateAuditEntry' }
+    | { __typename: 'RepoDestroyAuditEntry' }
+    | { __typename: 'RepoRemoveMemberAuditEntry' }
+    | { __typename: 'RepoRemoveTopicAuditEntry' }
+    | { __typename: 'Repository' }
+    | { __typename: 'RepositoryInvitation' }
+    | { __typename: 'RepositoryMigration' }
+    | { __typename: 'RepositoryRule' }
+    | { __typename: 'RepositoryRuleset' }
+    | { __typename: 'RepositoryRulesetBypassActor' }
+    | { __typename: 'RepositoryTopic' }
+    | { __typename: 'RepositoryVisibilityChangeDisableAuditEntry' }
+    | { __typename: 'RepositoryVisibilityChangeEnableAuditEntry' }
+    | { __typename: 'RepositoryVulnerabilityAlert' }
+    | { __typename: 'ReviewDismissalAllowance' }
+    | { __typename: 'ReviewDismissedEvent' }
+    | { __typename: 'ReviewRequest' }
+    | { __typename: 'ReviewRequestRemovedEvent' }
+    | { __typename: 'ReviewRequestedEvent' }
+    | { __typename: 'SavedReply' }
+    | { __typename: 'SecurityAdvisory' }
+    | { __typename: 'SponsorsActivity' }
+    | { __typename: 'SponsorsListing' }
+    | { __typename: 'SponsorsListingFeaturedItem' }
+    | { __typename: 'SponsorsTier' }
+    | { __typename: 'Sponsorship' }
+    | { __typename: 'SponsorshipNewsletter' }
+    | { __typename: 'Status' }
+    | { __typename: 'StatusCheckRollup' }
+    | { __typename: 'StatusContext' }
+    | { __typename: 'SubIssueAddedEvent' }
+    | { __typename: 'SubIssueRemovedEvent' }
+    | { __typename: 'SubscribedEvent' }
+    | { __typename: 'Tag' }
+    | { __typename: 'Team' }
+    | { __typename: 'TeamAddMemberAuditEntry' }
+    | { __typename: 'TeamAddRepositoryAuditEntry' }
+    | { __typename: 'TeamChangeParentTeamAuditEntry' }
+    | { __typename: 'TeamDiscussion' }
+    | { __typename: 'TeamDiscussionComment' }
+    | { __typename: 'TeamRemoveMemberAuditEntry' }
+    | { __typename: 'TeamRemoveRepositoryAuditEntry' }
+    | { __typename: 'Topic' }
+    | { __typename: 'TransferredEvent' }
+    | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?:
+          | { __typename: 'Blob' }
+          | { __typename: 'Commit' }
+          | { __typename: 'Tag' }
+          | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, path?: string | null, object?:
+                | { __typename: 'Blob', id: string }
+                | { __typename: 'Commit' }
+                | { __typename: 'Tag' }
+                | { __typename: 'Tree' }
+               | null }> | null }
+         | null }> | null }
+    | { __typename: 'UnassignedEvent' }
+    | { __typename: 'UnlabeledEvent' }
+    | { __typename: 'UnlockedEvent' }
+    | { __typename: 'UnmarkedAsDuplicateEvent' }
+    | { __typename: 'UnpinnedEvent' }
+    | { __typename: 'UnsubscribedEvent' }
+    | { __typename: 'User' }
+    | { __typename: 'UserBlockedEvent' }
+    | { __typename: 'UserContentEdit' }
+    | { __typename: 'UserList' }
+    | { __typename: 'UserNamespaceRepository' }
+    | { __typename: 'UserStatus' }
+    | { __typename: 'VerifiableDomain' }
+    | { __typename: 'Workflow' }
+    | { __typename: 'WorkflowRun' }
+    | { __typename: 'WorkflowRunFile' }
+   | null };
 
 export type ListMinutesYearsQueryVariables = Exact<{
   owner: Scalars['String']['input'];
@@ -32473,7 +33572,17 @@ export type ListMinutesYearsQueryVariables = Exact<{
 }>;
 
 
-export type ListMinutesYearsQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', defaultBranchRef?: { __typename?: 'Ref', name: string } | null, object?: { __typename: 'Blob' } | { __typename: 'Commit' } | { __typename: 'Tag' } | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?: { __typename: 'Blob', id: string } | { __typename: 'Commit', id: string } | { __typename: 'Tag', id: string } | { __typename: 'Tree', id: string } | null }> | null } | null } | null };
+export type ListMinutesYearsQuery = { __typename?: 'Query', repository?: { __typename?: 'Repository', defaultBranchRef?: { __typename?: 'Ref', name: string } | null, object?:
+      | { __typename: 'Blob' }
+      | { __typename: 'Commit' }
+      | { __typename: 'Tag' }
+      | { __typename: 'Tree', entries?: Array<{ __typename?: 'TreeEntry', name: string, object?:
+            | { __typename: 'Blob', id: string }
+            | { __typename: 'Commit', id: string }
+            | { __typename: 'Tag', id: string }
+            | { __typename: 'Tree', id: string }
+           | null }> | null }
+     | null } | null };
 
 export type RemoveLabelsMutationVariables = Exact<{
   labelableId: Scalars['ID']['input'];
@@ -32481,7 +33590,11 @@ export type RemoveLabelsMutationVariables = Exact<{
 }>;
 
 
-export type RemoveLabelsMutation = { __typename?: 'Mutation', removeLabelsFromLabelable?: { __typename?: 'RemoveLabelsFromLabelablePayload', labelable?: { __typename: 'Discussion', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'Issue', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | { __typename: 'PullRequest', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null } | null } | null };
+export type RemoveLabelsMutation = { __typename?: 'Mutation', removeLabelsFromLabelable?: { __typename?: 'RemoveLabelsFromLabelablePayload', labelable?:
+      | { __typename: 'Discussion', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null }
+      | { __typename: 'Issue', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null }
+      | { __typename: 'PullRequest', labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', id: string, name: string } | null> | null } | null }
+     | null } | null };
 
 export type UpdateIssueBodyMutationVariables = Exact<{
   id: Scalars['ID']['input'];
