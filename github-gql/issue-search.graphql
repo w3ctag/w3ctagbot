@@ -14,9 +14,7 @@ query IssueSearch($query_: String!, $cursor: String) {
       }
       ... on RepositoryNode {
         repository {
-            owner {
-                login
-            }
+            nameWithOwner
             name
         }
       }

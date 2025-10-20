@@ -33275,20 +33275,11 @@ export type IssueSearchQueryVariables = Exact<{
 
 export type IssueSearchQuery = { __typename?: 'Query', search: { __typename?: 'SearchResultItemConnection', pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor?: string | null }, nodes?: Array<
       | { __typename: 'App', id: string }
-      | { __typename: 'Discussion', id: string, repository: { __typename?: 'Repository', name: string, owner:
-            | { __typename?: 'Organization', login: string }
-            | { __typename?: 'User', login: string }
-           }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null }
-      | { __typename: 'Issue', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner:
-            | { __typename?: 'Organization', login: string }
-            | { __typename?: 'User', login: string }
-           }, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null }
+      | { __typename: 'Discussion', id: string, repository: { __typename?: 'Repository', nameWithOwner: string, name: string }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null }
+      | { __typename: 'Issue', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', nameWithOwner: string, name: string }, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null }
       | { __typename: 'MarketplaceListing', id: string }
       | { __typename: 'Organization', id: string, url: any }
-      | { __typename: 'PullRequest', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', name: string, owner:
-            | { __typename?: 'Organization', login: string }
-            | { __typename?: 'User', login: string }
-           }, author?:
+      | { __typename: 'PullRequest', id: string, url: any, title: string, number: number, repository: { __typename?: 'Repository', nameWithOwner: string, name: string }, author?:
           | { __typename?: 'Bot', login: string }
           | { __typename?: 'EnterpriseUserAccount', login: string }
           | { __typename?: 'Mannequin', login: string }
@@ -33873,9 +33864,7 @@ export const IssueSearchDocument = new TypedDocumentString(`
       }
       ... on RepositoryNode {
         repository {
-          owner {
-            login
-          }
+          nameWithOwner
           name
         }
       }

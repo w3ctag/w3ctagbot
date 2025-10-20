@@ -158,7 +158,13 @@ export class TagAgenda extends LitElement {
     function renderIssue(
       issue: SearchResult & { __typename: "Issue" | "PullRequest" },
     ) {
-      let result = `* [${issue.repository.name}#${issue.number}: ${issue.title}](${issue.url})`;
+      let result: string;
+      if (issue.repository.name === "design-reviews") {
+        const botUrl = `${import.meta.env.SITE}${import.meta.env.BASE_URL}gh/${issue.repository.nameWithOwner}/${issue.number}`;
+        result = `* [${issue.repository.name}#${issue.number}: ${issue.title}](${botUrl}) ([Github](${issue.url}))`;
+      } else {
+        result = `* [${issue.repository.name}#${issue.number}: ${issue.title}](${issue.url})`;
+      }
       const associated = [];
       if (issue.__typename === "PullRequest" && issue.author) {
         associated.push(issue.author.login);
