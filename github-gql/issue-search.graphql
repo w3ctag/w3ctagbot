@@ -14,8 +14,8 @@ query IssueSearch($query_: String!, $cursor: String) {
       }
       ... on RepositoryNode {
         repository {
-            nameWithOwner
-            name
+          nameWithOwner
+          name
         }
       }
       ... on Issue {
@@ -26,7 +26,17 @@ query IssueSearch($query_: String!, $cursor: String) {
         title
         number
         author {
-            login
+          login
+        }
+        reviewRequests(first: 50) {
+          nodes {
+            requestedReviewer {
+              __typename
+              ... on User {
+                login
+              }
+            }
+          }
         }
       }
       ... on Assignable {

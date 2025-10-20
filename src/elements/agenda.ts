@@ -165,17 +165,22 @@ export class TagAgenda extends LitElement {
       } else {
         result = `* [${issue.repository.name}#${issue.number}: ${issue.title}](${issue.url})`;
       }
-      const associated = [];
+      const associated = new Set<string>();
       if (issue.__typename === "PullRequest" && issue.author) {
-        associated.push(issue.author.login);
+        associated.add(issue.author.login);
+        for (const reviewer of issue.reviewRequests?.nodes ?? []) {
+          if (reviewer?.requestedReviewer?.__typename === "User") {
+            associated.add(reviewer.requestedReviewer.login);
+          }
+        }
       }
       for (const assignee of issue.assignees.nodes ?? []) {
         if (assignee) {
-          associated.push(assignee.login);
+          associated.add(assignee.login);
         }
       }
-      if (associated.length > 0) {
-        result += ` - ${associated.map((a) => `@${a}`).join(", ")}`;
+      if (associated.size > 0) {
+        result += ` - ${[...associated].map((a) => `@${a}`).join(", ")}`;
       }
       return result;
     }

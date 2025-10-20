@@ -33285,7 +33285,12 @@ export type IssueSearchQuery = { __typename?: 'Query', search: { __typename?: 'S
           | { __typename?: 'Mannequin', login: string }
           | { __typename?: 'Organization', login: string }
           | { __typename?: 'User', login: string }
-         | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null }
+         | null, reviewRequests?: { __typename?: 'ReviewRequestConnection', nodes?: Array<{ __typename?: 'ReviewRequest', requestedReviewer?:
+              | { __typename: 'Bot' }
+              | { __typename: 'Mannequin' }
+              | { __typename: 'Team' }
+              | { __typename: 'User', login: string }
+             | null } | null> | null } | null, assignees: { __typename?: 'UserConnection', nodes?: Array<{ __typename?: 'User', login: string } | null> | null }, labels?: { __typename?: 'LabelConnection', nodes?: Array<{ __typename?: 'Label', name: string } | null> | null } | null }
       | { __typename: 'Repository', id: string, url: any }
       | { __typename: 'User', id: string, url: any }
      | null> | null }, rateLimit?: { __typename?: 'RateLimit', cost: number, remaining: number, resetAt: any } | null };
@@ -33877,6 +33882,16 @@ export const IssueSearchDocument = new TypedDocumentString(`
         number
         author {
           login
+        }
+        reviewRequests(first: 50) {
+          nodes {
+            requestedReviewer {
+              __typename
+              ... on User {
+                login
+              }
+            }
+          }
         }
       }
       ... on Assignable {
