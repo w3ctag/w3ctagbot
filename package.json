@@ -13,15 +13,15 @@
   },
   "dependencies": {
     "@astrojs/node": "^9.5.0",
-    "@github/relative-time-element": "^4.4.5",
+    "@github/relative-time-element": "^4.5.0",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@js-temporal/polyfill": "^0.5.1",
     "@observablehq/plot": "^0.6.17",
     "@octokit/auth-oauth-app": "^9.0.2",
     "@octokit/graphql": "^9.0.1",
     "@octokit/webhooks": "^14.1.0",
-    "@prisma/client": "^6.15.0",
-    "astro": "^5.14.4",
+    "@prisma/client": "^6.18.0",
+    "astro": "^5.15.1",
     "lit": "^3.3.0",
     "mdast-util-from-markdown": "^2.0.2",
     "mdast-util-gfm": "^3.1.0",
@@ -29,13 +29,13 @@
     "micromark": "^4.0.2",
     "micromark-extension-gfm": "^3.0.0",
     "octokit": "^5.0.3",
-    "prisma": "^6.6.0",
+    "prisma": "^6.18.0",
     "unist-util-visit": "^5.0.0",
     "vite": "^6.4.1",
     "zod": "^4.0.5"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.4",
+    "@astrojs/check": "^0.9.5",
     "@eslint/js": "^9.24.0",
     "@graphql-codegen/cli": "^6.0.0",
     "@graphql-codegen/client-preset": "^5.0.1",
@@ -51,7 +51,7 @@
     "prettier": "^3.5.3",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.29.1",
+    "typescript-eslint": "^8.46.2",
     "vitest": "^3.1.1"
   },
   "engines": {
