@@ -167,6 +167,13 @@ export const tagMembers = {
     terms: [term("2024-02-01", "2026-02-01")],
     attendanceAliases: ["martin", "martin thompson"],
   },
+  "MDQ6VXNlcjI2NjMwNTg=": {
+    name: "Ehsan Toreini",
+    ghLogin: "toreini",
+    terms: [term("2025-06-25", "2026-02-01")],
+    attendanceAliases: ["ehsan"],
+    associate: true,
+  },
   "MDQ6VXNlcjE3NTgzNg==": {
     name: "Lea Verou",
     ghLogin: "LeaVerou",
