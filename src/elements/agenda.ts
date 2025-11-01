@@ -32,8 +32,8 @@ type SearchResult = NonNullable<
   NonNullable<IssueSearchQuery["search"]["nodes"]>[0]
 >;
 
-const wedMornPlenaryHours = 2 * 24 + 6;
-const thurAftPlenaryHours = 3 * 24 + 13;
+const wedMornPlenaryHours = 2 * 24 + 6; // Wednesday @ 06:00 UTC
+const wedNightPlenaryHours = 2 * 24 + 22; // Wednesday @ 22:00 UTC
 
 @customElement("tag-agenda")
 export class TagAgenda extends LitElement {
@@ -121,9 +121,9 @@ export class TagAgenda extends LitElement {
   private _callTimes() {
     const monday = this._weekOf;
     const breakoutA = new Date(monday);
-    breakoutA.setUTCHours(24 + 3); // 03:00 Tue GMT
+    breakoutA.setUTCHours(24 + 4); // 04:00 Tue GMT
     const breakoutB = new Date(monday);
-    breakoutB.setUTCHours(24 * 2 + 17); // 17:00 Wed GMT
+    breakoutB.setUTCHours(14); // 14:00 Mon GMT
     const breakoutC = new Date(monday);
     breakoutC.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
     const plenary = this._computePlenary(monday);
@@ -136,7 +136,14 @@ export class TagAgenda extends LitElement {
       { time: breakoutB, label: "Breakout B (America / Europe)" },
       { time: breakoutC, label: "Breakout C (Europe / Asia / Australia)" },
       { time: plenary, label: "Plenary Session" },
-    ];
+    ].sort((a, b) => {
+      const aTime = a.time?.getTime(),
+        bTime = b.time?.getTime();
+      if (aTime === bTime) return 0;
+      if (aTime === undefined) return 1;
+      if (bTime === undefined) return -1;
+      return aTime - bTime;
+    });
   }
 
   protected willUpdate(): void {
@@ -298,7 +305,7 @@ ${
       <label for="plenary">Plenary</label>
       <select id="plenary" @change=${this._plenaryChange}>
         <option value=${wedMornPlenaryHours}>Wednesday Morning UTC</option>
-        <option value=${thurAftPlenaryHours}>Thursday Afternoon UTC</option>
+        <option value=${wedNightPlenaryHours}>Wednesday Night UTC</option>
         <option value="">No Plenary</option>
       </select>
 
