@@ -20,7 +20,7 @@
     "@octokit/auth-oauth-app": "^9.0.3",
     "@octokit/graphql": "^9.0.3",
     "@octokit/webhooks": "^14.2.0",
-    "@prisma/client": "^6.19.0",
+    "@prisma/client": "^7.1.0",
     "astro": "^5.16.4",
     "lit": "^3.3.0",
     "mdast-util-from-markdown": "^2.0.2",
@@ -29,7 +29,7 @@
     "micromark": "^4.0.2",
     "micromark-extension-gfm": "^3.0.0",
     "octokit": "^5.0.5",
-    "prisma": "^6.19.0",
+    "prisma": "^7.1.0",
     "unist-util-visit": "^5.0.0",
     "vite": "^6.4.1",
     "zod": "^4.1.13"
