@@ -19,6 +19,8 @@ updates:
         patterns: ["@octokit/*"]
       graphql-codegen:
         patterns: ["@graphql-codegen/*"]
+      prisma:
+        patterns: ["prisma", "@prisma/*"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
