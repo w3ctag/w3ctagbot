@@ -8,6 +8,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    cooldown:
+      default-days: 2
     versioning-strategy: increase
     assignees:
       - "jyasskin"
@@ -26,6 +28,8 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
+    cooldown:
+      default-days: 2
     assignees:
       - "jyasskin"
     groups:
