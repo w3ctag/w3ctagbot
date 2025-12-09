@@ -1,3 +1,8 @@
+import type {
+  DesignReviewCreateNestedOneWithoutIssueInput,
+  DesignReviewCreateWithoutIssueInput,
+  LabelCreateManyInput,
+} from "@generated/prisma/models";
 import { getMirrorSource } from "@lib/design-reviews";
 import { query } from "@lib/github";
 import { addLinkToThisServerToIssue } from "@lib/github/edits";
@@ -5,7 +10,6 @@ import { parseNewMinutes } from "@lib/github/update";
 import { githubIdIsTagMemberOnDate } from "@lib/tag-members";
 import { notNull } from "@lib/util";
 import type { WebhookEventDefinition } from "@octokit/webhooks/types";
-import type { Prisma } from "@prisma/client";
 import type { APIRoute } from "astro";
 import {
   MEETINGS_REPO,
@@ -27,7 +31,7 @@ async function recordBrainstormingIssue(
   // Find the issue this was mirrored from.
   const mirrorSource = getMirrorSource(payload.issue.body ?? "");
   if (!mirrorSource) return;
-  const designReviewUpdate: Prisma.DesignReviewCreateWithoutIssueInput = {
+  const designReviewUpdate: DesignReviewCreateWithoutIssueInput = {
     privateBrainstormingIssueId: payload.issue.node_id,
     privateBrainstormingIssueNumber: payload.issue.number,
   };
@@ -56,9 +60,8 @@ webhooks.on("issues.opened", async ({ payload }) => {
     await recordBrainstormingIssue(payload);
     return;
   }
-  let designReview:
-    | Prisma.DesignReviewCreateNestedOneWithoutIssueInput
-    | undefined = undefined;
+  let designReview: DesignReviewCreateNestedOneWithoutIssueInput | undefined =
+    undefined;
   if (repository.owner.login === TAG_ORG && repository.name === REVIEWS_REPO) {
     designReview = { create: {} };
   }
@@ -256,7 +259,7 @@ async function removePendingReplyLabels(
                 issueId,
                 labelId: label.id,
                 label: label.name,
-              }) satisfies Prisma.LabelCreateManyInput,
+              }) satisfies LabelCreateManyInput,
           ),
         }),
       ]);

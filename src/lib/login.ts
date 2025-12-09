@@ -1,8 +1,8 @@
+import type { GithubUserCreateInput } from "@generated/prisma/models";
 import type {
   GitHubAppUserAuthentication,
   GitHubAppUserAuthenticationWithExpiration,
 } from "@octokit/auth-oauth-app";
-import type { Prisma } from "@prisma/client";
 import type { AstroCookies, AstroGlobal } from "astro";
 import crypto from "node:crypto";
 import util from "node:util";
@@ -41,7 +41,7 @@ export async function finishLogin(
   const sessionId = (await randomBytes(128 / 8)).toString("base64url");
   const sessionExpires = new Date();
   sessionExpires.setDate(sessionExpires.getDate() + 31);
-  const update: Omit<Prisma.GithubUserCreateInput, "id"> = {
+  const update: Omit<GithubUserCreateInput, "id"> = {
     username: login,
     accessToken: token,
     accessTokenExpires: expiresAt,

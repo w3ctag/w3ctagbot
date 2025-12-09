@@ -1,4 +1,5 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@generated/prisma/client";
+import { type DesignReviewCreateWithoutIssueInput } from "@generated/prisma/models";
 import {
   PRIVATE_BRAINSTORMING_REPO,
   REVIEWS_REPO,
@@ -50,7 +51,7 @@ export async function findMainIssueNumberFromMirrorNumber(
   const mirrorSource = getMirrorSource(mirrorIssue.body);
   if (mirrorSource === undefined) return undefined;
   // Optimistically try to cache the mirror issue details into the main issue.
-  const designReview: Prisma.DesignReviewCreateWithoutIssueInput = {
+  const designReview: DesignReviewCreateWithoutIssueInput = {
     privateBrainstormingIssueId: mirrorIssue.id,
     privateBrainstormingIssueNumber: number,
   };
