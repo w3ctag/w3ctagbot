@@ -20,7 +20,7 @@
     "@octokit/auth-oauth-app": "^9.0.3",
     "@octokit/graphql": "^9.0.3",
     "@octokit/webhooks": "^14.2.0",
-    "@prisma/client": "^6.19.0",
+    "@prisma/client": "^7.1.0",
     "astro": "^5.16.0",
     "lit": "^3.3.0",
     "mdast-util-from-markdown": "^2.0.2",
