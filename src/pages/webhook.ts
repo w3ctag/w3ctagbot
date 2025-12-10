@@ -1,3 +1,4 @@
+import { Prisma } from "@generated/prisma/client";
 import type {
   DesignReviewCreateNestedOneWithoutIssueInput,
   DesignReviewCreateWithoutIssueInput,
@@ -286,30 +287,43 @@ async function addIssueComment(
     }
     issueId = mainIssue.issue.id;
   }
-  await prisma.issueComment.create({
-    data: {
-      id: payload.comment.node_id,
-      issue: { connect: { id: issueId } },
-      author: payload.comment.user?.node_id
-        ? {
-            connectOrCreate: {
-              where: { id: payload.comment.user.node_id },
-              create: {
-                id: payload.comment.user.node_id,
-                username: payload.comment.user.login,
+  try {
+    await prisma.issueComment.create({
+      data: {
+        id: payload.comment.node_id,
+        issue: { connect: { id: issueId } },
+        author: payload.comment.user?.node_id
+          ? {
+              connectOrCreate: {
+                where: { id: payload.comment.user.node_id },
+                create: {
+                  id: payload.comment.user.node_id,
+                  username: payload.comment.user.login,
+                },
               },
-            },
-          }
-        : undefined,
-      body: payload.comment.body,
-      publishedAt: payload.comment.created_at,
-      updatedAt: payload.comment.updated_at,
-      url: payload.comment.html_url,
-      isMinimized: false,
-      isPrivateBrainstorming:
-        payload.repository.name === PRIVATE_BRAINSTORMING_REPO,
-    },
-  });
+            }
+          : undefined,
+        body: payload.comment.body,
+        publishedAt: payload.comment.created_at,
+        updatedAt: payload.comment.updated_at,
+        url: payload.comment.html_url,
+        isMinimized: false,
+        isPrivateBrainstorming:
+          payload.repository.name === PRIVATE_BRAINSTORMING_REPO,
+      },
+    });
+  } catch (e) {
+    if (
+      e instanceof Prisma.PrismaClientKnownRequestError &&
+      e.code === "P2002"
+    ) {
+      console.warn(
+        `Duplicate webhook received creating comment ${payload.comment.node_id}.`,
+      );
+    } else {
+      throw e;
+    }
+  }
 }
 
 webhooks.on("issue_comment.created", async ({ payload }) => {
