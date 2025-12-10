@@ -13,7 +13,7 @@ env:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     env:
       DATABASE_URL: file:./test.db
     steps:
@@ -38,7 +38,7 @@ jobs:
           WEBHOOK_SECRET: 37651a9cf25c2d370308aee98ce0b7c9a6bfc30c
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v6
       - name: Setup pnpm
@@ -70,7 +70,7 @@ jobs:
       url: "https://tag-github-bot.w3.org/"
     concurrency:
       group: production
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     env:
       SSH_USER: ${{ vars.SSH_USER }}
       SSH_HOST: ${{ secrets.SSH_HOST }}
@@ -97,6 +97,6 @@ jobs:
         env:
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
       - name: Update and Restart
-        run: 'ssh -o ProxyJump=$SSH_USER@$SSH_PROXY "$SSH_USER@$SSH_HOST" "cd $DEPLOY_PATH && DATABASE_URL=unused node_modules/.bin/prisma generate && sudo /usr/bin/systemctl restart w3ctagbot"'
+        run: 'ssh -o ProxyJump=$SSH_USER@$SSH_PROXY "$SSH_USER@$SSH_HOST" "sudo /usr/bin/systemctl restart w3ctagbot"'
         env:
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
