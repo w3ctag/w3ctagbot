@@ -2,7 +2,7 @@
 
 generator client {
   provider = "prisma-client"
-  output = "../src/generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -29,7 +29,7 @@ model Issue {
   /// When the Github issue was last updated.
   updated      DateTime
   /// When the local cache of this issue was last updated.
-  cacheUpdated DateTime     @updatedAt @default("0000-01-01T00:00:00Z")
+  cacheUpdated DateTime     @default("0000-01-01T00:00:00Z") @updatedAt
   closed       DateTime?
 
   /// We get an initial set of timeline items when querying the issue, but there may be more pages
@@ -208,4 +208,17 @@ model Session {
   user   GithubUser @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   expires DateTime
+}
+
+enum GlobalVariableName {
+  /// An ISO datetime string of the last time this server scanned the Github
+  /// webhook deliveries and asked it to retry failed ones.
+  LatestWebHookDeliveryCheck
+}
+
+/// Miscellaneous persistent data.
+/// Values get parsed with Zod and treated as absent if they don't match the expected datatype.
+model GlobalVariable {
+  name  GlobalVariableName @id
+  value Json
 }
