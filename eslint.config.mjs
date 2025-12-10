@@ -13,6 +13,7 @@ export default defineConfig(
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/restrict-template-expressions": ["error", {}],
       "@typescript-eslint/unbound-method": "off", // Conflicts with Lit event handlers.
+      "@typescript-eslint/no-unused-vars": "off", // Typescript covers this with better defaults.
     },
   },
   {
