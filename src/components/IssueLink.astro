@@ -1,7 +1,7 @@
 ---
-import type { Issue } from "@prisma/client";
+import type { IssueModel } from "@generated/prisma/models";
 
-export type IssueLinkFields = Pick<Issue, "org" | "repo" | "number" | "title">;
+export type IssueLinkFields = Pick<IssueModel, "org" | "repo" | "number" | "title">;
 
 interface Props {
   issue: IssueLinkFields;

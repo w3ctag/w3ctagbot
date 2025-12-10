@@ -1,6 +1,6 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
+  "include": [".astro/types.d.ts", "**/*", ".config/*"],
   "exclude": ["dist"],
   "compilerOptions": {
     "experimentalDecorators": true,
@@ -9,6 +9,7 @@
     "paths": {
       "@components/*": ["src/components/*"],
       "@elements/*": ["src/elements/*"],
+      "@generated/*": ["src/generated/*"],
       "@layouts/*": ["src/layouts/*"],
       "@lib/*": ["src/lib/*"]
     }

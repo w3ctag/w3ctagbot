@@ -2,7 +2,7 @@
 import IssueList from "@components/IssueList.astro";
 import ReviewLoad from "@components/ReviewLoad.astro";
 import { Temporal } from "@js-temporal/polyfill";
-import type { Issue } from "@prisma/client";
+import type { IssueModel } from "@generated/prisma/models";
 import Layout from "../layouts/Layout.astro";
 import { closestMonday, toPlainDateUTC } from "../lib/date";
 import { getLogin } from "../lib/login";
@@ -23,8 +23,8 @@ if (openReviews.length === 0) {
 }
 
 const thisMonday = closestMonday(Temporal.Now.plainDateISO("UTC"));
-const withMilestone = new Map<string, Issue[]>();
-const withoutMilestone: Issue[] = [];
+const withMilestone = new Map<string, IssueModel[]>();
+const withoutMilestone: IssueModel[] = [];
 for (const review of openReviews) {
   if (review.milestone?.dueOn) {
     const due = toPlainDateUTC(review.milestone.dueOn);

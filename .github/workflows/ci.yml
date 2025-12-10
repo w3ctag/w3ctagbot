@@ -26,6 +26,7 @@ jobs:
           node-version-file: "package.json"
           cache: pnpm
       - run: pnpm install
+      - run: pnpm prisma generate
       - run: pnpm prisma db push
       - name: Make a private key for testing.
         run: openssl genrsa -traditional -out testkey.pem
@@ -48,10 +49,12 @@ jobs:
           node-version-file: "package.json"
           cache: pnpm
       - run: pnpm install
+      - run: pnpm prisma generate
+        env:
+          DATABASE_URL: file:./unused.db
       - run: pnpm build --site "https://tag-github-bot.w3.org"
       - run: rm -rf node_modules
       - run: pnpm install --prod
-      - run: pnpm prisma generate
       - run: tar -cf built-server.tar package.json dist node_modules prisma
       - uses: actions/upload-artifact@v5
         with:

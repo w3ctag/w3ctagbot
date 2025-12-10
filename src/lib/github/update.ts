@@ -1,5 +1,16 @@
+import type {
+  DesignReviewCreateWithoutIssueInput,
+  DiscussionCreateWithoutMeetingInput,
+  IssueCommentUpsertWithWhereUniqueWithoutIssueInput,
+  IssueCreateInput,
+  MeetingAttendeeCreateNestedManyWithoutSessionInput,
+  MeetingCreateInput,
+  MeetingSessionCreateWithoutMeetingInput,
+  MeetingUpdateInput,
+  MeetingWhereInput,
+  MeetingWhereUniqueInput,
+} from "@generated/prisma/models";
 import { GraphqlResponseError } from "@octokit/graphql";
-import type { Prisma } from "@prisma/client";
 import {
   MEETINGS_REPO,
   PRIVATE_BRAINSTORMING_REPO,
@@ -31,7 +42,7 @@ type CommentsType = NonNullable<IssueList[0]>["comments"]["nodes"];
 function makeCommentUpserts(
   comments: CommentsType,
   { isPrivateBrainstorming }: { isPrivateBrainstorming: boolean },
-): Prisma.IssueCommentUpsertWithWhereUniqueWithoutIssueInput[] | undefined {
+): IssueCommentUpsertWithWhereUniqueWithoutIssueInput[] | undefined {
   return comments
     ?.filter(notNull)
     .map(({ id, url, author, publishedAt, updatedAt, body, isMinimized }) => {
@@ -95,7 +106,7 @@ export async function updateIssues(org: string, repo: string): Promise<void> {
   await prisma.$transaction(
     issues.map((issue) => {
       const update: Omit<
-        Prisma.IssueCreateInput,
+        IssueCreateInput,
         "id" | "org" | "repo" | "number" | "created"
       > = {
         title: issue.title,
@@ -220,7 +231,7 @@ async function updatePrivateBrainstorming(
         return [];
       }
       const number = parseInt(mirroredFromMatch.groups.number);
-      const designReviewCreate: Prisma.DesignReviewCreateWithoutIssueInput = {
+      const designReviewCreate: DesignReviewCreateWithoutIssueInput = {
         privateBrainstormingIssueId: issue.id,
         privateBrainstormingIssueNumber: issue.number,
         pendingPrivateBrainstormingCommentsFrom: issue.comments.pageInfo
@@ -408,7 +419,7 @@ async function getMinutesFromGithubResponse(
     const year = await query(ListMinutesInYearDocument, {
       id: yearId.object.id,
     });
-    if (year.node?.__typename!== "Tree" || year.node.entries == null) {
+    if (year.node?.__typename !== "Tree" || year.node.entries == null) {
       continue;
     }
     for (const meetingGroup of year.node.entries) {
@@ -454,7 +465,7 @@ function createSessionsFromMinutes(
   year: number,
   meetingName: string,
   minutes: Minutes,
-): Prisma.MeetingSessionCreateWithoutMeetingInput[] {
+): MeetingSessionCreateWithoutMeetingInput[] {
   return Object.entries(minutes.attendance).map(([session, names]) => ({
     type: session,
     attendees: {
@@ -477,7 +488,7 @@ function createSessionsFromMinutes(
         ),
         (attendeeId) => ({ attendeeId }),
       ),
-    } satisfies Prisma.MeetingAttendeeCreateNestedManyWithoutSessionInput,
+    } satisfies MeetingAttendeeCreateNestedManyWithoutSessionInput,
   }));
 }
 
@@ -498,7 +509,7 @@ function getReviewNameFromUrl(
 function createDiscussionsFromMinutes(
   minutes: Minutes,
   issueIdsByName: Map<`${string}/${string}#${string}`, string>,
-): Prisma.DiscussionCreateWithoutMeetingInput[] {
+): DiscussionCreateWithoutMeetingInput[] {
   return Object.entries(minutes.discussion).flatMap(
     ([designReviewUrl, discussions]) => {
       const reviewNumber = getReviewNameFromUrl(designReviewUrl);
@@ -659,10 +670,10 @@ export async function updateMinutes(): Promise<void> {
   }
 
   const newMeetings = await getMinutesFromGithubResponse(currentMeetingYears);
-  const createMeetings: Prisma.MeetingCreateInput[] = [];
+  const createMeetings: MeetingCreateInput[] = [];
   const updateMeetings: {
-    where: Prisma.MeetingWhereUniqueInput;
-    data: Prisma.MeetingUpdateInput;
+    where: MeetingWhereUniqueInput;
+    data: MeetingUpdateInput;
   }[] = [];
   for (const { year, name, minutesId, minutesUrl } of newMeetings) {
     const existingMinutesId = existingMeetings.get(`${year}/${name}`);
@@ -680,7 +691,7 @@ export async function updateMinutes(): Promise<void> {
   }
   // Anything that's still in the existingMeetings map is a meeting that no longer exists in the
   // repository.
-  const deleteMeetings: Prisma.MeetingWhereInput[] = Array.from(
+  const deleteMeetings: MeetingWhereInput[] = Array.from(
     existingMeetings.keys(),
     (meeting) => {
       const match = /^(?<year>\d+)\/(?<name>.+)$/.exec(meeting);

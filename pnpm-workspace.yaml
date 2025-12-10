@@ -3,6 +3,7 @@ minimumReleaseAge: 1440
 onlyBuiltDependencies:
   - '@prisma/client'
   - '@prisma/engines'
+  - better-sqlite3
   - esbuild
   - prisma
   - sharp
