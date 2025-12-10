@@ -11,6 +11,7 @@ import { githubIdIsTagMemberOnDate } from "@lib/tag-members";
 import { notNull } from "@lib/util";
 import type { WebhookEventDefinition } from "@octokit/webhooks/types";
 import type { APIRoute } from "astro";
+import { z } from "astro/zod";
 import {
   MEETINGS_REPO,
   PRIVATE_BRAINSTORMING_REPO,
@@ -449,16 +450,38 @@ export function webhookProcessingComplete(): Promise<void> {
 }
 
 export async function handleWebHook(request: Request): Promise<Response> {
+  let webhookId: string | null = null;
+  let webhookName: string | null = null;
+  let payload: string | null = null;
   try {
+    webhookId = request.headers.get("x-github-delivery");
+    webhookName = request.headers.get("x-github-event");
+    payload = await request.text();
     await webhooks.verifyAndReceive({
-      id: request.headers.get("x-github-delivery") ?? "",
-      name: request.headers.get("x-github-event") ?? "",
-      payload: await request.text(),
+      id: webhookId ?? "",
+      name: webhookName ?? "",
+      payload,
       signature: request.headers.get("X-Hub-Signature-256") ?? "",
     });
 
     return new Response(null, { status: 200 });
   } catch (e) {
+    let action: string | undefined = undefined;
+    if (payload != null) {
+      try {
+        action = z
+          .object({ action: z.string() })
+          .parse(JSON.parse(payload)).action;
+      } catch (e) {
+        // Ignore errors.
+      }
+    }
+    console.warn(
+      "Failed to handle webhook",
+      { webhookId, webhookName, action },
+      ": ",
+      e instanceof Error ? e.stack : e,
+    );
     // eslint-disable-next-line no-ex-assign
     if (e instanceof AggregateError) e = e.errors[0];
     return new Response(
