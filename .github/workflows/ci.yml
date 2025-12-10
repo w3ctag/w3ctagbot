@@ -55,7 +55,7 @@ jobs:
       - run: pnpm build --site "https://tag-github-bot.w3.org"
       - run: rm -rf node_modules
       - run: pnpm install --prod
-      - run: tar -cf built-server.tar package.json dist node_modules prisma
+      - run: tar -cf built-server.tar package.json dist node_modules prisma .config/prisma.ts
       - uses: actions/upload-artifact@v5
         with:
           name: built-server
