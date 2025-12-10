@@ -4,12 +4,14 @@ import type {
   DesignReviewCreateWithoutIssueInput,
   LabelCreateManyInput,
 } from "@generated/prisma/models";
+import { Temporal } from "@js-temporal/polyfill";
 import { getMirrorSource } from "@lib/design-reviews";
 import { query } from "@lib/github";
 import { addLinkToThisServerToIssue } from "@lib/github/edits";
 import { parseNewMinutes } from "@lib/github/update";
 import { githubIdIsTagMemberOnDate } from "@lib/tag-members";
 import { notNull } from "@lib/util";
+import type { PaginateInterface } from "@octokit/plugin-paginate-rest";
 import type { WebhookEventDefinition } from "@octokit/webhooks/types";
 import type { APIRoute } from "astro";
 import { z } from "astro/zod";
@@ -19,12 +21,14 @@ import {
   REVIEWS_REPO,
   TAG_ORG,
 } from "astro:env/client";
+import { setInterval } from "node:timers";
+import { RequestError, type Octokit } from "octokit";
 import {
   FileContentDocument,
   RemoveLabelsDocument,
   type FileContentQuery,
 } from "src/gql/graphql";
-import { webhooks } from "../lib/github/auth";
+import { installationOctokit, webhooks } from "../lib/github/auth";
 import { prisma } from "../lib/prisma";
 
 async function recordBrainstormingIssue(
@@ -508,3 +512,114 @@ export async function handleWebHook(request: Request): Promise<Response> {
 export const POST: APIRoute = async ({ request }) => {
   return handleWebHook(request);
 };
+
+// From https://docs.github.com/en/webhooks/using-webhooks/automatically-redelivering-failed-deliveries-for-a-github-app-webhook
+async function fetchWebhookDeliveriesSince({
+  since,
+  octokit,
+}: {
+  since: Temporal.Instant;
+  octokit: Octokit & {
+    paginate: PaginateInterface;
+  };
+}) {
+  const iterator = octokit.paginate.iterator("GET /app/hook/deliveries", {
+    per_page: 100,
+  });
+  const deliveries = [];
+  for await (const { data } of iterator) {
+    if (
+      Temporal.Instant.compare(data[data.length - 1].delivered_at, since) < 0
+    ) {
+      for (const delivery of data) {
+        if (Temporal.Instant.compare(delivery.delivered_at, since) > 0) {
+          deliveries.push(delivery);
+        } else {
+          break;
+        }
+      }
+      break;
+    } else {
+      deliveries.push(...data);
+    }
+  }
+  return deliveries;
+}
+
+async function retryFailedWebHookDeliveries() {
+  const latestWebHookDeliveryCheckParseResult = z
+    .string()
+    .datetime()
+    .safeParse(
+      (
+        await prisma.globalVariable.findUnique({
+          where: { name: "LatestWebHookDeliveryCheck" },
+        })
+      )?.value,
+    );
+  const latestWebHookDeliveryCheck =
+    latestWebHookDeliveryCheckParseResult.success
+      ? Temporal.Instant.from(latestWebHookDeliveryCheckParseResult.data)
+      : Temporal.Instant.from("2025-01-01T00:00:00Z");
+  const startTime = Temporal.Now.instant();
+  const octokit = await installationOctokit();
+  const deliveries = await fetchWebhookDeliveriesSince({
+    since: latestWebHookDeliveryCheck,
+    octokit,
+  });
+  const deliveriesByGuid = new Map<string, typeof deliveries>();
+  for (const delivery of deliveries) {
+    const existing = deliveriesByGuid.get(delivery.guid);
+    if (existing) {
+      existing.push(delivery);
+    } else {
+      deliveriesByGuid.set(delivery.guid, [delivery]);
+    }
+  }
+  const failedDeliveries: typeof deliveries = [];
+  for (const [_, deliveries] of deliveriesByGuid.entries()) {
+    if (!deliveries.some((delivery) => delivery.status === "OK")) {
+      failedDeliveries.push(deliveries[0]);
+    }
+  }
+
+  let succeeded = true;
+  for (const delivery of failedDeliveries) {
+    try {
+      await octokit.request(
+        "POST /app/hook/deliveries/{delivery_id}/attempts",
+        {
+          delivery_id: delivery.id,
+        },
+      );
+      console.log(
+        `Redelivered failed delivery id ${delivery.id}, guid ${delivery.guid}.`,
+      );
+    } catch (e) {
+      succeeded = false;
+      console.log(
+        `Failed to redeliver failed delivery id ${delivery.id}, guid ${delivery.guid}.` +
+          (e instanceof RequestError ? ` HTTP ${e.status}: ${e}` : ""),
+      );
+    }
+  }
+  if (succeeded) {
+    // Record that we've redelivered everything since |startTime|.
+    const startTimeString = startTime.toString({ smallestUnit: "second" });
+    await prisma.globalVariable.upsert({
+      where: { name: "LatestWebHookDeliveryCheck" },
+      create: { name: "LatestWebHookDeliveryCheck", value: startTimeString },
+      update: { value: startTimeString },
+    });
+  }
+}
+
+// Starts a periodic task to redeliver recent failed webhook deliveries from Github.
+export function periodicallyRetryFailedWebhookDeliveries() {
+  // Start the first run immediately.
+  void retryFailedWebHookDeliveries();
+  setInterval(
+    () => void retryFailedWebHookDeliveries(),
+    Temporal.Duration.from({ hours: 6 }).total("milliseconds"),
+  );
+}

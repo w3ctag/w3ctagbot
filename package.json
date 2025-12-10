@@ -19,6 +19,7 @@
     "@observablehq/plot": "^0.6.17",
     "@octokit/auth-oauth-app": "^9.0.3",
     "@octokit/graphql": "^9.0.3",
+    "@octokit/plugin-paginate-rest": "^14.0.0",
     "@octokit/webhooks": "^14.2.0",
     "@prisma/adapter-better-sqlite3": "^7.1.0",
     "@prisma/client": "^7.1.0",
