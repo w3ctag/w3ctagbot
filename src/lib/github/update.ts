@@ -11,13 +11,13 @@ import type {
   MeetingWhereUniqueInput,
 } from "@generated/prisma/models";
 import { GraphqlResponseError } from "@octokit/graphql";
+import { z } from "astro/zod";
 import {
   MEETINGS_REPO,
   PRIVATE_BRAINSTORMING_REPO,
   REVIEWS_REPO,
   TAG_ORG,
 } from "astro:env/client";
-import { z } from "zod";
 import {
   BlobContentsDocument,
   IssueCommentsDocument,
