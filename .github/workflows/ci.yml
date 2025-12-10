@@ -97,6 +97,6 @@ jobs:
         env:
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
       - name: Update and Restart
-        run: 'ssh -o ProxyJump=$SSH_USER@$SSH_PROXY "$SSH_USER@$SSH_HOST" "sudo /usr/bin/systemctl restart w3ctagbot"'
+        run: 'ssh -o ProxyJump=$SSH_USER@$SSH_PROXY "$SSH_USER@$SSH_HOST" "cd $DEPLOY_PATH && DATABASE_URL=unused node_modules/.bin/prisma generate && sudo /usr/bin/systemctl restart w3ctagbot"'
         env:
           DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
