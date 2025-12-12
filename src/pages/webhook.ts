@@ -112,6 +112,13 @@ webhooks.on("issues.opened", async ({ payload }) => {
 });
 
 webhooks.on(["issues.closed", "issues.reopened"], async ({ payload }) => {
+  if (
+    payload.repository.owner.login === TAG_ORG &&
+    payload.repository.name === PRIVATE_BRAINSTORMING_REPO
+  ) {
+    // Brainstorming issues are handled as part of their public issue.
+    return;
+  }
   await prisma.issue.update({
     where: {
       id: payload.issue.node_id,
@@ -124,6 +131,13 @@ webhooks.on(["issues.closed", "issues.reopened"], async ({ payload }) => {
 });
 
 webhooks.on("issues.edited", async ({ payload }) => {
+  if (
+    payload.repository.owner.login === TAG_ORG &&
+    payload.repository.name === PRIVATE_BRAINSTORMING_REPO
+  ) {
+    // Brainstorming issues are handled as part of their public issue.
+    return;
+  }
   await prisma.issue.update({
     where: {
       id: payload.issue.node_id,
@@ -137,6 +151,13 @@ webhooks.on("issues.edited", async ({ payload }) => {
 });
 
 webhooks.on("issues.assigned", async ({ payload }) => {
+  if (
+    payload.repository.owner.login === TAG_ORG &&
+    payload.repository.name === PRIVATE_BRAINSTORMING_REPO
+  ) {
+    // Brainstorming issues are handled as part of their public issue.
+    return;
+  }
   if (!payload.assignee?.node_id) return;
   await prisma.issue.update({
     where: {
