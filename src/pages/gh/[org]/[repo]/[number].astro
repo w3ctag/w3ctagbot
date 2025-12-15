@@ -48,6 +48,9 @@ const review = await prisma.issue.findUnique({
       include: { meeting: true, proposedComments: true },
       orderBy: [{ meetingYear: "asc" }, { meetingName: "asc" }],
     },
+    designReview: {
+      select: { privateBrainstormingIssueNumber: true },
+    },
   },
 });
 
@@ -137,8 +140,17 @@ const unifiedDiscussions = review.comments
     <p>
       <a
         href={`https://github.com/${TAG_ORG}/${REVIEWS_REPO}/issues/${review.number}`}
-        >Visit on Github.</a
+        >Visit on Github</a
       >
+      {
+        userIsOnTag &&
+        review.designReview?.privateBrainstormingIssueNumber != null ? (
+          <>
+            · {/* prettier-ignore */}
+            <a href={`https://github.com/${TAG_ORG}/${PRIVATE_BRAINSTORMING_REPO}/issues/${review.designReview.privateBrainstormingIssueNumber}`}>Private review thread</a>
+          </>
+        ) : null
+      }
     </p>
     <details open class="comment">
       <summary>Opened <RelativeTime datetime={review.created} /></summary>
