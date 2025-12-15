@@ -33972,7 +33972,7 @@ export const RemoveLabelsDocument = new TypedDocumentString(`
   ) {
     labelable {
       __typename
-      labels {
+      labels(first: 100) {
         nodes {
           id
           name
