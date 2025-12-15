@@ -14,7 +14,7 @@ const [agendaPRs, agendaIssues, pendingPRs, openReviews] = await Promise.all([
     query_: "org:w3ctag archived:false label:agenda+ is:open is:issue sort:updated",
   }),
   pagedQuery(IssueSearchDocument, {
-    query_: "org:w3ctag archived:false is:pr is:open -is:draft sort:updated",
+    query_: "org:w3ctag archived:false is:pr is:open -is:draft -author:app/dependabot sort:updated",
   }),
   pagedQuery(IssueSearchDocument, {
     query_:
