@@ -56,7 +56,7 @@ jobs:
       - run: rm -rf node_modules
       - run: pnpm install --prod
       - run: tar -cf built-server.tar package.json dist node_modules prisma .config/prisma.ts
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: built-server
           path: built-server.tar
@@ -76,7 +76,7 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_PROXY: ${{ secrets.SSH_PROXY }}
     steps:
-      - uses: actions/download-artifact@v6
+      - uses: actions/download-artifact@v7
         with:
           name: built-server
       - name: Extract the built server
