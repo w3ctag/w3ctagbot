@@ -45,7 +45,7 @@
     "@graphql-codegen/typescript-document-nodes": "^5.0.6",
     "@octokit/graphql-schema": "^15.26.1",
     "@types/mdast": "^4.0.4",
-    "@types/node": "^24.10.1",
+    "@types/node": "^25.0.1",
     "@types/unist": "^3.0.3",
     "eslint": "^9.39.1",
     "eslint-plugin-lit": "^2.1.1",
