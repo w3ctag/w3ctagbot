@@ -74,6 +74,8 @@ export class TagAgenda extends LitElement {
   pendingPRs: SearchResult[] = [];
   @property({ type: Array })
   openReviews: SearchResult[] = [];
+  @property({ type: Array })
+  longPendingReviews: SearchResult[] = [];
 
   @state()
   private _weekOf: Date = mondayBefore(
@@ -134,7 +136,10 @@ export class TagAgenda extends LitElement {
         label: "Pacific Breakout (Asia / Australia / West America)",
       },
       { time: atlanticBreakout, label: "Atlantic Breakout (America / Europe)" },
-      { time: eurasiaBreakout, label: "Eurasia Breakout (Europe / Asia / Australia)" },
+      {
+        time: eurasiaBreakout,
+        label: "Eurasia Breakout (Europe / Asia / Australia)",
+      },
       { time: plenary, label: "Plenary Session" },
     ].sort((a, b) => {
       const aTime = a.time?.getTime(),
@@ -216,6 +221,17 @@ ${this.openReviews
   .filter(isUnshownIssueOrPR)
   .map((issue) => renderIssue(issue))
   .join("\n")}
+${
+  this.longPendingReviews.length > 0
+    ? `
+<!-- Reviews that have been pending external action for at least 6 months -->
+
+`
+    : ""
+}${this.longPendingReviews
+      .filter(isUnshownIssueOrPR)
+      .map((issue) => renderIssue(issue))
+      .join("\n")}
 `;
 
     this._fileContents = `# Call Agenda

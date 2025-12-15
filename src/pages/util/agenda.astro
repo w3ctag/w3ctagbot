@@ -1,4 +1,5 @@
 ---
+import { Temporal } from "@js-temporal/polyfill";
 import { IssueSearchDocument } from "../../gql/graphql";
 import Layout from "../../layouts/Layout.astro";
 import { pagedQuery } from "../../lib/github";
@@ -6,30 +7,40 @@ import { getLogin } from "../../lib/login";
 
 const user = await getLogin(Astro.cookies);
 
-const [agendaPRs, agendaIssues, pendingPRs, openReviews] = await Promise.all([
-  pagedQuery(IssueSearchDocument, {
-    query_: "org:w3ctag archived:false label:agenda+ is:open is:pr sort:updated",
-  }),
-  pagedQuery(IssueSearchDocument, {
-    query_: "org:w3ctag archived:false label:agenda+ is:open is:issue sort:updated",
-  }),
-  pagedQuery(IssueSearchDocument, {
-    query_: "org:w3ctag archived:false is:pr is:open -is:draft -author:app/dependabot sort:updated",
-  }),
-  pagedQuery(IssueSearchDocument, {
-    query_:
-      "repo:w3ctag/design-reviews is:issue is:open sort:updated assignee:*" +
-      ' -label:"Progress: blocked on dependency"' +
-      ' -label:"Progress: pending editor update"' +
-      ' -label:"Progress: pending external feedback"',
-  }),
-]);
+const [agendaPRs, agendaIssues, pendingPRs, openReviews, longPendingReviews] =
+  await Promise.all([
+    pagedQuery(IssueSearchDocument, {
+      query_:
+        "org:w3ctag archived:false label:agenda+ is:open is:pr sort:updated",
+    }),
+    pagedQuery(IssueSearchDocument, {
+      query_:
+        "org:w3ctag archived:false label:agenda+ is:open is:issue sort:updated",
+    }),
+    pagedQuery(IssueSearchDocument, {
+      query_:
+        "org:w3ctag archived:false is:pr is:open -is:draft -author:app/dependabot sort:updated",
+    }),
+    pagedQuery(IssueSearchDocument, {
+      query_:
+        "repo:w3ctag/design-reviews is:issue is:open sort:updated assignee:*" +
+        ' -label:"Progress: blocked on dependency"' +
+        ' -label:"Progress: pending editor update"' +
+        ' -label:"Progress: pending external feedback"',
+    }),
+    pagedQuery(IssueSearchDocument, {
+      query_:
+        `repo:w3ctag/design-reviews is:issue is:open sort:updated updated:<${Temporal.Now.plainDateISO().subtract({ days: 180 }).toString()}` +
+        ' label:"Progress: pending external feedback","Progress: pending editor update","Progress: blocked on dependency"',
+    }),
+  ]);
 
-const rateLimit = openReviews.rateLimit!;
+const rateLimit = longPendingReviews.rateLimit!;
 rateLimit.cost =
   agendaIssues.rateLimit!.cost +
   pendingPRs.rateLimit!.cost +
-  openReviews.rateLimit!.cost;
+  openReviews.rateLimit!.cost +
+  longPendingReviews.rateLimit!.cost;
 ---
 
 <script src="../../elements/agenda.ts"></script>
@@ -39,7 +50,9 @@ rateLimit.cost =
       agendaPRs={JSON.stringify(agendaPRs.search.nodes)}
       agendaIssues={JSON.stringify(agendaIssues.search.nodes)}
       pendingPRs={JSON.stringify(pendingPRs.search.nodes)}
-      openReviews={JSON.stringify(openReviews.search.nodes)}></tag-agenda>
+      openReviews={JSON.stringify(openReviews.search.nodes)}
+      longPendingReviews={JSON.stringify(longPendingReviews.search.nodes)}
+    ></tag-agenda>
   </main>
   <footer style="float:right">
     Query cost: {rateLimit.cost}; remaining: {rateLimit.remaining}; limit resets
