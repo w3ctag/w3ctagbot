@@ -120,21 +120,21 @@ export class TagAgenda extends LitElement {
 
   private _callTimes() {
     const monday = this._weekOf;
-    const breakoutA = new Date(monday);
-    breakoutA.setUTCHours(24 + 4); // 04:00 Tue GMT
-    const breakoutB = new Date(monday);
-    breakoutB.setUTCHours(14); // 14:00 Mon GMT
-    const breakoutC = new Date(monday);
-    breakoutC.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
+    const pacificBreakout = new Date(monday);
+    pacificBreakout.setUTCHours(24 + 4); // 04:00 Tue GMT
+    const atlanticBreakout = new Date(monday);
+    atlanticBreakout.setUTCHours(14); // 14:00 Mon GMT
+    const eurasiaBreakout = new Date(monday);
+    eurasiaBreakout.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
     const plenary = this._computePlenary(monday);
 
     return [
       {
-        time: breakoutA,
-        label: "Breakout A (Asia / Australia / West America)",
+        time: pacificBreakout,
+        label: "Pacific Breakout (Asia / Australia / West America)",
       },
-      { time: breakoutB, label: "Breakout B (America / Europe)" },
-      { time: breakoutC, label: "Breakout C (Europe / Asia / Australia)" },
+      { time: atlanticBreakout, label: "Atlantic Breakout (America / Europe)" },
+      { time: eurasiaBreakout, label: "Eurasia Breakout (Europe / Asia / Australia)" },
       { time: plenary, label: "Plenary Session" },
     ].sort((a, b) => {
       const aTime = a.time?.getTime(),
