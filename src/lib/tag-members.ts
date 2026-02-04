@@ -3,13 +3,16 @@ import { hasOwn } from "./util";
 export type TagMember = {
   name: string;
   ghLogin: string;
-  terms: { start: Date; end: Date }[];
+  terms: { start: Date; end: Date, associate: boolean }[];
   attendanceAliases: string[];
-  associate?: true;
 };
 
 function term(start: string, end: string) {
-  return { start: new Date(start), end: new Date(end) };
+  return { start: new Date(start), end: new Date(end), associate: false };
+}
+
+function associate(start: string, end: string) {
+  return { start: new Date(start), end: new Date(end), associate: true };
 }
 
 export const tagMembers = {
@@ -28,7 +31,7 @@ export const tagMembers = {
   "MDQ6VXNlcjExMjU1MjI=": {
     name: "Matthew Tylee Atkinson",
     ghLogin: "matatk",
-    terms: [term("2024-02-01", "2026-02-01")],
+    terms: [term("2024-02-01", "2028-02-01")],
     attendanceAliases: ["matthew", "matt"],
   },
   "MDQ6VXNlcjI0ODcyMQ==": {
@@ -70,9 +73,8 @@ export const tagMembers = {
   "MDQ6VXNlcjY5MTI0NzQ=": {
     name: "Serena Chen",
     ghLogin: "heisenburger",
-    terms: [term("2025-03-31", "2026-02-01")],
+    terms: [associate("2025-03-31", "2026-02-01")],
     attendanceAliases: ["serena"],
-    associate: true,
   },
   "MDQ6VXNlcjExMDEzMzk=": {
     name: "Kenneth Rohde Christiansen",
@@ -83,9 +85,8 @@ export const tagMembers = {
   "MDQ6VXNlcjE2ODg3MTY=": {
     name: "Dan Clark",
     ghLogin: "dandclark",
-    terms: [term("2025-02-13", "2026-02-01")],
+    terms: [associate("2025-02-13", "2026-02-01")],
     attendanceAliases: ["danc", "dan clark"],
-    associate: true,
   },
   "MDQ6VXNlcjQ2NjIyOQ==": {
     name: "Amy Guy",
@@ -108,9 +109,8 @@ export const tagMembers = {
   "MDQ6VXNlcjY2OTgzNDQ=": {
     name: "Christian Liebel",
     ghLogin: "christianliebel",
-    terms: [term("2025-02-13", "2026-02-01")],
+    terms: [associate("2025-02-13", "2026-02-01"), term("2026-02-01", "2028-02-01")],
     attendanceAliases: ["christian"],
-    associate: true,
   },
   "MDQ6VXNlcjI2OTk2ODk=": {
     name: "Peter Linss",
@@ -157,9 +157,8 @@ export const tagMembers = {
   "MDQ6VXNlcjI0NDc3Mg==": {
     name: "Simon Pieters",
     ghLogin: "zcorpan",
-    terms: [term("2025-02-13", "2026-02-01")],
+    terms: [associate("2025-02-13", "2026-02-01")],
     attendanceAliases: ["simon"],
-    associate: true,
   },
   MDQ6VXNlcjY3NjQx: {
     name: "Martin Thomson",
@@ -170,9 +169,8 @@ export const tagMembers = {
   "MDQ6VXNlcjI2NjMwNTg=": {
     name: "Ehsan Toreini",
     ghLogin: "toreini",
-    terms: [term("2025-06-25", "2026-02-01")],
+    terms: [associate("2025-06-25", "2026-02-01")],
     attendanceAliases: ["ehsan"],
-    associate: true,
   },
   "MDQ6VXNlcjE3NTgzNg==": {
     name: "Lea Verou",
@@ -183,15 +181,20 @@ export const tagMembers = {
   "MDQ6VXNlcjc4NjE4Nw==": {
     name: "Yoav Weiss",
     ghLogin: "yoavweiss",
-    terms: [term("2025-02-13", "2026-02-01")],
+    terms: [associate("2025-02-13", "2026-02-01")],
     attendanceAliases: ["yoav"],
-    associate: true,
   },
   MDQ6VXNlcjgzNDIw: {
     name: "Jeffrey Yasskin",
     ghLogin: "jyasskin",
-    terms: [term("2024-07-15", "2026-02-01")],
+    terms: [term("2024-07-15", "2028-02-01")],
     attendanceAliases: ["jeffrey"],
+  },
+  "MDQ6VXNlcjUxMDU0NDU=": {
+    name: "Sen Yu",
+    ghLogin: "imsenyu",
+    terms: [term("2026-02-01", "2028-02-01")],
+    attendanceAliases: ["yusen", "yu sen", "sen yu"],
   },
 } as const satisfies { [id: string]: TagMember };
 
