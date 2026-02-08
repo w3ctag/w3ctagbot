@@ -3,7 +3,7 @@ import { hasOwn } from "./util";
 export type TagMember = {
   name: string;
   ghLogin: string;
-  terms: { start: Date; end: Date, associate: boolean }[];
+  terms: { start: Date; end: Date; associate: boolean }[];
   attendanceAliases: string[];
 };
 
@@ -100,6 +100,12 @@ export const tagMembers = {
     terms: [term("2025-02-01", "2027-02-01")],
     attendanceAliases: ["xiaocheng"],
   },
+  U_kgDOAA1IZQ: {
+    name: "Brian Kardell",
+    ghLogin: "bkardell",
+    terms: [term("2026-02-06", "2028-02-01")],
+    attendanceAliases: ["brian"],
+  },
   "MDQ6VXNlcjU4NDYwNw==": {
     name: "Yves Lafon",
     ghLogin: "ylafon",
@@ -109,7 +115,10 @@ export const tagMembers = {
   "MDQ6VXNlcjY2OTgzNDQ=": {
     name: "Christian Liebel",
     ghLogin: "christianliebel",
-    terms: [associate("2025-02-13", "2026-02-01"), term("2026-02-01", "2028-02-01")],
+    terms: [
+      associate("2025-02-13", "2026-02-01"),
+      term("2026-02-01", "2028-02-01"),
+    ],
     attendanceAliases: ["christian"],
   },
   "MDQ6VXNlcjI2OTk2ODk=": {
