@@ -15,6 +15,9 @@ function associate(start: string, end: string) {
   return { start: new Date(start), end: new Date(end), associate: true };
 }
 
+// This is a map from Github GraphQL node ID to information about that TAG member.
+// To get someone's node ID, run:
+// > gh api graphql -H "X-Github-Next-Global-ID: 1" -f query='query { user(login: "username") { id, login, name} }'
 export const tagMembers = {
   "MDQ6VXNlcjI4NzUyNg==": {
     name: "Daniel Appelquist",
@@ -87,6 +90,12 @@ export const tagMembers = {
     ghLogin: "dandclark",
     terms: [associate("2025-02-13", "2026-02-01")],
     attendanceAliases: ["danc", "dan clark"],
+  },
+  U_kgDOAEcXlQ: {
+    name: "Heather Flanagan",
+    ghLogin: "hlflanagan",
+    terms: [term("2026-02-12", "2028-02-01")],
+    attendanceAliases: ["heather"],
   },
   "MDQ6VXNlcjQ2NjIyOQ==": {
     name: "Amy Guy",
