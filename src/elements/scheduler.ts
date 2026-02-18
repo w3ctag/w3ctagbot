@@ -308,7 +308,12 @@ export class TagScheduler extends LitElement {
           <td></td>
           ${Object.entries(
             Object.groupBy(allTimes, (time) =>
-              time.toLocaleString(undefined, { dateStyle: "medium" }),
+              time.toLocaleString(undefined, {
+                weekday: "long",
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }),
             ),
           ).map(
             ([date, times]) => html`<th colspan=${times!.length}>${date}</th>`,
