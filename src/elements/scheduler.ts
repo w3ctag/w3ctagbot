@@ -193,12 +193,22 @@ function parse(input: string, date: Temporal.PlainDate): Availability[] {
 @customElement("tag-scheduler")
 export class TagScheduler extends LitElement {
   static styles = css`
+    #results {
+      width: 100%;
+      overflow: scroll;
+    }
     table {
       border-collapse: collapse;
     }
     th {
       text-align: left;
       text-wrap-mode: nowrap;
+    }
+    th[scope="row"],
+    td.stick-left {
+      position: sticky;
+      inset-inline-start: 0;
+      background: white;
     }
     th,
     td {
@@ -271,7 +281,7 @@ export class TagScheduler extends LitElement {
         >
       </div>
       <div id="errors">${this._errors}</div>
-      ${this.renderResultTable()}
+      <div id="results">${this.renderResultTable()}</div>
     `;
   }
 
@@ -302,10 +312,11 @@ export class TagScheduler extends LitElement {
       allTimes.push(current);
     }
 
-    return html`<table id="results">
+    return html`<table>
       <thead>
         <tr>
-          <td colspan="3"></td>
+          <td class="stick-left"></td>
+          <td colspan="2"></td>
           ${Object.entries(
             Object.groupBy(allTimes, (time) =>
               time.toLocaleString(undefined, {
@@ -320,7 +331,8 @@ export class TagScheduler extends LitElement {
           )}
         </tr>
         <tr>
-          <td colspan="3"></td>
+          <td class="stick-left"></td>
+          <td colspan="2"></td>
           ${allTimes
             .filter(({ minute }) => minute === 0)
             .map(
