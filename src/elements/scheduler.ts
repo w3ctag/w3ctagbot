@@ -305,7 +305,7 @@ export class TagScheduler extends LitElement {
     return html`<table id="results">
       <thead>
         <tr>
-          <td></td>
+          <td colspan="3"></td>
           ${Object.entries(
             Object.groupBy(allTimes, (time) =>
               time.toLocaleString(undefined, {
@@ -320,7 +320,7 @@ export class TagScheduler extends LitElement {
           )}
         </tr>
         <tr>
-          <td></td>
+          <td colspan="3"></td>
           ${allTimes
             .filter(({ minute }) => minute === 0)
             .map(
@@ -331,28 +331,47 @@ export class TagScheduler extends LitElement {
             )}
         </tr>
       </thead>
-      ${this._availability.map(
-        (person) =>
-          html`<tr>
-            <th scope="row">${person.name}</th>
-            ${allTimes.map((time) => {
-              const localTime = time.withTimeZone(person.tz);
-              return html`<td
-                class=${person.available(
-                  days[localTime.dayOfWeek - 1],
-                  localTime.toPlainTime(),
-                )}
-                title=${time.withTimeZone(person.tz).toLocaleString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                  timeZoneName: "short",
-                })}
-              ></td>`;
+      ${this._availability.map((person) => {
+        let core = 0;
+        let rare = 0;
+        let avoid = 0;
+        const cells = allTimes.map((time) => {
+          const localTime = time.withTimeZone(person.tz);
+          const availability = person.available(
+            days[localTime.dayOfWeek - 1],
+            localTime.toPlainTime(),
+          );
+          switch (availability) {
+            case "core":
+              core++;
+              break;
+            case "rare":
+              rare++;
+              break;
+            case "no":
+              avoid++;
+              break;
+          }
+          return html`<td
+            class=${availability}
+            title=${localTime.toLocaleString(undefined, {
+              month: "short",
+              day: "numeric",
+              hour: "numeric",
+              minute: "numeric",
+              timeZoneName: "short",
             })}
-          </tr>`,
-      )}
+          ></td>`;
+        });
+        return html`<tr>
+          <th scope="row">${person.name}</th>
+          <td title="Total good hours per week" class="core">${core / 2}</td>
+          <td title="Total good or rare hours per week" class="rare">
+            ${(core + rare) / 2}
+          </td>
+          ${cells}
+        </tr>`;
+      })}
     </table>`;
   }
 
