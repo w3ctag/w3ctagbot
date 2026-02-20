@@ -1,6 +1,7 @@
 import { Temporal } from "@js-temporal/polyfill";
 import { LitElement, css, html, nothing } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import { guard } from "lit/directives/guard.js";
 
 type AvailableTime = {
   days: Day[];
@@ -208,7 +209,7 @@ export class TagScheduler extends LitElement {
     td.stick-left {
       position: sticky;
       inset-inline-start: 0;
-      background: white;
+      background-color: white;
     }
     th,
     td {
@@ -217,14 +218,18 @@ export class TagScheduler extends LitElement {
     td {
       min-width: 1ex;
     }
-    .core {
+    :is(td, th).core {
       background-color: green;
+      color: white;
+      color: contrast-color(green);
     }
-    .rare {
+    :is(td, th).rare {
       background-color: orange;
+      color: contrast-color(orange);
     }
-    .no {
+    :is(td, th).no {
       background-color: red;
+      color: contrast-color(red);
     }
   `;
 
@@ -246,6 +251,9 @@ export class TagScheduler extends LitElement {
 
   @state()
   private _errors: string = "";
+
+  @state()
+  private _hoverTime: Temporal.ZonedDateTime | null = null;
 
   render() {
     return html`
@@ -285,103 +293,155 @@ export class TagScheduler extends LitElement {
     `;
   }
 
+  private _cachedAvailability: ExpandedAvailability[] = [];
+  private _cachedReferenceDate: Temporal.PlainDate | null = null;
+  private _cachedAllTimes: Temporal.ZonedDateTime[] = [];
+
+  private _allTimes(): Temporal.ZonedDateTime[] {
+    if (
+      this._cachedAvailability !== this._availability ||
+      this._cachedReferenceDate !== this._referenceDate
+    ) {
+      if (this._availability.length === 0) {
+        return [];
+      }
+      const monday = this._referenceDate.subtract({
+        days: this._referenceDate.dayOfWeek - 1,
+      });
+      const friday = this._referenceDate.add({
+        days: 5 - this._referenceDate.dayOfWeek,
+      });
+      const earliest = monday.toZonedDateTime({
+        plainTime: "00:00",
+        timeZone: this._availability[0].tz,
+      });
+      const latest = friday.toZonedDateTime({
+        plainTime: "23:30",
+        timeZone: this._availability[this._availability.length - 1].tz,
+      });
+      const allTimes: Temporal.ZonedDateTime[] = [];
+      for (
+        let current = earliest.withTimeZone(this._timezone);
+        Temporal.Instant.compare(current.toInstant(), latest.toInstant()) < 0;
+        current = current.add({ minutes: 30 })
+      ) {
+        allTimes.push(current);
+      }
+      this._cachedAllTimes = allTimes;
+      this._cachedAvailability = this._availability;
+      this._cachedReferenceDate = this._referenceDate;
+    }
+    return this._cachedAllTimes;
+  }
+
   renderResultTable() {
     if (this._availability.length === 0) {
       return nothing;
     }
-    const monday = this._referenceDate.subtract({
-      days: this._referenceDate.dayOfWeek - 1,
-    });
-    const friday = this._referenceDate.add({
-      days: 5 - this._referenceDate.dayOfWeek,
-    });
-    const earliest = monday.toZonedDateTime({
-      plainTime: "00:00",
-      timeZone: this._availability[0].tz,
-    });
-    const latest = friday.toZonedDateTime({
-      plainTime: "23:30",
-      timeZone: this._availability[this._availability.length - 1].tz,
-    });
-    const allTimes: Temporal.ZonedDateTime[] = [];
-    for (
-      let current = earliest.withTimeZone(this._timezone);
-      Temporal.Instant.compare(current.toInstant(), latest.toInstant()) < 0;
-      current = current.add({ minutes: 30 })
-    ) {
-      allTimes.push(current);
-    }
+    const allTimes = this._allTimes();
 
-    return html`<table>
+    const guardAllTimes = <T>(f: () => T) => {
+      return guard([this._referenceDate, this._availability], f);
+    };
+
+    return html`<table @mousemove="${this._onhover}">
       <thead>
         <tr>
           <td class="stick-left"></td>
           <td colspan="2"></td>
-          ${Object.entries(
-            Object.groupBy(allTimes, (time) =>
-              time.toLocaleString(undefined, {
-                weekday: "long",
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              }),
+          ${guardAllTimes(() =>
+            Object.entries(
+              Object.groupBy(allTimes, (time) =>
+                time.toLocaleString(undefined, {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                }),
+              ),
+            ).map(
+              ([date, times]) =>
+                html`<th colspan=${times!.length}>${date}</th>`,
             ),
-          ).map(
-            ([date, times]) => html`<th colspan=${times!.length}>${date}</th>`,
           )}
         </tr>
         <tr>
-          <td class="stick-left"></td>
+          <td class="stick-left">
+            ${this._hoverTime?.toLocaleString(undefined, {
+              weekday: "short",
+              hour: "numeric",
+              minute: "2-digit",
+              timeZoneName: "short",
+            })}
+          </td>
           <td colspan="2"></td>
-          ${allTimes
-            .filter(({ minute }) => minute === 0)
-            .map(
-              (time) =>
-                html`<th colspan="2">
-                  ${time.hour.toString().padStart(2, "0")}
-                </th>`,
-            )}
+          ${guardAllTimes(() =>
+            allTimes
+              .filter(({ minute }) => minute === 0)
+              .map(
+                (time) =>
+                  html`<th colspan="2" data-time="${time.toString()}">
+                    ${time.hour.toString().padStart(2, "0")}
+                  </th>`,
+              ),
+          )}
         </tr>
       </thead>
       ${this._availability.map((person) => {
-        let core = 0;
-        let rare = 0;
-        let avoid = 0;
-        const cells = allTimes.map((time) => {
-          const localTime = time.withTimeZone(person.tz);
-          const availability = person.available(
-            days[localTime.dayOfWeek - 1],
-            localTime.toPlainTime(),
-          );
-          switch (availability) {
-            case "core":
-              core++;
-              break;
-            case "rare":
-              rare++;
-              break;
-            case "no":
-              avoid++;
-              break;
-          }
-          return html`<td
-            class=${availability}
-            title=${localTime.toLocaleString(undefined, {
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "numeric",
-              timeZoneName: "short",
-            })}
-          ></td>`;
-        });
+        const localHoverTime = this._hoverTime?.withTimeZone(person.tz);
         return html`<tr>
-          <th scope="row">${person.name}</th>
-          <td title="Total good hours per week" class="core">${core / 2}</td>
-          <td title="Total good or rare hours per week" class="rare">
-            ${(core + rare) / 2}
-          </td>
-          ${cells}
+          <th
+            scope="row"
+            class=${localHoverTime
+              ? person.available(
+                  days[localHoverTime.dayOfWeek - 1],
+                  localHoverTime.toPlainTime(),
+                )
+              : nothing}
+          >
+            ${person.name}
+          </th>
+          ${guardAllTimes(() => {
+            let core = 0;
+            let rare = 0;
+            let avoid = 0;
+            const cells = allTimes.map((time) => {
+              const localTime = time.withTimeZone(person.tz);
+              const availability = person.available(
+                days[localTime.dayOfWeek - 1],
+                localTime.toPlainTime(),
+              );
+              switch (availability) {
+                case "core":
+                  core++;
+                  break;
+                case "rare":
+                  rare++;
+                  break;
+                case "no":
+                  avoid++;
+                  break;
+              }
+              return html`<td
+                class=${availability}
+                data-time="${localTime.toString()}"
+                title=${localTime.toLocaleString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                  timeZoneName: "short",
+                })}
+              ></td>`;
+            });
+            return html`<td title="Total good hours per week" class="core">
+                ${core / 2}
+              </td>
+              <td title="Total good or rare hours per week" class="rare">
+                ${(core + rare) / 2}
+              </td>
+              ${cells}`;
+          })}
         </tr>`;
       })}
     </table>`;
@@ -398,6 +458,21 @@ export class TagScheduler extends LitElement {
       this._timezone = e.target.value;
       localStorage.setItem("timezone", e.target.value);
     }
+  }
+
+  private _onhover(e: Event) {
+    if (e.target instanceof HTMLElement) {
+      const timeStr = e.target.dataset["time"];
+      if (timeStr) {
+        try {
+          this._hoverTime = Temporal.ZonedDateTime.from(timeStr);
+          return;
+        } catch (e) {
+          // Let failed conversions clear the hover time.
+        }
+      }
+    }
+    this._hoverTime = null;
   }
 
   private _updateAvailability(e: Event) {
