@@ -35,8 +35,8 @@ const { title, user } = Astro.props;
               </a>
               (
               <a
-                href={buildUrl(new URL("/api/logout", Astro.url), {
-                  next: Astro.request.url,
+                href={buildUrl(new URL("/api/logout", Astro.site), {
+                  next: Astro.url.pathname + Astro.url.search,
                 })}
               >
                 Logout

@@ -111,11 +111,11 @@ export async function logout(cookies: AstroCookies): Promise<void> {
 }
 
 export function getLoginUrl(
-  astro: Pick<AstroGlobal, "url" | "request">,
+  astro: Pick<AstroGlobal, "url" | "site">,
   app: App,
 ): string {
   return app.oauth.getWebFlowAuthorizationUrl({
-    redirectUrl: new URL("/api/github/oauth/callback", astro.url).href,
-    state: astro.request.url,
+    redirectUrl: new URL("/api/github/oauth/callback", astro.site).href,
+    state: astro.url.pathname + astro.url.search,
   }).url;
 }
