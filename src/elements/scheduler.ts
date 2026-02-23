@@ -209,7 +209,7 @@ function parse(input: string, date: Temporal.PlainDate): Availability[] {
         const core = parseAvailableTimes(lines, "Core:");
         const rare = parseAvailableTimes(lines, "Rare:");
         const except = parseAvailableTimes(lines, "Except:");
-        return { name, tz, tzoffset, core, rare, except };
+        return { name: name.trim(), tz, tzoffset, core, rare, except };
       } catch (cause) {
         throw new ParseError({ cause, context: [name] });
       }
@@ -231,6 +231,10 @@ export class TagScheduler extends LitElement {
     }
     table {
       border-collapse: collapse;
+    }
+    tr.dim {
+      /* This isn't quite right: it lets grid lines show through the cells. */
+      opacity: 50%;
     }
     th {
       text-align: left;
@@ -280,6 +284,13 @@ export class TagScheduler extends LitElement {
   @state()
   private _timezones = [this._timezone];
 
+  /// Used by _updateFilter() to set _filter.
+  private _filterName: string = "None";
+
+  /// Returns which rows to focus on.
+  @state()
+  private _filter: (e: ExpandedAvailability) => boolean = () => true;
+
   @state()
   private _errors: string = "";
 
@@ -316,6 +327,18 @@ export class TagScheduler extends LitElement {
               (tz) =>
                 html`<option ?selected=${tz === this._timezone}>${tz}</option>`,
             )}
+          </select></label
+        >
+      </div>
+      <div>
+        <label
+          >Filter:
+          <select @change=${this._onFilterChange}>
+            <option>None</option>
+            <option>Chairs</option>
+            <option>Pacific</option>
+            <option>Atlantic</option>
+            <option>Eurasia</option>
           </select></label
         >
       </div>
@@ -420,7 +443,7 @@ export class TagScheduler extends LitElement {
       </thead>
       ${this._availability.map((person) => {
         const localHoverTime = this._hoverTime?.withTimeZone(person.tz);
-        return html`<tr>
+        return html`<tr class=${this._filter(person) ? nothing : "dim"}>
           <th
             scope="row"
             class=${localHoverTime
@@ -481,6 +504,7 @@ export class TagScheduler extends LitElement {
   private _updateReferenceDate(e: Event) {
     if (e.target instanceof HTMLInputElement) {
       this._referenceDate = Temporal.PlainDate.from(e.target.value);
+      this._updateFilter();
     }
   }
 
@@ -488,6 +512,63 @@ export class TagScheduler extends LitElement {
     if (e.target instanceof HTMLSelectElement) {
       this._timezone = e.target.value;
       localStorage.setItem("timezone", e.target.value);
+    }
+  }
+
+  private _onFilterChange(e: Event) {
+    if (e.target instanceof HTMLSelectElement) {
+      this._filterName = e.target.value;
+      this._updateFilter();
+    }
+  }
+
+  private _updateFilter() {
+    const setFilterByTimezone = (
+      westZone: Temporal.TimeZoneLike,
+      eastZone: Temporal.TimeZoneLike,
+    ) => {
+      // Midnight on the reference date, in the target timezone.
+      // Eastern timezones get to midnight earlier than western timezones.
+      const westTime = this._referenceDate.toZonedDateTime({
+        timeZone: westZone,
+      });
+      const eastTime = this._referenceDate.toZonedDateTime({
+        timeZone: eastZone,
+      });
+      if (Temporal.ZonedDateTime.compare(eastTime, westTime) < 0) {
+        // 'west'–'east' does not cross the date line.
+        this._filter = (e: ExpandedAvailability) =>
+          Temporal.ZonedDateTime.compare(eastTime, e.tzoffset) <= 0 &&
+          Temporal.ZonedDateTime.compare(e.tzoffset, westTime) <= 0;
+      } else {
+        // 'west'–'east' does cross the date line.
+        this._filter = (e: ExpandedAvailability) =>
+          Temporal.ZonedDateTime.compare(eastTime, e.tzoffset) <= 0 ||
+          Temporal.ZonedDateTime.compare(e.tzoffset, westTime) <= 0;
+      }
+    };
+    switch (this._filterName) {
+      default:
+      case "None":
+        this._filter = () => true;
+        break;
+      case "Chairs":
+        this._filter = (e: ExpandedAvailability) => {
+          // Hack until I can put this into the parsed data format.
+          return ["Hadley Beeman", "Lola Odelola", "Jeffrey Yasskin"].includes(
+            e.name,
+          );
+        };
+        break;
+      case "Pacific":
+        setFilterByTimezone("Asia/Shanghai", "America/St_Johns");
+        break;
+      case "Atlantic":
+        setFilterByTimezone("America/Los_Angeles", "Europe/Warsaw");
+        break;
+      case "Eurasia":
+        setFilterByTimezone("Europe/London", "Pacific/Auckland");
+        break;
     }
   }
 
