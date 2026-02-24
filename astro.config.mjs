@@ -39,6 +39,10 @@ export default defineConfig({
 
   site: "http://localhost:4321",
 
+  security: {
+    allowedDomains: [{ protocol: "https", hostname: "tag-github-bot.w3.org" }],
+  },
+
   env: {
     schema: {
       // Names for TAG repositories. These are variables so that development instances can
