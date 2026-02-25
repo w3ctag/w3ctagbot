@@ -104,53 +104,80 @@ function parseAvailableTimes(lines: string[], header: string): AvailableTime[] {
   return lines
     .filter((line) => line.includes(header))
     .flatMap((line) => {
-      const dayGroups = line.slice(line.indexOf(header) + header.length);
-      return dayGroups.split(";").flatMap((group) => {
-        const daysMatch =
-          /(?<startDay>[A-Za-z]+)(?:-(?<endDay>[A-Za-z]+))?/.exec(group);
-        if (!daysMatch?.groups) {
-          throw new Error(
-            `'${group}' in '${line}' does not start with a day or range of days.`,
-          );
-        }
-        const { startDay, endDay } = daysMatch.groups;
-        if (!narrowingIncludes(days, startDay)) {
-          throw new Error(
-            `${startDay} in '${line}' is not the name of a day. Use one of ${String(days)}.`,
-          );
-        }
-        // endDay can be undefined when its group is missing, but we'd need to enable
-        // https://www.typescriptlang.org/tsconfig/#noUncheckedIndexedAccess project-wide to get the
-        // more-accurate typing here.
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (endDay !== undefined && !narrowingIncludes(days, endDay)) {
-          throw new Error(
-            `${endDay} in '${line}' is not the name of a day. Use one of ${String(days)}.`,
-          );
-        }
-        return group
-          .slice(daysMatch.index + daysMatch[0].length)
-          .split(",")
-          .map((timeRange) => {
-            const [startTime, endTime] = timeRange
-              .split("-")
-              .map((s) => s.trim());
-            const start = Temporal.PlainTime.from(startTime);
-            const end = Temporal.PlainTime.from(endTime);
-            if (start.minute !== 0 && start.minute !== 30) {
-              throw new Error(
-                `${startTime} must be on a half-hour in '${line}'.`,
-              );
-            }
-            if (end.minute !== 0 && end.minute !== 30) {
-              throw new Error(
-                `${endTime} must be on a half-hour in '${line}'.`,
-              );
-            }
-            return { days: dayRange(startDay, endDay), start, end };
-          });
-      });
+      try {
+        const dayGroups = line.slice(line.indexOf(header) + header.length);
+        return dayGroups.split(";").flatMap((group) => {
+          const daysMatch =
+            /(?<startDay>[A-Za-z]+)(?:-(?<endDay>[A-Za-z]+))?/.exec(group);
+          if (!daysMatch?.groups) {
+            throw new Error(
+              `'${group}' in '${line}' does not start with a day or range of days.`,
+            );
+          }
+          const { startDay, endDay } = daysMatch.groups;
+          if (!narrowingIncludes(days, startDay)) {
+            throw new Error(
+              `${startDay} in '${line}' is not the name of a day. Use one of ${String(days)}.`,
+            );
+          }
+          // endDay can be undefined when its group is missing, but we'd need to enable
+          // https://www.typescriptlang.org/tsconfig/#noUncheckedIndexedAccess project-wide to get the
+          // more-accurate typing here.
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          if (endDay !== undefined && !narrowingIncludes(days, endDay)) {
+            throw new Error(
+              `${endDay} in '${line}' is not the name of a day. Use one of ${String(days)}.`,
+            );
+          }
+          return group
+            .slice(daysMatch.index + daysMatch[0].length)
+            .split(",")
+            .map((timeRange) => {
+              try {
+                const [startTime, endTime] = timeRange
+                  .split("-")
+                  .map((s) => s.trim());
+                const start = Temporal.PlainTime.from(startTime);
+                const end = Temporal.PlainTime.from(endTime);
+                if (start.minute !== 0 && start.minute !== 30) {
+                  throw new Error(
+                    `${startTime} must be on a half-hour in '${line}'.`,
+                  );
+                }
+                if (end.minute !== 0 && end.minute !== 30) {
+                  throw new Error(
+                    `${endTime} must be on a half-hour in '${line}'.`,
+                  );
+                }
+                return { days: dayRange(startDay, endDay), start, end };
+              } catch (cause) {
+                throw new ParseError({
+                  cause,
+                  // See above for why this is needed.
+                  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+                  context: [startDay + (endDay ? `-${endDay}` : "")],
+                });
+              }
+            });
+        });
+      } catch (cause) {
+        throw new ParseError({ cause, context: [header] });
+      }
     });
+}
+
+class ParseError extends Error {
+  constructor({ cause, context }: { cause: unknown; context: string[] }) {
+    if (cause instanceof ParseError) {
+      context = context.concat(cause.context);
+      cause = cause.cause;
+    }
+    super(`In ${context.join(" / ")}, ${(cause as Error).message}`, { cause });
+    this.context = context;
+    this.name = "ParseError";
+  }
+
+  context: string[];
 }
 
 /**
@@ -177,11 +204,15 @@ function parse(input: string, date: Temporal.PlainDate): Availability[] {
         );
       }
       const { name, tz } = nameLine.groups;
-      const tzoffset = date.toZonedDateTime({ timeZone: tz });
-      const core = parseAvailableTimes(lines, "Core:");
-      const rare = parseAvailableTimes(lines, "Rare:");
-      const except = parseAvailableTimes(lines, "Except:");
-      return { name, tz, tzoffset, core, rare, except };
+      try {
+        const tzoffset = date.toZonedDateTime({ timeZone: tz });
+        const core = parseAvailableTimes(lines, "Core:");
+        const rare = parseAvailableTimes(lines, "Rare:");
+        const except = parseAvailableTimes(lines, "Except:");
+        return { name, tz, tzoffset, core, rare, except };
+      } catch (cause) {
+        throw new ParseError({ cause, context: [name] });
+      }
     });
   const errors = result.filter((i): i is Error => i instanceof Error);
   if (errors.length > 0) {
