@@ -32,8 +32,8 @@ type SearchResult = NonNullable<
   NonNullable<IssueSearchQuery["search"]["nodes"]>[0]
 >;
 
-const wedMornPlenaryHours = 2 * 24 + 6; // Wednesday @ 06:00 UTC
-const wedNightPlenaryHours = 2 * 24 + 22; // Wednesday @ 22:00 UTC
+const earlyAtlanticHours = 4 * 24 + 13; // Friday @ 13:00 UTC
+const lateAtlanticHours = 2 * 24 + 17; // Wednesday @ 17:00 UTC
 
 @customElement("tag-agenda")
 export class TagAgenda extends LitElement {
@@ -86,7 +86,10 @@ export class TagAgenda extends LitElement {
   private _year: number = this._weekOf.getUTCFullYear();
 
   @state()
-  private _plenaryHours: number | null = wedMornPlenaryHours;
+  private _plenaryWeek: boolean = false;
+
+  @state()
+  private _atlanticHours: number = earlyAtlanticHours;
 
   @state()
   private _filename: string = "";
@@ -97,12 +100,12 @@ export class TagAgenda extends LitElement {
   @query("#contents")
   private _contentsTextArea: HTMLTextAreaElement | undefined;
 
-  private _plenaryChange(e: Event & { target: HTMLSelectElement }) {
-    if (e.target.value == "") {
-      this._plenaryHours = null;
-    } else {
-      this._plenaryHours = parseInt(e.target.value);
-    }
+  private _plenaryChange(e: Event & { target: HTMLInputElement }) {
+    this._plenaryWeek = e.target.checked;
+  }
+
+  private _atlanticChange(e: Event & { target: HTMLSelectElement }) {
+    this._atlanticHours = parseInt(e.target.value);
   }
 
   private _dateChange(e: Event & { target: HTMLInputElement }) {
@@ -111,24 +114,28 @@ export class TagAgenda extends LitElement {
     }
   }
 
-  private _computePlenary(monday: Date): Date | null {
-    if (this._plenaryHours === null) {
-      return null;
-    }
+  private _computeAtlantic(monday: Date): Date | null {
     const plenary = new Date(monday);
-    plenary.setUTCHours(this._plenaryHours);
+    plenary.setUTCHours(this._atlanticHours);
     return plenary;
   }
 
   private _callTimes() {
     const monday = this._weekOf;
     const pacificBreakout = new Date(monday);
-    pacificBreakout.setUTCHours(24 + 4); // 04:00 Tue GMT
-    const atlanticBreakout = new Date(monday);
-    atlanticBreakout.setUTCHours(14); // 14:00 Mon GMT
+    pacificBreakout.setUTCHours(2 * 24); // 00:00 Wed GMT
+    const atlanticBreakout = this._computeAtlantic(monday);
     const eurasiaBreakout = new Date(monday);
-    eurasiaBreakout.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
-    const plenary = this._computePlenary(monday);
+    if (eurasiaBreakout < new Date("2026-04-01")) {
+      eurasiaBreakout.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
+    } else {
+      eurasiaBreakout.setUTCHours(24 * 3 + 8); // 08:00 Thu GMT
+    }
+    let plenary: null | Date = null;
+    if (this._plenaryWeek) {
+      plenary = new Date(monday);
+      plenary.setUTCHours(24 + 13); // 13:00 Tue GMT
+    }
 
     return [
       {
@@ -318,13 +325,6 @@ ${
 
   render() {
     return html`
-      <label for="plenary">Plenary</label>
-      <select id="plenary" @change=${this._plenaryChange}>
-        <option value=${wedMornPlenaryHours}>Wednesday Morning UTC</option>
-        <option value=${wedNightPlenaryHours}>Wednesday Night UTC</option>
-        <option value="">No Plenary</option>
-      </select>
-
       <label for="week">Week</label>
       <input
         id="week"
@@ -332,6 +332,19 @@ ${
         value=${this._weekOf.toISOString().slice(0, 10)}
         @change=${this._dateChange}
       />
+      <label for="plenary">Plenary</label>
+      <input
+        type="checkbox"
+        id="plenary"
+        @change=${this._plenaryChange}
+        style="justify-self: start"
+      />
+      <label for="atlantic">Atlantic Breakout</label>
+      <select id="atlantic" @change=${this._atlanticChange}>
+        <option value=${earlyAtlanticHours}>Friday Early</option>
+        <option value=${lateAtlanticHours}>Wednesday Late</option>
+        <option value="">No Plenary</option>
+      </select>
 
       <p>
         <a
