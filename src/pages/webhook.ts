@@ -569,7 +569,7 @@ async function fetchWebhookDeliveriesSince({
 
 async function retryFailedWebHookDeliveries() {
   const latestWebHookDeliveryCheckParseResult = z
-    .string()
+    .iso
     .datetime()
     .safeParse(
       (
