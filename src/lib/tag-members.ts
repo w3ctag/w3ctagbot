@@ -88,7 +88,10 @@ export const tagMembers = {
   "MDQ6VXNlcjE2ODg3MTY=": {
     name: "Dan Clark",
     ghLogin: "dandclark",
-    terms: [associate("2025-02-13", "2026-02-01")],
+    terms: [
+      associate("2025-02-13", "2026-02-01"),
+      associate("2026-02-01", "2027-02-01"),
+    ],
     attendanceAliases: ["danc", "dan clark"],
   },
   U_kgDOAEcXlQ: {
@@ -187,7 +190,10 @@ export const tagMembers = {
   "MDQ6VXNlcjI2NjMwNTg=": {
     name: "Ehsan Toreini",
     ghLogin: "toreini",
-    terms: [associate("2025-06-25", "2026-02-01")],
+    terms: [
+      associate("2025-06-25", "2026-02-01"),
+      associate("2026-02-01", "2027-02-01"),
+    ],
     attendanceAliases: ["ehsan"],
   },
   "MDQ6VXNlcjE3NTgzNg==": {
@@ -195,6 +201,12 @@ export const tagMembers = {
     ghLogin: "LeaVerou",
     terms: [term("2021-02-01", "2025-02-01")],
     attendanceAliases: ["lea"],
+  },
+  U_kgDOAe_ilA: {
+    name: "Luke Warlow",
+    ghLogin: "lukewarlow",
+    terms: [associate("2026-03-06", "2027-02-01")],
+    attendanceAliases: ["luke"],
   },
   "MDQ6VXNlcjc4NjE4Nw==": {
     name: "Yoav Weiss",
