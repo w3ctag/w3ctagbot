@@ -175,6 +175,12 @@ export const tagMembers = {
     terms: [term("2018-02-01", "2020-02-01")],
     attendanceAliases: ["lukasz"],
   },
+  U_kgDOAApVhA: {
+    name: "Mike Pennisi",
+    ghLogin: "jugglinmike",
+    terms: [associate("2026-03-06", "2027-01-31")],
+    attendanceAliases: ["mike"],
+  },
   "MDQ6VXNlcjI0NDc3Mg==": {
     name: "Simon Pieters",
     ghLogin: "zcorpan",
