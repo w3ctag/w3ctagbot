@@ -12,7 +12,7 @@
     "test": "astro check && eslint . && tsc && DATABASE_URL=file:./prisma/test.db prisma db push && DATABASE_URL=file:./prisma/test.db vitest"
   },
   "dependencies": {
-    "@astrojs/node": "^10.0.4",
+    "@astrojs/node": "^10.0.5",
     "@github/relative-time-element": "^5.0.0",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@js-temporal/polyfill": "^0.5.1",
@@ -23,8 +23,8 @@
     "@octokit/webhooks": "^14.2.0",
     "@prisma/adapter-better-sqlite3": "^7.7.0",
     "@prisma/client": "^7.7.0",
-    "astro": "^6.1.6",
-    "dotenv": "^17.4.1",
+    "astro": "^6.1.8",
+    "dotenv": "^17.4.2",
     "lit": "^3.3.2",
     "mdast-util-from-markdown": "^2.0.3",
     "mdast-util-gfm": "^3.1.0",
@@ -47,13 +47,13 @@
     "@types/mdast": "^4.0.4",
     "@types/node": "^24.12.2",
     "@types/unist": "^3.0.3",
-    "eslint": "^10.2.0",
+    "eslint": "^10.2.1",
     "eslint-plugin-lit": "^2.2.1",
     "nock": "^14.0.12",
-    "prettier": "^3.8.2",
+    "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.58.1",
+    "typescript-eslint": "^8.58.2",
     "vitest": "^4.1.4"
   },
   "engines": {
