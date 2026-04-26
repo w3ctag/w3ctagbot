@@ -126,11 +126,7 @@ export class TagAgenda extends LitElement {
     pacificBreakout.setUTCHours(2 * 24); // 00:00 Wed GMT
     const atlanticBreakout = this._computeAtlantic(monday);
     const eurasiaBreakout = new Date(monday);
-    if (eurasiaBreakout < new Date("2026-04-01")) {
-      eurasiaBreakout.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
-    } else {
-      eurasiaBreakout.setUTCHours(24 * 3 + 8); // 08:00 Thu GMT
-    }
+    eurasiaBreakout.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
     let plenary: null | Date = null;
     if (this._plenaryWeek) {
       plenary = new Date(monday);
