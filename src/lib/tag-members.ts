@@ -17,7 +17,7 @@ function associate(start: string, end: string) {
 
 // This is a map from Github GraphQL node ID to information about that TAG member.
 // To get someone's node ID, run:
-// > gh api graphql -H "X-Github-Next-Global-ID: 1" -f query='query { user(login: "username") { id, login, name} }'
+// > gh api graphql -f query='query { user(login: "username") { id, login, name} }'
 export const tagMembers = {
   "MDQ6VXNlcjI4NzUyNg==": {
     name: "Daniel Appelquist",
@@ -94,7 +94,7 @@ export const tagMembers = {
     ],
     attendanceAliases: ["danc", "dan clark"],
   },
-  U_kgDOAEcXlQ: {
+  "MDQ6VXNlcjQ2NTkwOTM=": {
     name: "Heather Flanagan",
     ghLogin: "hlflanagan",
     terms: [term("2026-02-12", "2028-02-01")],
@@ -112,7 +112,7 @@ export const tagMembers = {
     terms: [term("2025-02-01", "2027-02-01")],
     attendanceAliases: ["xiaocheng"],
   },
-  U_kgDOAA1IZQ: {
+  "MDQ6VXNlcjg3MDUwMQ==": {
     name: "Brian Kardell",
     ghLogin: "bkardell",
     terms: [term("2026-02-06", "2028-02-01")],
@@ -175,7 +175,7 @@ export const tagMembers = {
     terms: [term("2018-02-01", "2020-02-01")],
     attendanceAliases: ["lukasz"],
   },
-  U_kgDOAApVhA: {
+  "MDQ6VXNlcjY3NzI1Mg==": {
     name: "Mike Pennisi",
     ghLogin: "jugglinmike",
     terms: [associate("2026-03-06", "2027-01-31")],
@@ -208,7 +208,7 @@ export const tagMembers = {
     terms: [term("2021-02-01", "2025-02-01")],
     attendanceAliases: ["lea"],
   },
-  U_kgDOAe_ilA: {
+  MDQ6VXNlcjMyNDk4MzI0: {
     name: "Luke Warlow",
     ghLogin: "lukewarlow",
     terms: [associate("2026-03-06", "2027-02-01")],
