@@ -124,20 +124,20 @@ export class TagAgenda extends LitElement {
       {
         time: pacificBreakout,
         meetingName: "Pacific Breakout (Asia / Australia / West America)",
-        meetingLabel: "pacific"
+        meetingLabel: "pacific" as const
       },
       { time: atlanticBreakout,
         meetingName: "Atlantic Breakout (America / Europe)",
-        meetingLabel: "atlantic"
+        meetingLabel: "atlantic" as const
       },
       {
         time: eurasiaBreakout,
         meetingName: "Eurasia Breakout (Europe / Asia / Australia)",
-        meetingLabel: "eurasia"
+        meetingLabel: "eurasia" as const
       },
       { time: plenary,
         meetingName: "Plenary Session",
-        meetingLabel: "plenary"
+        meetingLabel: "plenary" as const
       },
     ].sort((a, b) => {
       const aTime = a.time?.getTime(),
@@ -147,18 +147,6 @@ export class TagAgenda extends LitElement {
       if (bTime === undefined) return -1;
       return aTime - bTime;
     });
-  }
-
-  private _meetingAgendaItems():
-    Record<string, IssueOrPR[]>
-    {
-    return {
-      pacific: [],
-      atlantic: [],
-      eurasia: [],
-      plenary: [],
-      notScheduled: []
-    }
   }
 
   protected willUpdate(): void {
@@ -219,10 +207,16 @@ export class TagAgenda extends LitElement {
       return result;
     }
 
-    const meetingAgendaItems = this._meetingAgendaItems();
+    const meetingAgendaItems = {
+      pacific: Array<IssueOrPR>(),
+      atlantic: Array<IssueOrPR>(),
+      eurasia: Array<IssueOrPR>(),
+      plenary: Array<IssueOrPR>(),
+      notScheduled: Array<IssueOrPR>(),
+    };
     function organiseIssue(issue: IssueOrPR) {
       let assigned = false;
-      for (const meeting of Object.keys(meetingAgendaItems)) {
+      for (const meeting of Object.keys(meetingAgendaItems) as Array<keyof typeof meetingAgendaItems>) {
         for(const gitHubLabel of issue.labels?.nodes ?? []) {
           if (gitHubLabel && gitHubLabel.name.toLowerCase().includes(meeting)) {
             meetingAgendaItems[meeting].push(issue);
