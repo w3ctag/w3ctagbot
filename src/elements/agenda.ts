@@ -32,8 +32,7 @@ type SearchResult = NonNullable<
   NonNullable<IssueSearchQuery["search"]["nodes"]>[0]
 >;
 
-const earlyAtlanticHours = 4 * 24 + 13; // Friday @ 13:00 UTC
-const lateAtlanticHours = 2 * 24 + 17; // Wednesday @ 17:00 UTC
+type IssueOrPR = SearchResult & { __typename: "Issue" | "PullRequest" }
 
 @customElement("tag-agenda")
 export class TagAgenda extends LitElement {
@@ -89,9 +88,6 @@ export class TagAgenda extends LitElement {
   private _plenaryWeek: boolean = false;
 
   @state()
-  private _atlanticHours: number = earlyAtlanticHours;
-
-  @state()
   private _filename: string = "";
 
   @state()
@@ -104,27 +100,18 @@ export class TagAgenda extends LitElement {
     this._plenaryWeek = e.target.checked;
   }
 
-  private _atlanticChange(e: Event & { target: HTMLSelectElement }) {
-    this._atlanticHours = parseInt(e.target.value);
-  }
-
   private _dateChange(e: Event & { target: HTMLInputElement }) {
     if (e.target.valueAsDate) {
       this._weekOf = mondayBefore(e.target.valueAsDate);
     }
   }
 
-  private _computeAtlantic(monday: Date): Date | null {
-    const plenary = new Date(monday);
-    plenary.setUTCHours(this._atlanticHours);
-    return plenary;
-  }
-
   private _callTimes() {
     const monday = this._weekOf;
     const pacificBreakout = new Date(monday);
     pacificBreakout.setUTCHours(2 * 24); // 00:00 Wed GMT
-    const atlanticBreakout = this._computeAtlantic(monday);
+    const atlanticBreakout = new Date(monday);
+    atlanticBreakout.setUTCHours(2 * 24 + 17); // 17:00 Wed GMT
     const eurasiaBreakout = new Date(monday);
     eurasiaBreakout.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
     let plenary: null | Date = null;
@@ -136,14 +123,22 @@ export class TagAgenda extends LitElement {
     return [
       {
         time: pacificBreakout,
-        label: "Pacific Breakout (Asia / Australia / West America)",
+        meetingName: "Pacific Breakout (Asia / Australia / West America)",
+        meetingLabel: "pacific" as const
       },
-      { time: atlanticBreakout, label: "Atlantic Breakout (America / Europe)" },
+      { time: atlanticBreakout,
+        meetingName: "Atlantic Breakout (America / Europe)",
+        meetingLabel: "atlantic" as const
+      },
       {
         time: eurasiaBreakout,
-        label: "Eurasia Breakout (Europe / Asia / Australia)",
+        meetingName: "Eurasia Breakout (Europe / Asia / Australia)",
+        meetingLabel: "eurasia" as const
       },
-      { time: plenary, label: "Plenary Session" },
+      { time: plenary,
+        meetingName: "Plenary Session",
+        meetingLabel: "plenary" as const
+      },
     ].sort((a, b) => {
       const aTime = a.time?.getTime(),
         bTime = b.time?.getTime();
@@ -170,6 +165,11 @@ export class TagAgenda extends LitElement {
       return elem.__typename === "Issue" || elem.__typename === "PullRequest";
     }
 
+    const longPendingReviewIds = new Set<string>();
+    for(const review of this.longPendingReviews) {
+      longPendingReviewIds.add(review.id);
+    }
+
     function renderIssue(
       issue: SearchResult & { __typename: "Issue" | "PullRequest" },
     ) {
@@ -180,6 +180,7 @@ export class TagAgenda extends LitElement {
       } else {
         result = `* [${issue.repository.name}#${issue.number}: ${issue.title}](${issue.url})`;
       }
+
       const associated = new Set<string>();
       if (issue.__typename === "PullRequest" && issue.author) {
         associated.add(issue.author.login);
@@ -189,6 +190,7 @@ export class TagAgenda extends LitElement {
           }
         }
       }
+
       for (const assignee of issue.assignees.nodes ?? []) {
         if (assignee) {
           associated.add(assignee.login);
@@ -197,44 +199,62 @@ export class TagAgenda extends LitElement {
       if (associated.size > 0) {
         result += ` - ${[...associated].map((a) => `@${a}`).join(", ")}`;
       }
+
+      if(longPendingReviewIds.has(issue.id)){
+        result += ` — *pending external action for 6+ months*`
+      }
+
       return result;
     }
 
-    const issueText = `<!-- Agenda+ -->
+    const meetingAgendaItems = {
+      pacific: Array<IssueOrPR>(),
+      atlantic: Array<IssueOrPR>(),
+      eurasia: Array<IssueOrPR>(),
+      plenary: Array<IssueOrPR>(),
+      notScheduled: Array<IssueOrPR>(),
+    };
+    function organiseIssue(issue: IssueOrPR) {
+      let assigned = false;
+      for (const meeting of Object.keys(meetingAgendaItems) as Array<keyof typeof meetingAgendaItems>) {
+        for(const gitHubLabel of issue.labels?.nodes ?? []) {
+          if (gitHubLabel && gitHubLabel.name.toLowerCase().includes(meeting)) {
+            meetingAgendaItems[meeting].push(issue);
+            assigned = true;
+            break;
+          }
+        }
+      }
+      if (!assigned) {
+        meetingAgendaItems.notScheduled.push(issue);
+      }
+    }
 
-${this.agendaPRs
-  .filter(isUnshownIssueOrPR)
+    const organisedIssueIds = new Set<string>();
+    for (const issueList of [
+      this.agendaPRs,
+      this.agendaIssues,
+      this.pendingPRs,
+      this.openReviews,
+      this.longPendingReviews,
+    ]) {
+      for (const issue of issueList) {
+        if (issue.__typename !== "Issue" &&
+            issue.__typename !== "PullRequest") {
+              continue;
+        }
+        if (organisedIssueIds.has(issue.id)) continue;
+
+        organisedIssueIds.add(issue.id);
+        organiseIssue(issue);
+      }
+    }
+
+    const issueText = `<!-- Issues/PRs that have not been organised -->
+
+${meetingAgendaItems.notScheduled.filter(isUnshownIssueOrPR)
   .map((issue) => renderIssue(issue))
   .join("\n")}
-${this.agendaIssues
-  .filter(isUnshownIssueOrPR)
-  .map((issue) => renderIssue(issue))
-  .join("\n")}
-
-<!-- PRs -->
-
-${this.pendingPRs
-  .filter(isUnshownIssueOrPR)
-  .map((issue) => renderIssue(issue))
-  .join("\n")}
-
-<!-- Design Reviews -->
-
-${this.openReviews
-  .filter(isUnshownIssueOrPR)
-  .map((issue) => renderIssue(issue))
-  .join("\n")}
-${
-  this.longPendingReviews.length > 0
-    ? `
-<!-- Reviews that have been pending external action for at least 6 months -->
-
-`
-    : ""
-}${this.longPendingReviews
-      .filter(isUnshownIssueOrPR)
-      .map((issue) => renderIssue(issue))
-      .join("\n")}
 `;
 
     this._fileContents = `# Call Agenda
@@ -245,8 +265,8 @@ If you would like to add an item to the agenda or volunteer to scribe please ope
 
 ${calls
   .map(
-    ({ time, label }) => `
-## ${label} - ${
+    ({ time, meetingName, meetingLabel }) => `
+## ${meetingName} - ${
       time
         ? `[${utcDate(
             time,
@@ -255,6 +275,14 @@ ${calls
           )}&p1=224&p2=43&p3=136&p4=195&p5=33&p6=248&p7=240)`
         : "None"
     }
+${time ? "" :
+  "There is no plenary meeting this week but do we want to discuss these " +
+  "plenary items?"
+}
+${meetingAgendaItems[meetingLabel]
+  .map((issue) => renderIssue(issue))
+  .join("\n")
+}
 `,
   )
   .join("")}
@@ -281,8 +309,8 @@ Raw minutes: ...
 
 ${calls
   .map(
-    ({ time, label }) => `
-### ${label}
+    ({ time, meetingName }) => `
+### ${meetingName}
 
 ${
   time
@@ -335,12 +363,6 @@ ${
         @change=${this._plenaryChange}
         style="justify-self: start"
       />
-      <label for="atlantic">Atlantic Breakout</label>
-      <select id="atlantic" @change=${this._atlanticChange}>
-        <option value=${earlyAtlanticHours}>Friday Early</option>
-        <option value=${lateAtlanticHours}>Wednesday Late</option>
-        <option value="">No Plenary</option>
-      </select>
 
       <p>
         <a
