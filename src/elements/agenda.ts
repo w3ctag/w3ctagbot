@@ -111,6 +111,7 @@ export class TagAgenda extends LitElement {
     const pacificBreakout = new Date(monday);
     pacificBreakout.setUTCHours(2 * 24); // 00:00 Wed GMT
     const atlanticBreakout = new Date(monday);
+    atlanticBreakout.setUTCHours(2 * 24 + 17); // 17:00 Wed GMT
     const eurasiaBreakout = new Date(monday);
     eurasiaBreakout.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
     let plenary: null | Date = null;
@@ -280,7 +281,7 @@ ${calls
           )}&p1=224&p2=43&p3=136&p4=195&p5=33&p6=248&p7=240)`
         : "None"
     }
-${time ? "" : 
+${time ? "" :
   "There is no plenary meeting this week but do we want to discuss these " +
   "plenary items?"
 }
