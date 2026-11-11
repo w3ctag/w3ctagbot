@@ -165,10 +165,9 @@ export class TagAgenda extends LitElement {
       return elem.__typename === "Issue" || elem.__typename === "PullRequest";
     }
 
-    const longPendingReviewIds = new Set<string>();
-    for(const review of this.longPendingReviews) {
-      longPendingReviewIds.add(review.id);
-    }
+    const longPendingReviewIds = new Set(
+      this.longPendingReviews.map((review) => review.id),
+    );
 
     function renderIssue(
       issue: SearchResult & { __typename: "Issue" | "PullRequest" },
@@ -252,7 +251,7 @@ export class TagAgenda extends LitElement {
 
     const issueText = `<!-- Issues/PRs that have not been organised -->
 
-${meetingAgendaItems.notScheduled.filter(isUnshownIssueOrPR)
+${meetingAgendaItems.notScheduled
   .map((issue) => renderIssue(issue))
   .join("\n")}
 `;
