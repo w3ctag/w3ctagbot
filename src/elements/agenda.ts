@@ -211,7 +211,6 @@ export class TagAgenda extends LitElement {
           if (gitHubLabel && gitHubLabel.name.toLowerCase().includes(meeting)) {
             meetingAgendaItems[meeting].push(issue);
             assigned = true;
-            break;
           }
         }
       }
