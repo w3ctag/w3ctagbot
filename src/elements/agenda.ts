@@ -156,15 +156,6 @@ export class TagAgenda extends LitElement {
     this._filename = `${monday.toISOString().slice(5, 10)}-agenda.md`;
     const minutesFilename = `${monday.toISOString().slice(5, 10)}-minutes.md`;
 
-    const shownIssues = new Set<string>(); // Holds graphql node IDs.
-    function isUnshownIssueOrPR(
-      elem: SearchResult,
-    ): elem is SearchResult & { __typename: "Issue" | "PullRequest" } {
-      if (shownIssues.has(elem.id)) return false;
-      shownIssues.add(elem.id);
-      return elem.__typename === "Issue" || elem.__typename === "PullRequest";
-    }
-
     const longPendingReviewIds = new Set(
       this.longPendingReviews.map((review) => review.id),
     );
