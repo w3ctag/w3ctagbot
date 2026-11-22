@@ -109,15 +109,15 @@ export class TagAgenda extends LitElement {
   private _callTimes() {
     const monday = this._weekOf;
     const pacificBreakout = new Date(monday);
-    pacificBreakout.setUTCHours(2 * 24); // 00:00 Wed GMT
+    pacificBreakout.setUTCHours(22); // 22:00 Mon GMT
     const atlanticBreakout = new Date(monday);
-    atlanticBreakout.setUTCHours(2 * 24 + 17); // 17:00 Wed GMT
+    atlanticBreakout.setUTCHours(1 * 24 + 14); // 14:00 Tue GMT
     const eurasiaBreakout = new Date(monday);
-    eurasiaBreakout.setUTCHours(24 * 3 + 9); // 09:00 Thu GMT
+    eurasiaBreakout.setUTCHours(24 * 2 + 9); // 09:00 Wed GMT
     let plenary: null | Date = null;
     if (this._plenaryWeek) {
       plenary = new Date(monday);
-      plenary.setUTCHours(24 + 13); // 13:00 Tue GMT
+      plenary.setUTCHours(3 * 24 + 22); // 22:00 Thu GMT
     }
 
     return [
